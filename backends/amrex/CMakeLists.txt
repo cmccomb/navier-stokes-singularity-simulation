@@ -2,11 +2,14 @@ cmake_minimum_required(VERSION 3.24)
 project(ns_static_refinement LANGUAGES C CXX)
 include(FetchContent)
 
+# Opt in without changing the archived serial baseline or numerical precision.
+option(NS_ENABLE_OPENMP "Enable bounded CPU threading in AMReX and Hydro" OFF)
+
 # Immutable upstream source snapshots, with archive integrity checks.
 set(AMReX_SPACEDIM 3 CACHE STRING "" FORCE)
 set(AMReX_PRECISION DOUBLE CACHE STRING "" FORCE)
 set(AMReX_MPI OFF CACHE BOOL "" FORCE)
-set(AMReX_OMP OFF CACHE BOOL "" FORCE)
+set(AMReX_OMP ${NS_ENABLE_OPENMP} CACHE BOOL "" FORCE)
 set(AMReX_FORTRAN OFF CACHE BOOL "" FORCE)
 set(AMReX_PARTICLES OFF CACHE BOOL "" FORCE)
 set(AMReX_AMRLEVEL OFF CACHE BOOL "" FORCE)
@@ -21,7 +24,7 @@ FetchContent_MakeAvailable(amrex)
 
 set(HYDRO_SPACEDIM 3 CACHE STRING "" FORCE)
 set(HYDRO_MPI OFF CACHE BOOL "" FORCE)
-set(HYDRO_OMP OFF CACHE BOOL "" FORCE)
+set(HYDRO_OMP ${NS_ENABLE_OPENMP} CACHE BOOL "" FORCE)
 set(HYDRO_EB OFF CACHE BOOL "" FORCE)
 set(HYDRO_NO_EB ON CACHE BOOL "" FORCE)
 set(HYDRO_PROJECTIONS ON CACHE BOOL "" FORCE)
@@ -40,6 +43,15 @@ target_compile_definitions(ns_projection_pilot PRIVATE
   NS_AMREX_COMMIT="e60cdc18711ccf7fc0616d7a2fdf062021376976"
   NS_HYDRO_COMMIT="e49df248aabd2cc11865eb5be734a2f5f2f65ee5")
 enable_testing()
+add_executable(ns_threading_check threading_check.cpp)
+target_compile_features(ns_threading_check PRIVATE cxx_std_20)
+target_link_libraries(ns_threading_check PRIVATE amrex_hydro)
+add_test(NAME forcing_serial_blocks COMMAND ns_threading_check ns.force=shear ns.force_threads=1)
+if(NS_ENABLE_OPENMP)
+  add_test(NAME forcing_threaded_blocks COMMAND ns_threading_check ns.force=shear ns.force_threads=2)
+  add_test(NAME forcing_thread_cap COMMAND ns_threading_check ns.force=shear ns.force_threads=4)
+endif()
+
 add_executable(ns_profile_probe profile_probe.cpp)
 target_compile_features(ns_profile_probe PRIVATE cxx_std_20)
 add_executable(ns_force_probe force_probe.cpp)
@@ -105,4 +117,11 @@ if(NS_BUILD_INCFLO)
   add_executable(ns_archive_check archive_check.cpp)
   target_compile_features(ns_archive_check PRIVATE cxx_std_20)
   target_link_libraries(ns_archive_check PRIVATE amrex_hydro)
+endif()
+
+# Bound regression resource use even when the developer's shell has no OMP cap.
+if(NS_ENABLE_OPENMP)
+  get_property(ns_tests DIRECTORY PROPERTY TESTS)
+  set_tests_properties(${ns_tests} PROPERTIES PROCESSORS 2
+    ENVIRONMENT "OMP_NUM_THREADS=2;OMP_DYNAMIC=FALSE;OMP_THREAD_LIMIT=2")
 endif()

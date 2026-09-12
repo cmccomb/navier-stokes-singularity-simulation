@@ -10,6 +10,7 @@ import argparse
 import hashlib
 import json
 import math
+import os
 import platform
 import shutil
 import subprocess
@@ -19,6 +20,18 @@ from pathlib import Path
 
 SOURCES = ("ns_case.H", "incflo_overlay.py", "paper_profile.H", "paper_fields.H")
 MARKER = "NS_INCFLO_RESULT "
+
+
+def thread_environment(threads: int, force_threads: int) -> dict[str, str]:
+    """Explicit child-process limits, not mutations to the worker's environment."""
+    if threads < 1 or not 1 <= force_threads <= threads:
+        raise ValueError("require 1 <= force_threads <= threads")
+    return {
+        "OMP_NUM_THREADS": str(threads),
+        "OMP_THREAD_LIMIT": str(threads),
+        "OMP_DYNAMIC": "FALSE",
+        "OMP_MAX_ACTIVE_LEVELS": "1",
+    }
 
 
 def sha(path: Path) -> str:
@@ -47,6 +60,11 @@ def validate_history(text: str, record: dict) -> list[dict]:
     params = record["parameters"]
     clock = record["profile_manifest"]["parameters"]
     for i, row in enumerate(rows):
+        if (execution := record.get("execution")) and (
+            row.get("openmp_max_threads") != execution["threads"]
+            or row.get("force_threads_limit") != execution["force_threads"]
+        ):
+            raise ValueError("compiled/runtime threading differs from the run record")
         if row["case"] != "paper" or row["adapter_sha256"] != record["adapter_sha256"]:
             raise ValueError("case or compiled adapter does not match the record")
         if row["step"] != i or row["levels"] != len(params["widths"]) + 1:
@@ -109,7 +127,19 @@ def main() -> None:
     parser.add_argument("--epsilon-tau-ratio", type=float, default=0)
     parser.add_argument("--frame-dt", type=float, default=0.025)
     parser.add_argument("--timeout", type=float, default=86400)
+    parser.add_argument("--threads", type=int, default=1, help="solver OpenMP threads")
+    parser.add_argument(
+        "--force-threads",
+        type=int,
+        default=1,
+        help="concurrent force boxes; at most --threads (extra scratch per worker)",
+    )
     args = parser.parse_args()
+    try:
+        thread_env = thread_environment(args.threads, args.force_threads)
+    except ValueError as exc:
+        parser.error(str(exc))
+    child_env = {**os.environ, **thread_env}
     inputs = args.inputs.resolve(strict=True)
     table = args.table.resolve(strict=True)
     manifest = json.loads(table.with_suffix(table.suffix + ".json").read_text())
@@ -145,6 +175,8 @@ def main() -> None:
         f"stop_time={args.end:.17g}",
         f"ns.max_dt={args.max_dt:.17g}",
         f"ns.epsilon_tau_ratio={args.epsilon_tau_ratio:.17g}",
+        f"ns.force_threads={args.force_threads}",
+        f"ns.expected_omp_threads={args.threads}",
         f"amr.n_cell={args.base_n} {args.base_n} {args.base_n}",
         f"amr.max_level={len(args.widths)}",
         f"amr.max_grid_size={args.box}",
@@ -166,6 +198,11 @@ def main() -> None:
         "checker_sha256": sha(output / "ns_archive_check"),
         "inputs_sha256": sha(output / "inputs.paper"),
         "profile_manifest": manifest,
+        "execution": {
+            "threads": args.threads,
+            "force_threads": args.force_threads,
+            "environment": thread_env,
+        },
         "parameters": {
             "base_n": args.base_n,
             "widths": args.widths,
@@ -184,7 +221,11 @@ def main() -> None:
     try:
         with (output / "run.log").open("w") as log:
             process = subprocess.Popen(
-                command, cwd=output, stdout=log, stderr=subprocess.STDOUT
+                command,
+                cwd=output,
+                stdout=log,
+                stderr=subprocess.STDOUT,
+                env=child_env,
             )
             record["pid"] = process.pid
             write(output / "run.json", record)
@@ -216,6 +257,7 @@ def main() -> None:
                 text=True,
                 timeout=1800,
                 check=False,
+                env=child_env,
             )
             (output / f"{plot.name}-read.log").write_text(
                 checked.stdout + checked.stderr

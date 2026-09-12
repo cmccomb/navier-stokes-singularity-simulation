@@ -140,3 +140,17 @@ def test_actual_forcing_port_keeps_version_and_accuracy_boundaries():
     assert report["fine_force"]["passed"]
     assert len(report["fine_force"]["cases"]) == 18
     assert {r["n"] for r in report["fine_force"]["cases"]} == {1024, 16384}
+
+
+def test_threading_record_is_correctness_not_a_speedup_claim():
+    page = (SITE / "refinement.html").read_text()
+    assert "correctness checks, not measured speedups" in page
+    record = json.loads((SITE / "data/threading-validation.json").read_text())
+    assert record["limits"]["mpi_enabled"] is False
+    for key in ("same_binary_one_two", "same_binary_one_four"):
+        assert record[key]["passed"]
+        assert len(record[key]["frames"]) == 26
+        assert record[key]["velocity_linf_difference"] < 2e-16
+        assert record[key]["frames"][0]["peak_speed"] == 0
+    assert record["native_restriction"]["passed"]
+    assert record["native_restriction"]["restart_rejects_mesh_change"]

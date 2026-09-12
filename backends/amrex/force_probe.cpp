@@ -32,7 +32,11 @@ int main(int argc,char** argv) {
         }
         stream.close(); if (!stream) Abort("probe output write failed");
         Print()<<std::setprecision(17)<<"NS_FORCE_PROBE {\"n\":"<<n<<",\"time\":"<<t
-            <<",\"patch_width\":"<<width<<",\"dx\":"<<g.CellSize(0)<<",\"phase_limit\":"<<ns_paper::phase_limit(p,t)<<"}\n";
+            <<",\"patch_width\":"<<width<<",\"dx\":"<<g.CellSize(0)<<",\"phase_limit\":";
+        Real limit=ns_paper::phase_limit(p,t);
+        if (std::isfinite(limit)) Print()<<std::setprecision(17)<<limit;
+        else Print()<<"null";
+        Print()<<"}\n";
     }
     amrex::Finalize();
 }
