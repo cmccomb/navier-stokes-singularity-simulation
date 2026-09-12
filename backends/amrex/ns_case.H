@@ -8,6 +8,7 @@
 #include <AMReX_ParmParse.H>
 #include <AMReX_TagBox.H>
 #include <AMReX_OpenMP.H>
+#include <algorithm>
 #include <cmath>
 #include <deque>
 #include <iomanip>
@@ -27,6 +28,7 @@ struct Options {
     Real epsilon_tau_ratio = 0;
     std::string table_file;
     Vector<Real> widths;
+    Vector<Real> plot_times;
     bool diagnostics = false;
     int force_threads = 1;
     Options() {
@@ -37,6 +39,7 @@ struct Options {
         pp.query("epsilon_tau_ratio", epsilon_tau_ratio);
         pp.query("table_file", table_file);
         pp.queryarr("refine_half_width", widths);
+        pp.queryarr("plot_times", plot_times);
         pp.query("diagnostics", diagnostics);
         pp.query("force_threads", force_threads);
         int expected_threads=0;
@@ -57,9 +60,29 @@ struct Options {
         for (int l=0; l<widths.size(); ++l)
             if (!std::isfinite(widths[l]) || widths[l] <= 0 || widths[l] >= (l ? widths[l-1] : 1.0))
                 Abort("fixed refinement widths must decrease inside [-1,1]^3");
+        for (int i=0;i<plot_times.size();++i)
+            if (!std::isfinite(plot_times[i]) || plot_times[i]<0 ||
+                (i && plot_times[i]-plot_times[i-1]<=1.e-11))
+                Abort("prescribed output times must be finite and strictly separated");
     }
 };
 inline Options const& options() { static Options o; return o; }
+inline Real limit_plot_dt(Real time, Real dt) {
+    auto const& events=options().plot_times;
+    auto next=std::upper_bound(events.begin(),events.end(),time+1.e-12);
+    return next==events.end() ? dt : std::min(dt,*next-time);
+}
+inline bool plot_due(Real time) {
+    auto const& events=options().plot_times;
+    auto next=std::lower_bound(events.begin(),events.end(),time-1.e-12);
+    return next!=events.end() && std::abs(*next-time)<=1.e-12;
+}
+inline bool reached_end(Real time, Real end, Real dt) {
+    // Our diagnostic/archive contract accepts 2e-14 endpoint roundoff. Do not
+    // take a new tiny step after accepting that endpoint as an output event.
+    Real tolerance=options().max_dt<1e99 ? Real(2.e-14) : Real(1.e-12)*dt;
+    return time>=end-tolerance;
+}
 inline ns_paper::Profile const& profile() {
     static ns_paper::Profile p(options().table_file); return p;
 }
@@ -81,12 +104,13 @@ inline Real limit_dt(Real time, Real dt, bool zero_cfl=false) {
     auto const& o=options();
     if (o.force == "paper") {
         auto const& p=profile();
+        bool before_activation=p.cutoff_start-time>Real(16)*std::numeric_limits<Real>::epsilon()*std::max(Real(1),std::abs(p.cutoff_start));
         // Only skip over an exactly quiescent interval, ending at activation.
         // A nonzero velocity/force CFL must retain the upstream stability bound.
-        if (time<p.cutoff_start && zero_cfl && o.quiescent_max_dt>0)
+        if (before_activation && zero_cfl && o.quiescent_max_dt>0)
             return std::min(o.quiescent_max_dt,p.cutoff_start-time);
         dt=std::min(dt,ns_paper::phase_limit(p,time));
-        if (time<p.cutoff_start) dt=std::min(dt,p.cutoff_start-time);
+        if (before_activation) dt=std::min(dt,p.cutoff_start-time);
     }
     return std::min(dt,o.max_dt);
 }

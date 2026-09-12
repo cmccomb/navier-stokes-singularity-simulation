@@ -128,9 +128,14 @@ def generate(source: Path, destination: Path) -> None:
                 "if(! initialization && comb_cfl <= eps && ns_case::options().max_dt >= 1e99)",
             ),
             (
+                "if (dt_new < eps)",
+                "if (dt_new < eps && ns_case::options().max_dt >= 1e99 && ns_case::options().plot_times.empty())",
+            ),
+            (
                 "    // Don't overshoot specified plot times",
                 (
-                    "    dt_new = ns_case::limit_dt(m_cur_time, dt_new, comb_cfl == 0);\n\n"
+                    "    dt_new = ns_case::limit_dt(m_cur_time, dt_new, comb_cfl == 0);\n"
+                    "    dt_new = ns_case::limit_plot_dt(m_cur_time, dt_new);\n\n"
                     "    // Don't overshoot specified plot times"
                 ),
             ),
@@ -178,6 +183,15 @@ def generate(source: Path, destination: Path) -> None:
             (
                 "        m_cur_time += m_dt;",
                 "        m_cur_time += m_dt;\n        " + call,
+            ),
+            (
+                "        if (writeNow())",
+                "        if (ns_case::options().plot_times.empty() ? writeNow() : ns_case::plot_due(m_cur_time))",
+            ),
+            (
+                "m_cur_time >= m_stop_time - (1.e-12 * m_dt)",
+                "ns_case::reached_end(m_cur_time, m_stop_time, m_dt)",
+                2,
             ),
         ],
     )

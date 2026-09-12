@@ -44,6 +44,81 @@ def write(path: Path, record: dict) -> None:
     temporary.replace(path)
 
 
+def output_times(end: float, period: float, phase: float, clock: dict) -> list[float]:
+    """Predefine output events; the numerical integration clock stays independent."""
+    if not 0 < end < clock["t_star"] or period <= 0 or phase < 0:
+        raise ValueError("invalid output clock")
+    if phase == 0:
+        times = [i * period for i in range(math.floor(end / period + 1e-10) + 1)]
+        if abs(times[-1] - end) > 1e-13:
+            times.append(end)
+        return times
+    times = [0.0]
+    while times[-1] < end:
+        t = times[-1]
+        dt = min(period, end - t)
+        if t < clock["paper_time_cutoff_start"]:
+            dt = min(dt, clock["paper_time_cutoff_start"] - t)
+        elif clock["forcing_log_rate_bound"] > 0:
+            dt = min(
+                dt,
+                -(clock["t_star"] - t)
+                * math.expm1(-phase / clock["forcing_log_rate_bound"]),
+            )
+        next_time = min(end, t + dt)
+        if end - next_time <= 1e-13:
+            next_time = end
+        if next_time - t <= 1e-11 or len(times) >= 50000:
+            raise ValueError("unresolvable or excessive output schedule")
+        times.append(next_time)
+    return times
+
+
+def resource_check(
+    output: Path, pid: int, max_rss_mib: float, min_disk_free_gib: float
+) -> None:
+    if (
+        min_disk_free_gib
+        and shutil.disk_usage(output).free < min_disk_free_gib * 1024**3
+    ):
+        raise RuntimeError(
+            "disk reserve reached; stopping this run without deleting data"
+        )
+    if max_rss_mib:
+        result = subprocess.run(
+            ["ps", "-p", str(pid), "-o", "rss="],
+            capture_output=True,
+            text=True,
+            timeout=10,
+            check=False,
+        )
+        if not result.stdout.strip():
+            return  # child can finish between the wait and this inspection
+        rss = float(result.stdout.strip()) / 1024
+        if rss > max_rss_mib:
+            raise RuntimeError(
+                f"solver RSS {rss:.1f} MiB exceeds {max_rss_mib:.1f} MiB limit"
+            )
+
+
+def wait_bounded(
+    process: subprocess.Popen,
+    output: Path,
+    timeout: float,
+    max_rss_mib: float,
+    min_disk_free_gib: float,
+) -> int:
+    deadline = time.monotonic() + timeout
+    while True:
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            raise subprocess.TimeoutExpired(process.args, timeout)
+        try:
+            return process.wait(timeout=min(5, remaining))
+        except subprocess.TimeoutExpired:
+            resource_check(output, process.pid, max_rss_mib, min_disk_free_gib)
+
+
 def validate_history(text: str, record: dict) -> list[dict]:
     rows = [
         json.loads(line[len(MARKER) :])
@@ -91,7 +166,9 @@ def validate_history(text: str, record: dict) -> list[dict]:
             previous = rows[i - 1]["time"]
             if row["dt"] <= 0 or abs(row["time"] - previous - row["dt"]) > 2e-14:
                 raise ValueError("inconsistent time increment")
-            if previous >= clock["paper_time_cutoff_start"]:
+            if previous >= clock["paper_time_cutoff_start"] - 16 * math.ulp(1.0) * max(
+                1, abs(clock["paper_time_cutoff_start"])
+            ):
                 phase = clock["forcing_log_rate_bound"] * math.log1p(
                     row["dt"] / (clock["t_star"] - row["time"])
                 )
@@ -126,7 +203,25 @@ def main() -> None:
     parser.add_argument("--max-dt", type=float, default=0.00025)
     parser.add_argument("--epsilon-tau-ratio", type=float, default=0)
     parser.add_argument("--frame-dt", type=float, default=0.025)
+    parser.add_argument(
+        "--frame-phase-step",
+        type=float,
+        default=0,
+        help="optional forcing-phase output spacing, never an integration timestep",
+    )
     parser.add_argument("--timeout", type=float, default=86400)
+    parser.add_argument(
+        "--max-rss-mib",
+        type=float,
+        default=0,
+        help="solver RSS stop ceiling; zero disables",
+    )
+    parser.add_argument(
+        "--min-disk-free-gib",
+        type=float,
+        default=0,
+        help="stop with this disk reserve; zero disables",
+    )
     parser.add_argument("--threads", type=int, default=1, help="solver OpenMP threads")
     parser.add_argument(
         "--force-threads",
@@ -149,10 +244,29 @@ def main() -> None:
         0 < args.end < manifest["parameters"]["t_star"]
         and args.max_dt > 0
         and args.frame_dt > 0
+        and args.frame_phase_step >= 0
+        and args.timeout > 0
+        and args.max_rss_mib >= 0
+        and args.min_disk_free_gib >= 0
+        and all(
+            math.isfinite(value)
+            for value in (
+                args.end,
+                args.max_dt,
+                args.frame_dt,
+                args.frame_phase_step,
+                args.timeout,
+                args.max_rss_mib,
+                args.min_disk_free_gib,
+            )
+        )
     ):
         parser.error("invalid run clock")
     if args.base_n < 16 or args.base_n % 8 or args.box < 8 or args.box % 8:
         parser.error("mesh dimensions must be multiples of eight")
+    planned_frames = output_times(
+        args.end, args.frame_dt, args.frame_phase_step, manifest["parameters"]
+    )
     source_hashes = {name: sha(inputs.parent / name) for name in SOURCES}
     adapter_hash = hashlib.sha256(";".join(source_hashes.values()).encode()).hexdigest()
     args.output.mkdir(parents=True, exist_ok=False)
@@ -167,6 +281,7 @@ def main() -> None:
         shutil.copy2(source.resolve(strict=True), output / name)
     for name in SOURCES:
         shutil.copy2(inputs.parent / name, output / name)
+    shutil.copy2(Path(__file__), output / "paper_run.py")
     write(output / "profile.tbl.json", manifest)
     command = [
         str(output / "ns_incflo"),
@@ -186,6 +301,14 @@ def main() -> None:
         command.append(
             "ns.refine_half_width=" + " ".join(f"{w:.17g}" for w in args.widths)
         )
+    if args.frame_phase_step:
+        command.extend(
+            [
+                "amr.plot_per_exact=-1",
+                "amr.plot_int=1000000000",
+                "ns.plot_times=" + " ".join(f"{t:.17g}" for t in planned_frames),
+            ]
+        )
     record = {
         "schema_version": 1,
         "kind": "finite-paper-surrogate-from-rest-incflo",
@@ -197,11 +320,21 @@ def main() -> None:
         "binary_sha256": sha(output / "ns_incflo"),
         "checker_sha256": sha(output / "ns_archive_check"),
         "inputs_sha256": sha(output / "inputs.paper"),
+        "runner_sha256": sha(output / "paper_run.py"),
         "profile_manifest": manifest,
         "execution": {
             "threads": args.threads,
             "force_threads": args.force_threads,
             "environment": thread_env,
+            "library_environment": {
+                key: os.environ[key]
+                for key in (
+                    "DYLD_LIBRARY_PATH",
+                    "DYLD_FALLBACK_LIBRARY_PATH",
+                    "LD_LIBRARY_PATH",
+                )
+                if key in os.environ
+            },
         },
         "parameters": {
             "base_n": args.base_n,
@@ -211,6 +344,14 @@ def main() -> None:
             "max_dt": args.max_dt,
             "epsilon_tau_ratio": args.epsilon_tau_ratio,
             "frame_dt": args.frame_dt,
+            "frame_phase_step": args.frame_phase_step,
+        },
+        "planned_frames": planned_frames,
+        "limits": {
+            "wall_seconds": args.timeout,
+            "max_rss_mib": args.max_rss_mib,
+            "min_disk_free_gib": args.min_disk_free_gib,
+            "poll_seconds": 5,
         },
         "command": command,
         "native_frames": [],
@@ -219,6 +360,7 @@ def main() -> None:
     write(output / "run.json", record)
     start = time.monotonic()
     try:
+        resource_check(output, 0, 0, args.min_disk_free_gib)
         with (output / "run.log").open("w") as log:
             process = subprocess.Popen(
                 command,
@@ -230,8 +372,14 @@ def main() -> None:
             record["pid"] = process.pid
             write(output / "run.json", record)
             try:
-                code = process.wait(timeout=args.timeout)
-            except subprocess.TimeoutExpired:
+                code = wait_bounded(
+                    process,
+                    output,
+                    args.timeout,
+                    args.max_rss_mib,
+                    args.min_disk_free_gib,
+                )
+            except BaseException:
                 process.terminate()
                 try:
                     process.wait(timeout=15)
@@ -274,12 +422,7 @@ def main() -> None:
             record["native_frames"].append({"path": plot.name, **rows[0]})
             write(output / "run.json", record)
         frames = record["native_frames"]
-        expected_times = [
-            i * args.frame_dt
-            for i in range(math.floor(args.end / args.frame_dt + 1e-10) + 1)
-        ]
-        if not math.isclose(expected_times[-1], args.end, abs_tol=1e-13):
-            expected_times.append(args.end)
+        expected_times = planned_frames
         if len(frames) != len(expected_times) or any(
             abs(f["time"] - t) > 1e-12 for f, t in zip(frames, expected_times)
         ):
