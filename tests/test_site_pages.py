@@ -169,3 +169,44 @@ def test_fleet_sensitivity_keeps_failed_audit_and_uncertainty_visible():
     assert record["source_sensors"]["completed"]
     assert not record["candidate"]["production_accuracy_certified"]
     assert record["candidate"]["planned_frames"] == 280
+
+
+def test_refined_long_run_records_launch_not_completion():
+    page = (SITE / "refinement.html").read_text()
+    assert 'href="data/refined-long-run.json"' in page
+    assert "not a live progress counter or a completed result" in page
+    report = json.loads((SITE / "data/refined-long-run.json").read_text())
+    assert report["kind"] == "paired-refinement-launch-snapshot"
+    assert not report["production_accuracy_certified"]
+    assert report["preflight"]["validated"]
+    assert report["preflight"]["independent_history_revalidation"]
+    assert len(report["preflight"]["native_frames"]) == 3
+    assert abs(report["preflight"]["last"]["time"] - 0.552) < 2e-14
+    assert report["oliver_destination_check"]["passed"]
+    assert report["preserved_launch_failure"]["status"] == "failed"
+    assert report["preserved_launch_failure"]["initialized"] is False
+    primary, reference = report["runs"]["kay"], report["runs"]["oliver"]
+    for name in (
+        "adapter_sha256", "binary_sha256", "checker_sha256",
+        "inputs_sha256", "runner_sha256", "profile_sha256",
+    ):
+        assert primary[name] == reference[name]
+    assert primary["parameters"]["base_n"] == 2 * reference["parameters"]["base_n"]
+    assert primary["first"]["stored_cells"] == 8 * reference["first"]["stored_cells"]
+    assert primary["parameters"]["widths"] == reference["parameters"]["widths"]
+    assert primary["binary_sha256"] == report["preflight"]["binary_sha256"]
+    for run in (primary, reference):
+        assert run["status"] == "running" and run["prefix_history_valid"]
+        assert run["solver_process"]["pid"] == run["pid"]
+        assert run["first"]["time"] == run["first"]["peak_speed"] == 0
+        assert run["latest"]["time"] > 0.55
+        assert run["latest"]["peak_speed"] > 0
+        assert run["planned_frames"] == 280
+        assert run["planned_first"] == 0 and run["planned_last"] == 0.995
+        assert run["execution"]["threads"] == run["execution"]["force_threads"] == 4
+        assert run["initial_native_check"]["force_linf_error"] == 0
+        assert run["initial_native_check"]["composite_volume"] == 8
+        assert run["initial_native_check"]["checked_variables"] == [
+            "velx", "vely", "velz", "forcing_x", "forcing_y", "forcing_z",
+        ]
+    assert reference["execution"]["library_environment"]["DYLD_LIBRARY_PATH"]

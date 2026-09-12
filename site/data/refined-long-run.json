@@ -1,0 +1,438 @@
+{
+  "schema_version": 1,
+  "kind": "paired-refinement-launch-snapshot",
+  "scope": "Timestamped launch evidence for two independently evolving, full-domain, fixed-refinement AMReX/incflo runs from exact rest. This is not a live progress counter, completed result, continuum forcing certificate, or singularity claim.",
+  "source_commit": "b24716f4f1fa0b6a570a9aa4d377b41783967725",
+  "release": "ns-phase-fixed-20260912",
+  "bundle_sha256": "9d1854023ab4bd33c13adc5e719a58b94f0336fc33d11d7eefe872a248f08973",
+  "production_accuracy_certified": false,
+  "full_native_components": 6,
+  "primary_finest_equivalent_n": 2048,
+  "reference_finest_equivalent_n": 1024,
+  "raw_native_gib": {
+    "kay": 131.25,
+    "oliver": 16.40625,
+    "excludes": "headers and checkpoints"
+  },
+  "preflight": {
+    "status": "completed",
+    "validated": true,
+    "adapter_sha256": "36c8e5aa334a1dc94db25c6f02baced6156f5ccde4c2297f37fee117c6040d76",
+    "binary_sha256": "d389eabe02b2187e11567275b6b3b39acf15dde0498ed272411326946195ebfc",
+    "parameters": {
+      "base_n": 128,
+      "widths": [
+        0.5,
+        0.25,
+        0.125,
+        0.0625
+      ],
+      "box": 32,
+      "end": 0.552,
+      "max_dt": 0.00025,
+      "epsilon_tau_ratio": 0,
+      "frame_dt": 0.55,
+      "frame_phase_step": 0.75
+    },
+    "execution": {
+      "threads": 4,
+      "force_threads": 4,
+      "environment": {
+        "OMP_NUM_THREADS": "4",
+        "OMP_THREAD_LIMIT": "4",
+        "OMP_DYNAMIC": "FALSE",
+        "OMP_MAX_ACTIVE_LEVELS": "1"
+      },
+      "library_environment": {}
+    },
+    "planned_frames": [
+      0,
+      0.55,
+      0.552
+    ],
+    "native_frames": [
+      {
+        "path": "plt00000",
+        "time": 0,
+        "step": 0,
+        "levels": 5,
+        "stored_cells": 10485760,
+        "force_linf_error": 0,
+        "peak_speed": 0,
+        "compared": false,
+        "report_difference": false,
+        "reference_resolution_ratio": 1,
+        "time_difference": 0,
+        "velocity_linf_difference": 0,
+        "velocity_l2_difference": 0,
+        "reference_velocity_l2": 0,
+        "composite_volume": 8
+      },
+      {
+        "path": "plt00011",
+        "time": 0.5499999999999999,
+        "step": 11,
+        "levels": 5,
+        "stored_cells": 10485760,
+        "force_linf_error": 0,
+        "peak_speed": 0,
+        "compared": false,
+        "report_difference": false,
+        "reference_resolution_ratio": 1,
+        "time_difference": 0,
+        "velocity_linf_difference": 0,
+        "velocity_l2_difference": 0,
+        "reference_velocity_l2": 0,
+        "composite_volume": 8
+      },
+      {
+        "path": "plt00019",
+        "time": 0.5519999999999997,
+        "step": 19,
+        "levels": 5,
+        "stored_cells": 10485760,
+        "force_linf_error": 0,
+        "peak_speed": 2.0244936797752076e-48,
+        "compared": false,
+        "report_difference": false,
+        "reference_resolution_ratio": 1,
+        "time_difference": 0,
+        "velocity_linf_difference": 0,
+        "velocity_l2_difference": 0,
+        "reference_velocity_l2": 7.064488398624206e-49,
+        "composite_volume": 8
+      }
+    ],
+    "wall_seconds": 262.93549170800543,
+    "first": {
+      "schema_version": 1,
+      "adapter_sha256": "36c8e5aa334a1dc94db25c6f02baced6156f5ccde4c2297f37fee117c6040d76",
+      "case": "paper",
+      "problem": 0,
+      "step": 0,
+      "time": 0,
+      "dt": -1,
+      "levels": 5,
+      "stored_cells": 10485760,
+      "active_cells": 9437184,
+      "volume": 8,
+      "l2_error": 0,
+      "openmp_max_threads": 4,
+      "force_threads_limit": 4,
+      "linf_error": 0,
+      "peak_speed": 0,
+      "energy": 0,
+      "velocity_integral": [
+        0,
+        0,
+        0
+      ],
+      "peak_rss_mib": 6831.71875
+    },
+    "last": {
+      "schema_version": 1,
+      "adapter_sha256": "36c8e5aa334a1dc94db25c6f02baced6156f5ccde4c2297f37fee117c6040d76",
+      "case": "paper",
+      "problem": 0,
+      "step": 19,
+      "time": 0.5519999999999997,
+      "dt": 0.00025,
+      "levels": 5,
+      "stored_cells": 10485760,
+      "active_cells": 9437184,
+      "volume": 8,
+      "l2_error": 6.059878408941032e-49,
+      "openmp_max_threads": 4,
+      "force_threads_limit": 4,
+      "linf_error": 1.7326797725052528e-48,
+      "peak_speed": 2.0244936797752076e-48,
+      "energy": 1.9962798533689377e-96,
+      "velocity_integral": [
+        4.3455053878437405e-54,
+        -3.020672669864598e-55,
+        4.4813987273743164e-55
+      ],
+      "peak_rss_mib": 7187.453125
+    },
+    "peak_rss_mib": 7187.453125,
+    "original_record_sha256": "ea1d65693a2149943a0ec3a4f3b96722335a418b2d3803dfa31038716e30e00a",
+    "independent_history_revalidation": true
+  },
+  "oliver_destination_check": {
+    "passed": true,
+    "binary_sha256": "d389eabe02b2187e11567275b6b3b39acf15dde0498ed272411326946195ebfc",
+    "adapter_sha256": "36c8e5aa334a1dc94db25c6f02baced6156f5ccde4c2297f37fee117c6040d76",
+    "source_check": {
+      "actual_threads": 2,
+      "force_linf_difference": 0,
+      "passed": true
+    },
+    "velocity_linf_difference": 1.942890293094024e-16,
+    "frame_count": 33,
+    "original_record_sha256": "d09074ec40b0a6def78ef4086eb397ba9f0eac727c224a713fd8015d731ee92b"
+  },
+  "preserved_launch_failure": {
+    "host": "oliver",
+    "output": "reference-n64-l5-rest-t0995",
+    "status": "failed",
+    "validated": false,
+    "initialized": false,
+    "solver_exit_code": -6,
+    "reason": "OpenMP library was not found after caffeinate stripped the inherited per-process loader setting.",
+    "resolution": "Set DYLD_LIBRARY_PATH with env after caffeinate and use a fresh output directory; source, binary, global library configuration, and old output unchanged."
+  },
+  "runs": {
+    "kay": {
+      "status": "running",
+      "started_at": "2026-09-12T19:52:52.239690+00:00",
+      "adapter_sha256": "36c8e5aa334a1dc94db25c6f02baced6156f5ccde4c2297f37fee117c6040d76",
+      "binary_sha256": "d389eabe02b2187e11567275b6b3b39acf15dde0498ed272411326946195ebfc",
+      "checker_sha256": "1e2b85432ed0681da68f5b823da2ef30c75ecf94ff1b6306b52d7112ecb3c60c",
+      "inputs_sha256": "810310f9bebf26a04dfc60a55a08f31b5bd0d36e93ac12ee8b43525369c3f1e6",
+      "runner_sha256": "ef5ebc1de271aabafb49587c38fbee199da1aaddb1639987f34bcb4c1feaa7ec",
+      "execution": {
+        "threads": 4,
+        "force_threads": 4,
+        "environment": {
+          "OMP_NUM_THREADS": "4",
+          "OMP_THREAD_LIMIT": "4",
+          "OMP_DYNAMIC": "FALSE",
+          "OMP_MAX_ACTIVE_LEVELS": "1"
+        },
+        "library_environment": {}
+      },
+      "parameters": {
+        "base_n": 128,
+        "widths": [
+          0.5,
+          0.25,
+          0.125,
+          0.0625
+        ],
+        "box": 32,
+        "end": 0.995,
+        "max_dt": 0.00025,
+        "epsilon_tau_ratio": 0,
+        "frame_dt": 0.025,
+        "frame_phase_step": 0.75
+      },
+      "limits": {
+        "wall_seconds": 172800,
+        "max_rss_mib": 11776,
+        "min_disk_free_gib": 20,
+        "poll_seconds": 5
+      },
+      "pid": 92937,
+      "observed_at": "2026-09-12T19:57:10.482545+00:00",
+      "output": "refined-n128-l5-rest-t0995",
+      "profile_sha256": "fb613aa587c4bd42d63af26ac783e71f02b0380f570813a027b752a82f20f994",
+      "planned_frames": 280,
+      "planned_first": 0,
+      "planned_last": 0.995,
+      "first": {
+        "schema_version": 1,
+        "adapter_sha256": "36c8e5aa334a1dc94db25c6f02baced6156f5ccde4c2297f37fee117c6040d76",
+        "case": "paper",
+        "problem": 0,
+        "step": 0,
+        "time": 0,
+        "dt": -1,
+        "levels": 5,
+        "stored_cells": 10485760,
+        "active_cells": 9437184,
+        "volume": 8,
+        "l2_error": 0,
+        "openmp_max_threads": 4,
+        "force_threads_limit": 4,
+        "linf_error": 0,
+        "peak_speed": 0,
+        "energy": 0,
+        "velocity_integral": [
+          0,
+          0,
+          0
+        ],
+        "peak_rss_mib": 7159.109375
+      },
+      "latest": {
+        "schema_version": 1,
+        "adapter_sha256": "36c8e5aa334a1dc94db25c6f02baced6156f5ccde4c2297f37fee117c6040d76",
+        "case": "paper",
+        "problem": 0,
+        "step": 27,
+        "time": 0.5512499999999999,
+        "dt": 0.00025,
+        "levels": 5,
+        "stored_cells": 10485760,
+        "active_cells": 9437184,
+        "volume": 8,
+        "l2_error": 8.250422322480241e-78,
+        "openmp_max_threads": 4,
+        "force_threads_limit": 4,
+        "linf_error": 2.3554036569797416e-77,
+        "peak_speed": 2.5077109588365326e-77,
+        "energy": 3.0524655749749824e-154,
+        "velocity_integral": [
+          5.338672137549503e-83,
+          -1.8581411527048692e-84,
+          5.691786211340177e-84
+        ],
+        "peak_rss_mib": 7247.296875
+      },
+      "prefix_rows": 28,
+      "prefix_history_valid": true,
+      "solver_process": {
+        "pid": 92937,
+        "parent_pid": 92933,
+        "elapsed": "04:18",
+        "rss_mib": 6467.8125,
+        "executable_basename": "ns_incflo"
+      },
+      "disk_free_gib": 176.08370971679688,
+      "initial_native_check": {
+        "plot": "plt00000",
+        "time": 0,
+        "levels": 5,
+        "stored_cells": 10485760,
+        "force_linf_error": 0,
+        "peak_speed": 0,
+        "composite_volume": 8,
+        "checked_variables": [
+          "velx",
+          "vely",
+          "velz",
+          "forcing_x",
+          "forcing_y",
+          "forcing_z"
+        ]
+      }
+    },
+    "oliver": {
+      "status": "running",
+      "started_at": "2026-09-12T19:54:16.661890+00:00",
+      "adapter_sha256": "36c8e5aa334a1dc94db25c6f02baced6156f5ccde4c2297f37fee117c6040d76",
+      "binary_sha256": "d389eabe02b2187e11567275b6b3b39acf15dde0498ed272411326946195ebfc",
+      "checker_sha256": "1e2b85432ed0681da68f5b823da2ef30c75ecf94ff1b6306b52d7112ecb3c60c",
+      "inputs_sha256": "810310f9bebf26a04dfc60a55a08f31b5bd0d36e93ac12ee8b43525369c3f1e6",
+      "runner_sha256": "ef5ebc1de271aabafb49587c38fbee199da1aaddb1639987f34bcb4c1feaa7ec",
+      "execution": {
+        "threads": 4,
+        "force_threads": 4,
+        "environment": {
+          "OMP_NUM_THREADS": "4",
+          "OMP_THREAD_LIMIT": "4",
+          "OMP_DYNAMIC": "FALSE",
+          "OMP_MAX_ACTIVE_LEVELS": "1"
+        },
+        "library_environment": {
+          "DYLD_LIBRARY_PATH": "/opt/homebrew/opt/libomp/lib"
+        }
+      },
+      "parameters": {
+        "base_n": 64,
+        "widths": [
+          0.5,
+          0.25,
+          0.125,
+          0.0625
+        ],
+        "box": 32,
+        "end": 0.995,
+        "max_dt": 0.00025,
+        "epsilon_tau_ratio": 0,
+        "frame_dt": 0.025,
+        "frame_phase_step": 0.75
+      },
+      "limits": {
+        "wall_seconds": 86400,
+        "max_rss_mib": 3072,
+        "min_disk_free_gib": 20,
+        "poll_seconds": 5
+      },
+      "pid": 99300,
+      "observed_at": "2026-09-12T19:57:10.541713+00:00",
+      "output": "reference-n64-l5-rest-t0995-loader-fixed",
+      "profile_sha256": "fb613aa587c4bd42d63af26ac783e71f02b0380f570813a027b752a82f20f994",
+      "planned_frames": 280,
+      "planned_first": 0,
+      "planned_last": 0.995,
+      "first": {
+        "schema_version": 1,
+        "adapter_sha256": "36c8e5aa334a1dc94db25c6f02baced6156f5ccde4c2297f37fee117c6040d76",
+        "case": "paper",
+        "problem": 0,
+        "step": 0,
+        "time": 0,
+        "dt": -1,
+        "levels": 5,
+        "stored_cells": 1310720,
+        "active_cells": 1179648,
+        "volume": 8,
+        "l2_error": 0,
+        "openmp_max_threads": 4,
+        "force_threads_limit": 4,
+        "linf_error": 0,
+        "peak_speed": 0,
+        "energy": 0,
+        "velocity_integral": [
+          0,
+          0,
+          0
+        ],
+        "peak_rss_mib": 1131.53125
+      },
+      "latest": {
+        "schema_version": 1,
+        "adapter_sha256": "36c8e5aa334a1dc94db25c6f02baced6156f5ccde4c2297f37fee117c6040d76",
+        "case": "paper",
+        "problem": 0,
+        "step": 74,
+        "time": 0.5618425336447767,
+        "dt": 0.00025,
+        "levels": 5,
+        "stored_cells": 1310720,
+        "active_cells": 1179648,
+        "volume": 8,
+        "l2_error": 6.680752459698207e-11,
+        "openmp_max_threads": 4,
+        "force_threads_limit": 4,
+        "linf_error": 2.291439800661562e-10,
+        "peak_speed": 1.2450267095895688e-8,
+        "energy": 7.092903590892116e-17,
+        "velocity_integral": [
+          1.0725802636320583e-13,
+          -6.424096929884095e-14,
+          6.8945508880183615e-15
+        ],
+        "peak_rss_mib": 1248.15625
+      },
+      "prefix_rows": 75,
+      "prefix_history_valid": true,
+      "solver_process": {
+        "pid": 99300,
+        "parent_pid": 99296,
+        "elapsed": "02:54",
+        "rss_mib": 1248.203125,
+        "executable_basename": "ns_incflo"
+      },
+      "disk_free_gib": 60.18656539916992,
+      "initial_native_check": {
+        "plot": "plt00000",
+        "time": 0,
+        "levels": 5,
+        "stored_cells": 1310720,
+        "force_linf_error": 0,
+        "peak_speed": 0,
+        "composite_volume": 8,
+        "checked_variables": [
+          "velx",
+          "vely",
+          "velz",
+          "forcing_x",
+          "forcing_y",
+          "forcing_z"
+        ]
+      }
+    }
+  }
+}

@@ -266,10 +266,15 @@ existing native frames and checkpoints intact. The runner itself is copied
 and hashed along with the solver inputs; per-process loader overrides are
 recorded. No fleet machine's global library configuration is changed.
 
-The current large candidate is 128³ base with half-widths
+The large experiment launched on September 12, 2026, is 128³ base with half-widths
 `0.5 0.25 0.125 0.0625`, from rest to 0.995. At output phase 0.75 and maximum gap
 0.025 it needs 280 full-native frames, about 131.25 GiB before checkpoints.
-Deployment requires a full-size activation/memory check first. Local
+The corrected full-size activation/memory check passed: 19 steps through 0.552,
+three native events, zero force-readback difference, and 7.02 GiB peak RSS.
+Kay's run and Oliver's paired 64³-base reference use the same five-level regions,
+binary, profile, integration clock, and output events. This is a launch, not a
+completed or accuracy-certified result; see the timestamped
+[launch record](../../site/data/refined-long-run.json). Local
 `scripts.force_resolution_scan` sensors show appreciable source discretization
 sensitivity even when velocity sensitivity is below 1%; they are overlapping
 local samples, not a global norm or production accuracy certificate. See the
@@ -297,5 +302,20 @@ preflight remains recorded as failed: an upstream tiny-step fallback enlarged
 a roundoff-limited activation step and overshot the requested endpoint. The
 controlled-run overlay now suppresses that fallback, recognizes activation
 roundoff, and uses the archive contract's 2e-14 endpoint tolerance. A dedicated
-0.55-spaced output regression exercises the trigger; full-size repetition is
-required before the long run.
+0.55-spaced output regression exercises the trigger; the full-size repetition
+passed before the long run was launched.
+
+On a Mac needing a per-process OpenMP loader path, place `env` **after** system
+wrappers such as `caffeinate`, which can strip inherited `DYLD_*` variables:
+
+```sh
+nohup /usr/bin/caffeinate -i /usr/bin/env \
+  DYLD_LIBRARY_PATH=/opt/homebrew/opt/libomp/lib \
+  /path/to/python -m scripts.paper_run [recorded run arguments]
+```
+
+Resolve and verify the destination's existing runtime first; do not assume this
+path exists on every machine. Confirm `execution.library_environment` in the
+new run record and the live solver process. Oliver's first detached attempt
+failed before initialization and remains preserved; the corrected launch uses
+a fresh output directory without changing any global library configuration.
