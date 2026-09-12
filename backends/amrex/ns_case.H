@@ -7,6 +7,7 @@
 #include <AMReX_MultiFabUtil.H>
 #include <AMReX_ParmParse.H>
 #include <AMReX_TagBox.H>
+#include <AMReX_OpenMP.H>
 #include <cmath>
 #include <deque>
 #include <iomanip>
@@ -27,6 +28,7 @@ struct Options {
     std::string table_file;
     Vector<Real> widths;
     bool diagnostics = false;
+    int force_threads = 1;
     Options() {
         ParmParse pp("ns");
         pp.query("force", force);
@@ -36,6 +38,15 @@ struct Options {
         pp.query("table_file", table_file);
         pp.queryarr("refine_half_width", widths);
         pp.query("diagnostics", diagnostics);
+        pp.query("force_threads", force_threads);
+        int expected_threads=0;
+        pp.query("expected_omp_threads", expected_threads);
+        if (expected_threads < 0 || (expected_threads && expected_threads!=OpenMP::get_max_threads()))
+            Abort("OpenMP thread configuration does not match ns.expected_omp_threads");
+        if (force_threads < 1) Abort("ns.force_threads must be positive");
+#ifndef AMREX_USE_OMP
+        if (force_threads != 1) Abort("ns.force_threads > 1 requires NS_ENABLE_OPENMP=ON");
+#endif
         if (force != "none" && force != "rest" && force != "oscillation" && force != "shear" && force != "paper")
             Abort("ns.force must be none, rest, oscillation, shear, or paper");
         if (!std::isfinite(max_dt) || max_dt <= 0) Abort("ns.max_dt must be finite and positive");
@@ -51,6 +62,9 @@ struct Options {
 inline Options const& options() { static Options o; return o; }
 inline ns_paper::Profile const& profile() {
     static ns_paper::Profile p(options().table_file); return p;
+}
+inline int force_thread_limit() {
+    return std::min(options().force_threads, OpenMP::get_max_threads());
 }
 inline void validate(Real fixed_dt, int regrid_int, bool constant_density, Real density, Real nu) {
     auto const& o=options();
@@ -82,6 +96,9 @@ struct ForceRecord {
     std::shared_ptr<MultiFab> values;
 };
 inline std::shared_ptr<MultiFab const> paper_force(int level, MultiFab const& layout, Geometry const& g, Real time) {
+    // The cache is owned by the integrator thread. Only independent boxes below
+    // run concurrently; never mutate the cache or initialize profile data there.
+    if (OpenMP::in_parallel()) Abort("paper_force must be called outside an OpenMP region");
     auto const& p=profile();
     for (int c=0;c<3;++c)
         if (g.ProbLo(c)!=-p.domain || g.ProbHi(c)!=p.domain || !g.isPeriodic(c))
@@ -96,9 +113,18 @@ inline std::shared_ptr<MultiFab const> paper_force(int level, MultiFab const& la
             record.values->boxArray()==layout.boxArray() &&
             record.values->DistributionMap()==layout.DistributionMap()) return record.values;
     auto value=std::make_shared<MultiFab>(layout.boxArray(),layout.DistributionMap(),3,0);
-    for (MFIter mfi(*value);mfi.isValid();++mfi) {
-        auto source=ns_paper::force(p,mfi.validbox(),g,time,options().epsilon_tau_ratio);
-        (*value)[mfi].copy(source);
+    [[maybe_unused]] int threads=force_thread_limit();
+    Real epsilon_tau_ratio=options().epsilon_tau_ratio;
+#ifdef AMREX_USE_OMP
+#pragma omp parallel num_threads(threads) if(threads > 1)
+#endif
+    {
+        // Whole boxes bound scratch memory to one stencil working set per worker.
+        // Tiling would repeat padded potential evaluations around every tile.
+        for (MFIter mfi(*value);mfi.isValid();++mfi) {
+            auto source=ns_paper::force(p,mfi.validbox(),g,time,epsilon_tau_ratio);
+            (*value)[mfi].copy(source);
+        }
     }
     records.push_back({time,g.CellSize(0),value});
     // f(t_n) and f(t_n+dt) suffice for MOL. Shared ownership also makes a
@@ -129,31 +155,43 @@ inline Real exact_value(int problem, Real x, Real y, Real z, Real t, int c, Real
     return 0;
 }
 inline void add_force(int level, MultiFab& f, Geometry const& g, Real time, Real end, Real nu) {
+    if (OpenMP::in_parallel()) Abort("add_force must be called outside an OpenMP region");
     auto const& mode=options().force;
     if (mode == "none" || mode == "rest") return;
+    [[maybe_unused]] int threads=force_thread_limit();
     if (mode == "paper") {
         if (time<=profile().cutoff_start && (end<0 || end<=profile().cutoff_start)) return;
         auto first=paper_force(level,f,g,time);
         auto second=end>=0 ? paper_force(level,f,g,end) : first;
-        for (MFIter mfi(f);mfi.isValid();++mfi) {
-            auto a=f.array(mfi); auto b=first->const_array(mfi),c=second->const_array(mfi);
-            LoopOnCpu(mfi.validbox(),[&](int i,int j,int k) {
-                for (int d=0;d<3;++d) a(i,j,k,d)+=.5*(b(i,j,k,d)+c(i,j,k,d));
-            });
+#ifdef AMREX_USE_OMP
+#pragma omp parallel num_threads(threads) if(threads > 1)
+#endif
+        {
+            for (MFIter mfi(f);mfi.isValid();++mfi) {
+                auto a=f.array(mfi); auto b=first->const_array(mfi),c=second->const_array(mfi);
+                LoopOnCpu(mfi.validbox(),[&](int i,int j,int k) {
+                    for (int d=0;d<3;++d) a(i,j,k,d)+=.5*(b(i,j,k,d)+c(i,j,k,d));
+                });
+            }
         }
         return;
     }
     auto dx=g.CellSizeArray(); auto lo=g.ProbLoArray();
-    for (MFIter mfi(f); mfi.isValid(); ++mfi) {
-        auto a=f.array(mfi);
-        LoopOnCpu(mfi.validbox(), [&](int i,int j,int k) {
-            Real x=lo[0]+(i+0.5)*dx[0], y=lo[1]+(j+0.5)*dx[1], z=lo[2]+(k+0.5)*dx[2];
-            for (int c=0;c<3;++c) {
-                Real value=force_value(mode,x,y,z,time,c,nu);
-                if (end >= 0) value=0.5*(value+force_value(mode,x,y,z,end,c,nu));
-                a(i,j,k,c)+=value;
-            }
-        });
+#ifdef AMREX_USE_OMP
+#pragma omp parallel num_threads(threads) if(threads > 1)
+#endif
+    {
+        for (MFIter mfi(f); mfi.isValid(); ++mfi) {
+            auto a=f.array(mfi);
+            LoopOnCpu(mfi.validbox(), [&](int i,int j,int k) {
+                Real x=lo[0]+(i+0.5)*dx[0], y=lo[1]+(j+0.5)*dx[1], z=lo[2]+(k+0.5)*dx[2];
+                for (int c=0;c<3;++c) {
+                    Real value=force_value(mode,x,y,z,time,c,nu);
+                    if (end >= 0) value=0.5*(value+force_value(mode,x,y,z,end,c,nu));
+                    a(i,j,k,c)+=value;
+                }
+            });
+        }
     }
 }
 inline void tag_fixed_region(int level, TagBoxArray& tags, Geometry const& g) {
@@ -213,8 +251,8 @@ inline void diagnose(Vector<MultiFab const*> const& vel, Vector<Geometry> const&
     Real domain_volume=1;
     for (int c=0;c<3;++c) domain_volume*=geom[0].ProbHi(c)-geom[0].ProbLo(c);
     if (std::abs(volume-domain_volume)>1e-10) Abort("composite diagnostic volume does not cover the domain");
-    // Current target is explicitly serial CPU. No misleading distributed reduction.
-    if (ParallelDescriptor::NProcs()!=1) Abort("diagnostic reductions require the serial validation build");
+    // Diagnostics deliberately retain serial summation order. No MPI reductions.
+    if (ParallelDescriptor::NProcs()!=1) Abort("diagnostic reductions require a single MPI process");
     struct rusage usage{}; getrusage(RUSAGE_SELF,&usage);
     Real rss=usage.ru_maxrss;
 #ifdef __APPLE__
@@ -227,6 +265,7 @@ inline void diagnose(Vector<MultiFab const*> const& vel, Vector<Geometry> const&
         <<options().force<<"\",\"problem\":"<<problem<<",\"step\":"<<step<<",\"time\":"<<time
         <<",\"dt\":"<<dt<<",\"levels\":"<<vel.size()<<",\"stored_cells\":"<<stored
         <<",\"active_cells\":"<<active<<",\"volume\":"<<volume<<",\"l2_error\":"<<std::sqrt(sumsq/volume)
+        <<",\"openmp_max_threads\":"<<OpenMP::get_max_threads()<<",\"force_threads_limit\":"<<force_thread_limit()
         <<",\"linf_error\":"<<maxerr<<",\"peak_speed\":"<<peak<<",\"energy\":"<<energy
         <<",\"velocity_integral\":["<<integral[0]<<","<<integral[1]<<","<<integral[2]
         <<"],\"peak_rss_mib\":"<<rss<<"}\n";

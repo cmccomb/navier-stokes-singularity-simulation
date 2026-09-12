@@ -3,7 +3,7 @@ from copy import deepcopy
 
 import pytest
 
-from scripts.paper_run import MARKER, validate_history
+from scripts.paper_run import MARKER, thread_environment, validate_history
 
 
 def fixture():
@@ -72,3 +72,28 @@ def test_paper_history_checks_from_rest_and_phase_clock():
         validate_history(text(rows), changed)
     with pytest.raises(ValueError, match="endpoint"):
         validate_history(text(rows[:-1]), record)
+
+
+def test_explicit_child_thread_limits():
+    assert thread_environment(2, 1) == {
+        "OMP_NUM_THREADS": "2",
+        "OMP_THREAD_LIMIT": "2",
+        "OMP_DYNAMIC": "FALSE",
+        "OMP_MAX_ACTIVE_LEVELS": "1",
+    }
+    for solver, force in [(0, 1), (-1, 1), (2, 0), (1, 2)]:
+        with pytest.raises(ValueError, match="force_threads"):
+            thread_environment(solver, force)
+
+
+def test_runtime_threading_must_match_provenance():
+    record, rows = fixture()
+    record["execution"] = {"threads": 2, "force_threads": 1}
+    for row in rows:
+        row.update(openmp_max_threads=2, force_threads_limit=1)
+    assert validate_history(text(rows), record) == rows
+    for key in ("openmp_max_threads", "force_threads_limit"):
+        altered = deepcopy(rows)
+        altered[1][key] = 4
+        with pytest.raises(ValueError, match="threading"):
+            validate_history(text(altered), record)
