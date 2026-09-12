@@ -130,7 +130,8 @@ def generate(source: Path, destination: Path) -> None:
             (
                 "    // Don't overshoot specified plot times",
                 (
-                    "    dt_new = ns_case::limit_dt(m_cur_time, dt_new, comb_cfl == 0);\n\n"
+                    "    dt_new = ns_case::limit_dt(m_cur_time, dt_new, comb_cfl == 0);\n"
+                    "    dt_new = ns_case::limit_plot_dt(m_cur_time, dt_new);\n\n"
                     "    // Don't overshoot specified plot times"
                 ),
             ),
@@ -178,6 +179,10 @@ def generate(source: Path, destination: Path) -> None:
             (
                 "        m_cur_time += m_dt;",
                 "        m_cur_time += m_dt;\n        " + call,
+            ),
+            (
+                "        if (writeNow())",
+                "        if (ns_case::options().plot_times.empty() ? writeNow() : ns_case::plot_due(m_cur_time))",
             ),
         ],
     )

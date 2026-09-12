@@ -67,6 +67,7 @@ def main() -> None:
     parser.add_argument("--build", type=Path, default=Path("build/amrex-omp"))
     parser.add_argument("--table", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--frame-phase-step", type=float, default=0)
     parser.add_argument(
         "--end",
         type=float,
@@ -140,6 +141,8 @@ def main() -> None:
                 "0.00025",
                 "--frame-dt",
                 "0.025",
+                "--frame-phase-step",
+                str(args.frame_phase_step),
                 "--timeout",
                 "300",
             ]

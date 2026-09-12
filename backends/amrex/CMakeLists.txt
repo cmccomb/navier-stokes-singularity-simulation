@@ -47,6 +47,8 @@ add_executable(ns_threading_check threading_check.cpp)
 target_compile_features(ns_threading_check PRIVATE cxx_std_20)
 target_link_libraries(ns_threading_check PRIVATE amrex_hydro)
 add_test(NAME forcing_serial_blocks COMMAND ns_threading_check ns.force=shear ns.force_threads=1)
+add_test(NAME prescribed_output_clock COMMAND ns_threading_check ns.force=shear ns.force_threads=1
+  "ns.plot_times=0 0.025 0.05 0.063 0.0645 0.065")
 if(NS_ENABLE_OPENMP)
   add_test(NAME forcing_threaded_blocks COMMAND ns_threading_check ns.force=shear ns.force_threads=2)
   add_test(NAME forcing_thread_cap COMMAND ns_threading_check ns.force=shear ns.force_threads=4)

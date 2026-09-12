@@ -7,6 +7,16 @@ int main(int argc, char** argv) {
     {
         using namespace amrex;
         auto const& opt=ns_case::options();
+        for (int i=0;i<opt.plot_times.size();++i) {
+            Real t=opt.plot_times[i];
+            if (!ns_case::plot_due(t) || !ns_case::plot_due(t+2.e-13) || ns_case::plot_due(t+2.e-12))
+                Abort("prescribed output acceptance tolerance mismatch");
+            Real dt=i+1<opt.plot_times.size() ? opt.plot_times[i+1]-t : 1.;
+            if (ns_case::limit_plot_dt(t,dt)!=dt || ns_case::limit_plot_dt(t,dt/4)!=dt/4)
+                Abort("output clock enlarged a bound or skipped an event");
+            if (ns_case::limit_plot_dt(t-5.e-13,dt)<dt*.99)
+                Abort("accepted output event caused a duplicate tiny step");
+        }
         if (opt.force!="shear" && opt.force!="paper") Abort("check requires shear or paper forcing");
         int requested=ns_case::force_thread_limit(), actual=1;
 #ifdef AMREX_USE_OMP

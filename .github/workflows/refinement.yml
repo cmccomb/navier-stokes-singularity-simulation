@@ -74,7 +74,7 @@ jobs:
       - run: python -m scripts.force_bridge --table outputs/paper-ci.tbl --output outputs/force-ci
       - run: python -m scripts.fine_force_bridge --table outputs/paper-ci.tbl --output outputs/fine-force-ci
       - run: python -m scripts.paper_run --table outputs/paper-ci.tbl --output outputs/paper-ci --base-n 16 --widths 0.5 --end 0.62 --max-dt 0.00025 --frame-dt 0.025 --timeout 600
-      - run: python -m scripts.threading_regression --build build/amrex --table outputs/paper-ci.tbl --output outputs/threading-ci
+      - run: python -m scripts.threading_regression --build build/amrex --table outputs/paper-ci.tbl --frame-phase-step 0.75 --output outputs/threading-ci
       - run: python -m scripts.archive_restriction_check --build build/amrex --output outputs/restriction-ci
       - uses: actions/upload-artifact@v4
         if: always()
