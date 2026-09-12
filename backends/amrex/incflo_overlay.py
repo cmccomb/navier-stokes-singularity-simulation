@@ -136,9 +136,11 @@ def generate(source: Path, destination: Path) -> None:
             ),
             (
                 "dt_new = std::trunc((m_cur_time + dt_new) / m_plot_per_exact) * m_plot_per_exact - m_cur_time;",
-                # A quiescent step can cross several intervals. Stop at the
-                # first scheduled output, not the last interval crossed.
-                "dt_new = (std::floor((m_cur_time + eps) / m_plot_per_exact) + 1) * m_plot_per_exact - m_cur_time;",
+                # Stop at the first event. Match writeNow's 1e-12 acceptance
+                # tolerance: a frame already accepted a few ulps below its
+                # nominal time must not cause a duplicate ~1e-15 step. min
+                # also prevents this tolerance from enlarging a CFL bound.
+                "dt_new = amrex::min(dt_new, (std::floor((m_cur_time + 1.e-12) / m_plot_per_exact) + 1) * m_plot_per_exact - m_cur_time);",
             ),
         ],
     )

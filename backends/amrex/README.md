@@ -182,3 +182,18 @@ arrays preserve the original full-domain sample coordinates; only interior
 cells, clear of artificial periodic patch edges, enter the comparison. Both
 velocity and force agree within the recorded gates. This is a local stencil
 agreement test, not a simulation at that effective full-domain resolution.
+
+For matched-grid temporal sensitivity, `ns_archive_check` accepts
+`compare=other_plot report_difference=1`. It retains instantaneous-force
+verification but reports the velocity difference instead of enforcing the
+restart-equality gate. Composite L² excludes covered coarse cells; L∞ includes
+all stored cells. Mesh, domain, variable names, and output times must match
+(within 1e-12 for the report mode). The default still enforces restart equality.
+At `t=0.625`, the first reference/finer-time pair differs by 0.0414% relative
+composite L². This is not a late-time bound or a measured convergence order.
+
+The longer pinned probes exposed roundoff-scale duplicate output events.
+The next-launch clipper uses the same 1e-12 acceptance tolerance as upstream
+`writeNow`, and never enlarges an existing CFL-limited step. A 0.00025-ceiling
+rerun has all 26 scheduled frames without duplicate events; a final tiny
+endpoint cleanup step remains. The running pinned probes were not patched.
