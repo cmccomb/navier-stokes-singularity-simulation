@@ -88,8 +88,9 @@ The integration edits matter for an oscillatory case from rest:
   every stored level.
 
 These smooth manufactured problems do not establish accuracy for the actual
-oscillatory pulse hierarchy. The current build is serial CPU, double precision,
-and constant unit density; the fleet runs independent checks, not distributed
+oscillatory pulse hierarchy. The default build is serial CPU, double precision,
+and constant unit density; opt-in OpenMP shares work within one Mac. The fleet
+runs independent checks, not distributed
 subdomains of one trajectory. Set `NS_BUILD_INCFLO=OFF` for operator-only builds.
 
 The archived fourteen-case suite identifies source commit `ec253643b31d`.
@@ -147,7 +148,7 @@ The new revision agrees exactly on the interior plateau and remains a discrete
 curl. This is a versioned modeling change, not a relabeling of old results.
 
 ```sh
-python -m navier_stokes_sim.amrex_profile --localized --output outputs/profile.tbl
+python -m navier_stokes_sim.amrex_profile --config backends/amrex/paper-reference.json --output outputs/profile.tbl
 python -m scripts.profile_bridge --table outputs/profile.tbl --output outputs/profile-check.json
 python -m scripts.force_bridge --table outputs/profile.tbl --output outputs/force-check
 python -m scripts.fine_force_bridge --table outputs/profile.tbl --output outputs/fine-force-check
@@ -187,8 +188,12 @@ For matched-grid temporal sensitivity, `ns_archive_check` accepts
 `compare=other_plot report_difference=1`. It retains instantaneous-force
 verification but reports the velocity difference instead of enforcing the
 restart-equality gate. Composite L² excludes covered coarse cells; L∞ includes
-all stored cells. Mesh, domain, variable names, and output times must match
-(within 1e-12 for the report mode). The default still enforces restart equality.
+all stored cells. Domain, variable names, refinement regions, and output times
+must match (within 1e-12 for the report mode). A finer reference can be volume
+averaged to the comparison grid at an aligned integer refinement ratio;
+uncovered/mismatched regions are rejected. The default still enforces restart
+equality without changing meshes. `scripts.archive_restriction_check` verifies
+the averaging against an analytic initial Taylor field, not an evolved result.
 At `t=0.625`, the first reference/finer-time pair differs by 0.0414% relative
 composite L². This is not a late-time bound or a measured convergence order.
 
@@ -197,3 +202,33 @@ The next-launch clipper uses the same 1e-12 acceptance tolerance as upstream
 `writeNow`, and never enlarges an existing CFL-limited step. A 0.00025-ceiling
 rerun has all 26 scheduled frames without duplicate events; a final tiny
 endpoint cleanup step remains. The running pinned probes were not patched.
+
+## Bounded OpenMP
+
+Configure with `-DNS_ENABLE_OPENMP=ON` to enable AMReX/Hydro CPU threading.
+On macOS, the verified build uses an existing Homebrew LLVM/OpenMP toolchain:
+
+```sh
+cmake -S backends/amrex -B build/amrex-omp -DCMAKE_BUILD_TYPE=Release \
+  -DNS_ENABLE_OPENMP=ON \
+  -DCMAKE_C_COMPILER=/opt/homebrew/opt/llvm/bin/clang \
+  -DCMAKE_CXX_COMPILER=/opt/homebrew/opt/llvm/bin/clang++
+cmake --build build/amrex-omp --parallel 2
+python -m scripts.threading_regression --build build/amrex-omp \
+  --table outputs/profile.tbl --output outputs/threading-check --end 0.62
+python -m scripts.paper_run --executable build/amrex-omp/ns_incflo \
+  --checker build/amrex-omp/ns_archive_check --threads 2 --force-threads 2 \
+  --table outputs/profile.tbl --output outputs/threaded-paper-check \
+  --base-n 16 --widths 0.5 --end 0.62 --max-dt 0.00025
+```
+
+The default remains one thread. The runner explicitly caps `OMP_NUM_THREADS`,
+`OMP_THREAD_LIMIT`, nested teams, and dynamic sizing, and records those limits.
+`--force-threads` separately bounds per-box source scratch memory. Cached force
+lookup/insertion and diagnostic summation stay outside parallel regions.
+The same binary agrees within 1.4e-16 for one/two threads and 1.7e-16 for
+one/four threads across all 26 from-rest native frames through 0.62. Late-time
+per-box source comparisons are exactly equal. See the
+[threading record](../../site/data/threading-validation.json). These checks do
+not measure a speedup or establish late-time accuracy. Verify the destination's
+OpenMP runtime before deploying a dynamically linked binary. MPI stays off.

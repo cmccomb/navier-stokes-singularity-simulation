@@ -67,6 +67,12 @@ def main() -> None:
     parser.add_argument("--build", type=Path, default=Path("build/amrex-omp"))
     parser.add_argument("--table", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument(
+        "--end",
+        type=float,
+        default=0.62,
+        help="matched from-rest endpoint after forcing activation",
+    )
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
     build, table = args.build.resolve(strict=True), args.table.resolve(strict=True)
@@ -129,9 +135,9 @@ def main() -> None:
                 "--widths",
                 "0.5",
                 "--end",
-                "0.56",
+                str(args.end),
                 "--max-dt",
-                "0.0005",
+                "0.00025",
                 "--frame-dt",
                 "0.025",
                 "--timeout",
