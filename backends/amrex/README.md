@@ -3,9 +3,10 @@
 This backend validates the pressure-projection operator needed for full-domain,
 fixed local refinement. It uses the established AMReX-Hydro MAC projector and
 AMReX multilevel multigrid, with double precision and immutable upstream source
-pins in `CMakeLists.txt`. The coupled `incflo` integrator now advances
-incompressible Navier–Stokes in manufactured validation cases. It does **not**
-yet apply the project's paper-surrogate force or produce a new vortex animation.
+pins in `CMakeLists.txt`. The coupled `incflo` integrator advances
+incompressible Navier–Stokes with both verification sources and the project's
+finite paper-surrogate force. The latter has cross-language field checks and
+a small from-rest trajectory test, not yet a spatial-convergence certificate.
 
 The [first-class documentation page](https://cmccomb.com/navier-stokes-singularity-simulation/refinement.html)
 contains the mesh derivation, measured results, limitations, and next gates.
@@ -56,7 +57,7 @@ be compared directly with a macOS physical-footprint measurement.
 `7491eea4d69bbfde0581a5fe7f95d803841a8a09` against the same AMReX libraries.
 `incflo_overlay.py` generates a separate source tree with exact-count edits;
 it leaves the downloaded upstream unchanged and refuses source drift.
-`ns_case.H` supplies only analytic verification forces, fixed-region tagging,
+`ns_case.H` supplies verification or finite-surrogate forces, fixed-region tagging,
 and volume-weighted composite diagnostics. Covered coarse cells are excluded.
 
 ```sh
@@ -115,11 +116,10 @@ underresolved by that conservative criterion. The new
 `navier_stokes_sim.refinement_design` module reproduces this screen. It does not
 generate a production mesh or certify the full force, weak tails, or errors.
 
-There is deliberately no production-run option. Before a refined from-rest
-trajectory can replace the existing 192³ result, implement and verify the
-actual finite-surrogate force evaluation and multilevel movie/export path.
+Before a refined from-rest trajectory can replace the existing 192³ result,
+verify its actual-force convergence and the multilevel movie/export path.
 The upstream coupled update, interpolation, synchronization, and native archive
-now have manufactured-case checks, not a project-force convergence certificate.
+have manufactured-case checks, not a project-force convergence certificate.
 Audit the entire active
 support and all relevant phase gradients, then separate spatial, temporal, and
 force-difference convergence. The pilot's convenient nested cubes are not yet
@@ -128,3 +128,49 @@ an accepted forcing-informed production mesh.
 CI builds the actual C++ backend and runs the four-level convergence suite when
 backend-related files change. The Python unit tests alone do not validate the
 numerical operator.
+
+## Finite paper forcing, versioned and cross-checked
+
+`amrex_profile` exports the existing SciPy cubic coefficients and physical
+parameters. `paper_profile.H` evaluates those same potentials in C++;
+`paper_fields.H` applies the original centered curl, finite correction passes,
+and force stencil at each level's spacing. This preserves a **grid-dependent
+finite surrogate**, not the proof's infinite pulse/correction construction.
+Force is prescribed independently of the evolving numerical state:
+`f_h = centered_dt(u_h) + u_h · centered_grad(u_h) - nu * laplace_h(u_h)`.
+
+The port exposed missing fixed localization on the core swirl potential.
+`appendix-b-axis-v2-localized` applies that cutoff to the core `A_z` term;
+the already-localized exterior term is unchanged. The old v1 remains selectable
+and remains the default for reproducibility. Existing movies are v1, not v2.
+The new revision agrees exactly on the interior plateau and remains a discrete
+curl. This is a versioned modeling change, not a relabeling of old results.
+
+```sh
+python -m navier_stokes_sim.amrex_profile --localized --output outputs/profile.tbl
+python -m scripts.profile_bridge --table outputs/profile.tbl --output outputs/profile-check.json
+python -m scripts.force_bridge --table outputs/profile.tbl --output outputs/force-check
+python -m scripts.paper_run --table outputs/profile.tbl --output outputs/paper-smoke \
+  --base-n 16 --widths 0.5 --end 0.62 --max-dt 0.0005 --frame-dt 0.025
+```
+
+Export and Python/PhiFlow comparisons require the project's scientific Python
+dependencies. `paper_run` itself uses only the standard library and built C++
+binaries. Each run pins its binary, input, table, manifest, and adapter sources;
+it records every solver step and reads back all native velocity/force frames.
+It refuses existing output directories and has a bounded runtime. `run.json`
+starts as `running`; a `completed` status also requires clock and archive checks.
+
+The force clock retains the exported log-phase ceiling in addition to CFL and
+`ns.max_dt`. An optional `ns.epsilon_tau_ratio` caps the force derivative window
+relative to `T-t`; zero preserves the original rule. Only an exactly zero CFL
+before activation permits larger quiescent steps. Those steps stop at the next
+output time and at activation, so no scheduled frame is skipped. Two cached
+force times per level avoid repeated evaluations within MOL stages; this adds
+six double-precision values per stored cell. Native forcing excludes pressure.
+
+The first two-level v2 trajectory passes exact rest, all 26 scheduled frames
+through `t=0.62`, and zero measured full-field force readback error. Its coarse
+mesh does not establish physical accuracy. Separate fleet runs test spatial and
+temporal sensitivity. See the [forcing-port record](../../site/data/paper-port.json)
+and [documentation](https://cmccomb.com/navier-stokes-singularity-simulation/refinement.html#paper-force).

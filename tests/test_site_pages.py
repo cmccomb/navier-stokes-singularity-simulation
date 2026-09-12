@@ -79,7 +79,7 @@ def test_refinement_pilot_is_documentation_not_a_replacement_flow_run() -> None:
     page = (SITE / "refinement.html").read_text()
     assert 'href="refinement.html"' in docs
     assert 'href="data/refinement-pilot.json"' in page
-    assert "not a new paper-surrogate trajectory" in page
+    assert "not a new best movie or a singularity demonstration" in page
     assert "manufactured tests, not validation of the paper-surrogate forcing" in page
     report = json.loads((SITE / "data/refinement-pilot.json").read_text())
     assert report["passed"] and len(report["cases"]) == 9
@@ -116,3 +116,24 @@ def test_coupled_validation_remains_distinct_from_the_project_force():
     assert capacity["passed"] is False  # Keep the original failed gate visible.
     assert capacity["resolution"]["status"] == "fixed"
     assert all(r["volume"] == 8 for r in capacity["resolution"]["regression"]["rows"])
+
+
+def test_actual_forcing_port_keeps_version_and_accuracy_boundaries():
+    page = (SITE / "refinement.html").read_text()
+    assert 'href="data/paper-port.json"' in page
+    assert "Existing homepage movies remain v1" in page
+    assert "convergence probes, not accepted production meshes" in page
+    report = json.loads((SITE / "data/paper-port.json").read_text())
+    assert report["localization"]["default_changed"] is False
+    for revision in ("legacy", "localized"):
+        assert report["profile_points"][revision]["passed"]
+        assert len(report["profile_points"][revision]["cases"]) == 40
+        assert report["fields"][revision]["passed"]
+        assert len(report["fields"][revision]["cases"]) == 14
+    smoke = report["smoke"]
+    assert smoke["validated"] and smoke["status"] == "completed"
+    assert smoke["final"]["time"] == 0.62
+    assert len(smoke["native_frames"]) == 26
+    assert smoke["native_frames"][0]["peak_speed"] == 0
+    assert all(f["force_linf_error"] == 0 for f in smoke["native_frames"])
+    assert report["earlier_output_failure"]["validated"] is False
