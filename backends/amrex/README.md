@@ -232,3 +232,70 @@ per-box source comparisons are exactly equal. See the
 [threading record](../../site/data/threading-validation.json). These checks do
 not measure a speedup or establish late-time accuracy. Verify the destination's
 OpenMP runtime before deploying a dynamically linked binary. MPI stays off.
+
+## Native comparisons, phase-spaced output, and run limits
+
+`scripts.paper_comparison` checks pinned source/input/profile identities, the
+complete available diagnostic prefix from rest, all requested native fields,
+and controlled spatial or temporal parameter changes. It does not rewrite a
+run's original status. Legacy duplicate output events are listed and compared;
+missing requested events still fail. The 32³/64³-base pair differs by 6.12%
+relative composite velocity L² at 0.65, versus 0.0439% for halved time limits.
+The temporal difference at 0.85 is 0.0672%. Two runs do not establish order.
+
+```sh
+python -m scripts.paper_comparison --coarse outputs/reference \
+  --reference outputs/time-fine --kind temporal --output outputs/time-comparison
+python -m scripts.paper_comparison --coarse outputs/reference \
+  --reference outputs/space-fine --kind spatial --times 0 0.625 0.65 \
+  --output outputs/space-comparison
+```
+
+`--frame-phase-step` optionally predefines increasingly dense native output
+times using the exported forcing-rate bound. `--frame-dt` remains the maximum
+physical-time output gap. These output parameters are distinct from numerical
+`--max-dt` and the table's forcing-phase ceiling. Events can only shorten the
+integration step; all expected events, including rest and the endpoint, are
+retained in `run.json` and checked against native archives. The default zero
+frame-phase step preserves uniform output scheduling.
+
+`--max-rss-mib` and `--min-disk-free-gib` optionally stop the owned solver if a
+resource threshold is crossed. They are polled every five seconds, not OS hard
+limits. `--timeout` limits solver wall time. A stop records failure and leaves
+existing native frames and checkpoints intact. The runner itself is copied
+and hashed along with the solver inputs; per-process loader overrides are
+recorded. No fleet machine's global library configuration is changed.
+
+The current large candidate is 128³ base with half-widths
+`0.5 0.25 0.125 0.0625`, from rest to 0.995. At output phase 0.75 and maximum gap
+0.025 it needs 280 full-native frames, about 131.25 GiB before checkpoints.
+Deployment requires a full-size activation/memory check first. Local
+`scripts.force_resolution_scan` sensors show appreciable source discretization
+sensitivity even when velocity sensitivity is below 1%; they are overlapping
+local samples, not a global norm or production accuracy certificate. See the
+[first-class refinement documentation](https://cmccomb.com/navier-stokes-singularity-simulation/refinement.html#next-refined-run)
+and [machine-readable evidence](../../site/data/fleet-sensitivity.json).
+
+`ns_slice_export` reads native AMReX plotfiles and samples three orthogonal
+zero-plane views using the finest containing cell. Ties at a zero-plane face
+use the positive-side native cell. No spatial smoothing is applied. An analytic
+initial-field fixture with three refinement levels checks all orientations and
+level selection independently of the rendered pictures. Disable initialization
+projection only for this fixture so it remains exactly the known field; normal
+scientific runs retain their existing projection settings.
+
+```sh
+python -m scripts.render_native_gifs --run outputs/validated-paper-run \
+  --output outputs/native-gifs
+```
+
+The GIF renderer requires a validated complete event sequence, preserves every
+saved state, fixes color scales across time and orientations, and records field
+and GIF hashes. It produces velocity and body-force GIFs in XZ and XY views.
+Display pixel count is not a solver resolution. The first full-size resource
+preflight remains recorded as failed: an upstream tiny-step fallback enlarged
+a roundoff-limited activation step and overshot the requested endpoint. The
+controlled-run overlay now suppresses that fallback, recognizes activation
+roundoff, and uses the archive contract's 2e-14 endpoint tolerance. A dedicated
+0.55-spaced output regression exercises the trigger; full-size repetition is
+required before the long run.

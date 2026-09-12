@@ -68,13 +68,15 @@ jobs:
       - run: python -m scripts.refinement_pilot --levels 4 --output outputs/projection-ci
       - run: python -m scripts.diffusion_pilot --output outputs/diffusion-ci
       - run: python -m scripts.coupled_pilot --output outputs/coupled-ci
-      - run: python -m pip install -e .
+      - run: python -m pip install -e '.[dev]'
+      - run: python -m pytest -q tests/test_native_slice_export.py
       - run: python -m navier_stokes_sim.amrex_profile --config backends/amrex/paper-reference.json --output outputs/paper-ci.tbl
       - run: python -m scripts.profile_bridge --table outputs/paper-ci.tbl --output outputs/profile-ci.json
       - run: python -m scripts.force_bridge --table outputs/paper-ci.tbl --output outputs/force-ci
       - run: python -m scripts.fine_force_bridge --table outputs/paper-ci.tbl --output outputs/fine-force-ci
       - run: python -m scripts.paper_run --table outputs/paper-ci.tbl --output outputs/paper-ci --base-n 16 --widths 0.5 --end 0.62 --max-dt 0.00025 --frame-dt 0.025 --timeout 600
       - run: python -m scripts.threading_regression --build build/amrex --table outputs/paper-ci.tbl --frame-phase-step 0.75 --output outputs/threading-ci
+      - run: python -m scripts.paper_run --table outputs/paper-ci.tbl --output outputs/activation-ci --base-n 16 --widths 0.5 --end 0.552 --frame-dt 0.55 --frame-phase-step 0.75 --threads 2 --force-threads 2 --timeout 120
       - run: python -m scripts.archive_restriction_check --build build/amrex --output outputs/restriction-ci
       - uses: actions/upload-artifact@v4
         if: always()
@@ -90,5 +92,6 @@ jobs:
             outputs/paper-ci
             outputs/paper-ci.tbl*
             outputs/threading-ci
+            outputs/activation-ci
             outputs/restriction-ci
           if-no-files-found: ignore

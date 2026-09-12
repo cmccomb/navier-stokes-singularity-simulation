@@ -7,6 +7,9 @@ int main(int argc, char** argv) {
     {
         using namespace amrex;
         auto const& opt=ns_case::options();
+        if (opt.max_dt<1e99 && (!ns_case::reached_end(.552-2.e-15,.552,1.e-18)
+            || ns_case::reached_end(.552-.00025,.552,.00025)))
+            Abort("endpoint roundoff check failed");
         for (int i=0;i<opt.plot_times.size();++i) {
             Real t=opt.plot_times[i];
             if (!ns_case::plot_due(t) || !ns_case::plot_due(t+2.e-13) || ns_case::plot_due(t+2.e-12))

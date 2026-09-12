@@ -77,6 +77,12 @@ inline bool plot_due(Real time) {
     auto next=std::lower_bound(events.begin(),events.end(),time-1.e-12);
     return next!=events.end() && std::abs(*next-time)<=1.e-12;
 }
+inline bool reached_end(Real time, Real end, Real dt) {
+    // Our diagnostic/archive contract accepts 2e-14 endpoint roundoff. Do not
+    // take a new tiny step after accepting that endpoint as an output event.
+    Real tolerance=options().max_dt<1e99 ? Real(2.e-14) : Real(1.e-12)*dt;
+    return time>=end-tolerance;
+}
 inline ns_paper::Profile const& profile() {
     static ns_paper::Profile p(options().table_file); return p;
 }
@@ -98,12 +104,13 @@ inline Real limit_dt(Real time, Real dt, bool zero_cfl=false) {
     auto const& o=options();
     if (o.force == "paper") {
         auto const& p=profile();
+        bool before_activation=p.cutoff_start-time>Real(16)*std::numeric_limits<Real>::epsilon()*std::max(Real(1),std::abs(p.cutoff_start));
         // Only skip over an exactly quiescent interval, ending at activation.
         // A nonzero velocity/force CFL must retain the upstream stability bound.
-        if (time<p.cutoff_start && zero_cfl && o.quiescent_max_dt>0)
+        if (before_activation && zero_cfl && o.quiescent_max_dt>0)
             return std::min(o.quiescent_max_dt,p.cutoff_start-time);
         dt=std::min(dt,ns_paper::phase_limit(p,time));
-        if (time<p.cutoff_start) dt=std::min(dt,p.cutoff_start-time);
+        if (before_activation) dt=std::min(dt,p.cutoff_start-time);
     }
     return std::min(dt,o.max_dt);
 }

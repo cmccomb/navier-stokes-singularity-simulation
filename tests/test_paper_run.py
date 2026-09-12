@@ -143,3 +143,16 @@ def test_resource_ceilings_are_scoped_and_stop_without_cleanup(monkeypatch, tmp_
         resource_check(tmp_path, 123, 1, 20)
     with pytest.raises(RuntimeError, match="disk reserve"):
         resource_check(tmp_path, 123, 3, 40)
+
+
+def test_activation_roundoff_still_enforces_active_step_caps():
+    record, rows = fixture()
+    rows[2]["time"] -= 1e-16
+    rows[2]["dt"] = rows[2]["time"] - rows[1]["time"]
+    rows[3]["dt"] = rows[3]["time"] - rows[2]["time"]
+    validate_history(text(rows), record)
+    changed = deepcopy(rows)
+    changed[-1]["dt"] = 0.025
+    changed[-1]["time"] = rows[2]["time"] + 0.025
+    with pytest.raises(ValueError, match="phase step|timestep ceiling"):
+        validate_history(text(changed), record)

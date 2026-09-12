@@ -166,7 +166,9 @@ def validate_history(text: str, record: dict) -> list[dict]:
             previous = rows[i - 1]["time"]
             if row["dt"] <= 0 or abs(row["time"] - previous - row["dt"]) > 2e-14:
                 raise ValueError("inconsistent time increment")
-            if previous >= clock["paper_time_cutoff_start"]:
+            if previous >= clock["paper_time_cutoff_start"] - 16 * math.ulp(1.0) * max(
+                1, abs(clock["paper_time_cutoff_start"])
+            ):
                 phase = clock["forcing_log_rate_bound"] * math.log1p(
                     row["dt"] / (clock["t_star"] - row["time"])
                 )

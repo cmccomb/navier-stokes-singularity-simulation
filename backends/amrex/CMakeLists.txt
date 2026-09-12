@@ -48,7 +48,7 @@ target_compile_features(ns_threading_check PRIVATE cxx_std_20)
 target_link_libraries(ns_threading_check PRIVATE amrex_hydro)
 add_test(NAME forcing_serial_blocks COMMAND ns_threading_check ns.force=shear ns.force_threads=1)
 add_test(NAME prescribed_output_clock COMMAND ns_threading_check ns.force=shear ns.force_threads=1
-  "ns.plot_times=0 0.025 0.05 0.063 0.0645 0.065")
+  ns.max_dt=0.00025 "ns.plot_times=0 0.025 0.05 0.063 0.0645 0.065")
 if(NS_ENABLE_OPENMP)
   add_test(NAME forcing_threaded_blocks COMMAND ns_threading_check ns.force=shear ns.force_threads=2)
   add_test(NAME forcing_thread_cap COMMAND ns_threading_check ns.force=shear ns.force_threads=4)
@@ -119,6 +119,9 @@ if(NS_BUILD_INCFLO)
   add_executable(ns_archive_check archive_check.cpp)
   target_compile_features(ns_archive_check PRIVATE cxx_std_20)
   target_link_libraries(ns_archive_check PRIVATE amrex_hydro)
+  add_executable(ns_slice_export slice_export.cpp)
+  target_compile_features(ns_slice_export PRIVATE cxx_std_20)
+  target_link_libraries(ns_slice_export PRIVATE amrex_hydro)
 endif()
 
 # Bound regression resource use even when the developer's shell has no OMP cap.

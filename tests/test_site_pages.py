@@ -154,3 +154,18 @@ def test_threading_record_is_correctness_not_a_speedup_claim():
         assert record[key]["frames"][0]["peak_speed"] == 0
     assert record["native_restriction"]["passed"]
     assert record["native_restriction"]["restart_rejects_mesh_change"]
+
+
+def test_fleet_sensitivity_keeps_failed_audit_and_uncertainty_visible():
+    page = (SITE / "refinement.html").read_text()
+    record = json.loads((SITE / "data/fleet-sensitivity.json").read_text())
+    assert 'href="data/fleet-sensitivity.json"' in page
+    assert "not an accepted fully resolved forcing or a blowup claim" in page
+    assert record["temporal"]["passed"]
+    assert len(record["temporal"]["frames"]) == 35
+    assert len(record["temporal"]["duplicate_events"]) == 6
+    assert record["temporal"]["runs"][0]["original_status"] == "failed"
+    assert len(record["spatial_prefix"]["frames"]) == 5
+    assert record["source_sensors"]["completed"]
+    assert not record["candidate"]["production_accuracy_certified"]
+    assert record["candidate"]["planned_frames"] == 280
