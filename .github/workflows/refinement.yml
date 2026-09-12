@@ -9,9 +9,16 @@ on:
       - "scripts/refinement_pilot.py"
       - "scripts/diffusion_pilot.py"
       - "scripts/coupled_*.py"
+      - "scripts/paper_run.py"
+      - "scripts/*_bridge.py"
+      - "src/navier_stokes_sim/amrex_profile.py"
+      - "src/navier_stokes_sim/profile.py"
+      - "src/navier_stokes_sim/config.py"
       - "tests/test_refinement_pilot.py"
       - "tests/test_diffusion_pilot.py"
       - "tests/test_coupled_pilot.py"
+      - "tests/test_paper_run.py"
+      - "tests/test_amrex_profile.py"
       - ".github/workflows/refinement.yml"
   pull_request:
     paths:
@@ -19,9 +26,16 @@ on:
       - "scripts/refinement_pilot.py"
       - "scripts/diffusion_pilot.py"
       - "scripts/coupled_*.py"
+      - "scripts/paper_run.py"
+      - "scripts/*_bridge.py"
+      - "src/navier_stokes_sim/amrex_profile.py"
+      - "src/navier_stokes_sim/profile.py"
+      - "src/navier_stokes_sim/config.py"
       - "tests/test_refinement_pilot.py"
       - "tests/test_diffusion_pilot.py"
       - "tests/test_coupled_pilot.py"
+      - "tests/test_paper_run.py"
+      - "tests/test_amrex_profile.py"
       - ".github/workflows/refinement.yml"
 
 permissions:
@@ -43,6 +57,11 @@ jobs:
       - run: python -m scripts.refinement_pilot --levels 4 --output outputs/projection-ci
       - run: python -m scripts.diffusion_pilot --output outputs/diffusion-ci
       - run: python -m scripts.coupled_pilot --output outputs/coupled-ci
+      - run: python -m pip install -e .
+      - run: python -m navier_stokes_sim.amrex_profile --localized --output outputs/paper-ci.tbl
+      - run: python -m scripts.profile_bridge --table outputs/paper-ci.tbl --output outputs/profile-ci.json
+      - run: python -m scripts.force_bridge --table outputs/paper-ci.tbl --output outputs/force-ci
+      - run: python -m scripts.paper_run --table outputs/paper-ci.tbl --output outputs/paper-ci --base-n 16 --widths 0.5 --end 0.62 --max-dt 0.0005 --frame-dt 0.025 --timeout 600
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -51,4 +70,8 @@ jobs:
             outputs/projection-ci
             outputs/diffusion-ci
             outputs/coupled-ci
+            outputs/profile-ci.json
+            outputs/force-ci
+            outputs/paper-ci
+            outputs/paper-ci.tbl*
           if-no-files-found: ignore

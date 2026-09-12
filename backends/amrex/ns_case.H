@@ -1,13 +1,16 @@
 #ifndef NS_CASE_H
 #define NS_CASE_H
 
-// CPU, constant-density validation adapter for the coupled incflo integrator.
-// These manufactured tests are NOT the paper-surrogate force.
+// CPU, constant-density adapter for the coupled incflo integrator. The finite
+// paper surrogate is a prescribed source, not the infinite proof construction.
+#include "paper_fields.H"
 #include <AMReX_MultiFabUtil.H>
 #include <AMReX_ParmParse.H>
 #include <AMReX_TagBox.H>
 #include <cmath>
+#include <deque>
 #include <iomanip>
+#include <memory>
 #include <sys/resource.h>
 #ifndef NS_ADAPTER_SHA256
 #define NS_ADAPTER_SHA256 "not-built-as-integrator"
@@ -19,33 +22,90 @@ constexpr Real pi = 3.1415926535897932384626433832795;
 struct Options {
     std::string force = "none";
     Real max_dt = 1e100;
+    Real quiescent_max_dt = 0;
+    Real epsilon_tau_ratio = 0;
+    std::string table_file;
     Vector<Real> widths;
     bool diagnostics = false;
     Options() {
         ParmParse pp("ns");
         pp.query("force", force);
         pp.query("max_dt", max_dt);
+        pp.query("quiescent_max_dt", quiescent_max_dt);
+        pp.query("epsilon_tau_ratio", epsilon_tau_ratio);
+        pp.query("table_file", table_file);
         pp.queryarr("refine_half_width", widths);
         pp.query("diagnostics", diagnostics);
-        if (force != "none" && force != "rest" && force != "oscillation" && force != "shear")
-            Abort("ns.force must be none, rest, oscillation, or shear; paper forcing is not implemented");
+        if (force != "none" && force != "rest" && force != "oscillation" && force != "shear" && force != "paper")
+            Abort("ns.force must be none, rest, oscillation, shear, or paper");
         if (!std::isfinite(max_dt) || max_dt <= 0) Abort("ns.max_dt must be finite and positive");
+        if (!std::isfinite(quiescent_max_dt) || quiescent_max_dt < 0 ||
+            !std::isfinite(epsilon_tau_ratio) || epsilon_tau_ratio < 0)
+            Abort("quiescent dt and derivative ratio must be finite and nonnegative");
+        if (force == "paper" && table_file.empty()) Abort("paper force requires ns.table_file");
         for (int l=0; l<widths.size(); ++l)
             if (!std::isfinite(widths[l]) || widths[l] <= 0 || widths[l] >= (l ? widths[l-1] : 1.0))
                 Abort("fixed refinement widths must decrease inside [-1,1]^3");
     }
 };
 inline Options const& options() { static Options o; return o; }
-inline void validate(Real fixed_dt, int regrid_int, bool constant_density, Real density) {
+inline ns_paper::Profile const& profile() {
+    static ns_paper::Profile p(options().table_file); return p;
+}
+inline void validate(Real fixed_dt, int regrid_int, bool constant_density, Real density, Real nu) {
     auto const& o=options();
     if (fixed_dt > 0 && (o.force != "none" || o.max_dt < 1e99))
         Abort("use ns.max_dt, not the upstream fixed_dt CFL override");
     if (!o.widths.empty() && regrid_int > 0)
         Abort("pre-refined tests require amr.regrid_int <= 0");
     if (o.force != "none" && (!constant_density || density != 1.0))
-        Abort("the manufactured acceleration adapter requires constant unit density");
+        Abort("the acceleration adapter requires constant unit density");
+    if (o.force == "paper" && nu != profile().viscosity)
+        Abort("incflo.mu must match the exported paper viscosity");
 }
-inline Real limit_dt(Real /*time*/, Real dt) { return std::min(dt, options().max_dt); }
+inline Real limit_dt(Real time, Real dt, bool zero_cfl=false) {
+    auto const& o=options();
+    if (o.force == "paper") {
+        auto const& p=profile();
+        // Only skip over an exactly quiescent interval, ending at activation.
+        // A nonzero velocity/force CFL must retain the upstream stability bound.
+        if (time<p.cutoff_start && zero_cfl && o.quiescent_max_dt>0)
+            return std::min(o.quiescent_max_dt,p.cutoff_start-time);
+        dt=std::min(dt,ns_paper::phase_limit(p,time));
+        if (time<p.cutoff_start) dt=std::min(dt,p.cutoff_start-time);
+    }
+    return std::min(dt,o.max_dt);
+}
+
+struct ForceRecord {
+    Real time, dx;
+    std::shared_ptr<MultiFab> values;
+};
+inline std::shared_ptr<MultiFab const> paper_force(int level, MultiFab const& layout, Geometry const& g, Real time) {
+    auto const& p=profile();
+    for (int c=0;c<3;++c)
+        if (g.ProbLo(c)!=-p.domain || g.ProbHi(c)!=p.domain || !g.isPeriodic(c))
+            Abort("paper source requires its full periodic domain");
+    static Vector<std::deque<ForceRecord>> cache;
+    static bool registered=[] { ExecOnFinalize([] { cache.clear(); }); return true; }();
+    (void)registered;
+    if (cache.size()<=level) cache.resize(level+1);
+    auto& records=cache[level];
+    for (auto const& record:records)
+        if (record.time==time && record.dx==g.CellSize(0) &&
+            record.values->boxArray()==layout.boxArray() &&
+            record.values->DistributionMap()==layout.DistributionMap()) return record.values;
+    auto value=std::make_shared<MultiFab>(layout.boxArray(),layout.DistributionMap(),3,0);
+    for (MFIter mfi(*value);mfi.isValid();++mfi) {
+        auto source=ns_paper::force(p,mfi.validbox(),g,time,options().epsilon_tau_ratio);
+        (*value)[mfi].copy(source);
+    }
+    records.push_back({time,g.CellSize(0),value});
+    // f(t_n) and f(t_n+dt) suffice for MOL. Shared ownership also makes a
+    // midpoint/Godunov request safe if it evicts a still-used endpoint.
+    while (records.size()>2) records.pop_front();
+    return value;
+}
 
 inline Real force_value(std::string const& mode, Real x, Real y, Real z, Real t, int c, Real nu) {
     if (mode == "oscillation") return 0.1*(c+1)*5.0*std::sin(10*t);
@@ -68,9 +128,21 @@ inline Real exact_value(int problem, Real x, Real y, Real z, Real t, int c, Real
     Abort("diagnostic exact reference is unavailable for this case");
     return 0;
 }
-inline void add_force(MultiFab& f, Geometry const& g, Real time, Real end, Real nu) {
+inline void add_force(int level, MultiFab& f, Geometry const& g, Real time, Real end, Real nu) {
     auto const& mode=options().force;
     if (mode == "none" || mode == "rest") return;
+    if (mode == "paper") {
+        if (time<=profile().cutoff_start && (end<0 || end<=profile().cutoff_start)) return;
+        auto first=paper_force(level,f,g,time);
+        auto second=end>=0 ? paper_force(level,f,g,end) : first;
+        for (MFIter mfi(f);mfi.isValid();++mfi) {
+            auto a=f.array(mfi); auto b=first->const_array(mfi),c=second->const_array(mfi);
+            LoopOnCpu(mfi.validbox(),[&](int i,int j,int k) {
+                for (int d=0;d<3;++d) a(i,j,k,d)+=.5*(b(i,j,k,d)+c(i,j,k,d));
+            });
+        }
+        return;
+    }
     auto dx=g.CellSizeArray(); auto lo=g.ProbLoArray();
     for (MFIter mfi(f); mfi.isValid(); ++mfi) {
         auto a=f.array(mfi);
@@ -118,6 +190,9 @@ inline void diagnose(Vector<MultiFab const*> const& vel, Vector<Geometry> const&
         Long active_before=active;
         for (MFIter mfi(v);mfi.isValid();++mfi) {
             auto a=v.const_array(mfi); auto m=mask.const_array(mfi);
+            FArrayBox paper_reference;
+            if (options().force=="paper") paper_reference=ns_paper::velocity(profile(),mfi.validbox(),geom[lev],time);
+            auto target=paper_reference.const_array();
             LoopOnCpu(mfi.validbox(),[&](int i,int j,int k) {
                 if (!m(i,j,k)) return;
                 ++active; Real speed2=0;
@@ -125,7 +200,7 @@ inline void diagnose(Vector<MultiFab const*> const& vel, Vector<Geometry> const&
                 for (int c=0;c<3;++c) {
                     Real u=a(i,j,k,c);
                     if (!std::isfinite(u)) Abort("non-finite coupled solution");
-                    Real e=u-exact_value(problem,x,y,z,time,c,nu);
+                    Real e=u-(options().force=="paper" ? target(i,j,k,c) : exact_value(problem,x,y,z,time,c,nu));
                     sumsq+=e*e*dv; maxerr=std::max(maxerr,std::abs(e));
                     speed2+=u*u; integral[c]+=u*dv;
                 }

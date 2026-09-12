@@ -198,7 +198,12 @@ def main() -> None:
     executable = pinned_executable
     source_hashes = {
         name: hashlib.sha256((inputs.parent / name).read_bytes()).hexdigest()
-        for name in ("ns_case.H", "incflo_overlay.py")
+        for name in (
+            "ns_case.H",
+            "incflo_overlay.py",
+            "paper_profile.H",
+            "paper_fields.H",
+        )
     }
     expected_adapter = hashlib.sha256(
         ";".join(source_hashes.values()).encode()
