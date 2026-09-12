@@ -150,6 +150,7 @@ curl. This is a versioned modeling change, not a relabeling of old results.
 python -m navier_stokes_sim.amrex_profile --localized --output outputs/profile.tbl
 python -m scripts.profile_bridge --table outputs/profile.tbl --output outputs/profile-check.json
 python -m scripts.force_bridge --table outputs/profile.tbl --output outputs/force-check
+python -m scripts.fine_force_bridge --table outputs/profile.tbl --output outputs/fine-force-check
 python -m scripts.paper_run --table outputs/profile.tbl --output outputs/paper-smoke \
   --base-n 16 --widths 0.5 --end 0.62 --max-dt 0.0005 --frame-dt 0.025
 ```
@@ -174,3 +175,10 @@ through `t=0.62`, and zero measured full-field force readback error. Its coarse
 mesh does not establish physical accuracy. Separate fleet runs test spatial and
 temporal sensitivity. See the [forcing-port record](../../site/data/paper-port.json)
 and [documentation](https://cmccomb.com/navier-stokes-singularity-simulation/refinement.html#paper-force).
+
+The fine-force cross-check compares 18 bounded patches, each 12³ cells, at
+1024³- and 16,384³-equivalent spacing through `t=0.99983872`. Padded Python
+arrays preserve the original full-domain sample coordinates; only interior
+cells, clear of artificial periodic patch edges, enter the comparison. Both
+velocity and force agree within the recorded gates. This is a local stencil
+agreement test, not a simulation at that effective full-domain resolution.

@@ -61,6 +61,7 @@ jobs:
       - run: python -m navier_stokes_sim.amrex_profile --localized --output outputs/paper-ci.tbl
       - run: python -m scripts.profile_bridge --table outputs/paper-ci.tbl --output outputs/profile-ci.json
       - run: python -m scripts.force_bridge --table outputs/paper-ci.tbl --output outputs/force-ci
+      - run: python -m scripts.fine_force_bridge --table outputs/paper-ci.tbl --output outputs/fine-force-ci
       - run: python -m scripts.paper_run --table outputs/paper-ci.tbl --output outputs/paper-ci --base-n 16 --widths 0.5 --end 0.62 --max-dt 0.0005 --frame-dt 0.025 --timeout 600
       - uses: actions/upload-artifact@v4
         if: always()
@@ -72,6 +73,7 @@ jobs:
             outputs/coupled-ci
             outputs/profile-ci.json
             outputs/force-ci
+            outputs/fine-force-ci
             outputs/paper-ci
             outputs/paper-ci.tbl*
           if-no-files-found: ignore

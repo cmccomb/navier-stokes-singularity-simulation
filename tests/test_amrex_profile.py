@@ -23,7 +23,13 @@ def test_localized_revision_removes_only_the_missing_core_cutoff():
     a_old, _, _ = _paper_vector_potentials(0.7, old)
     a_new, _, _ = _paper_vector_potentials(0.7, new)
     assert np.max(np.abs(a_old[2][outside])) > 1e-7
-    assert np.max(np.abs(np.stack(a_new, axis=-1)[outside])) == 0
+    # PPoly's last-interval evaluation can leave a tiny cancellation residual
+    # at the zero exterior-table endpoint (1.4e-116 on Linux/SciPy). Preserve
+    # a scale-aware roundoff gate, not a platform-dependent exact-zero test.
+    potential_scale = np.max(np.abs(np.stack(a_old, axis=-1)))
+    assert np.max(np.abs(np.stack(a_new, axis=-1)[outside])) <= (
+        16 * np.finfo(float).eps * potential_scale
+    )
     u_old, u_new = target_velocity(0.7, old), target_velocity(0.7, new)
     inner = (radius < new.localization_inner - 2 * new.dx) & (
         np.abs(z) < new.localization_inner - 2 * new.dx

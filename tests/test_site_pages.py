@@ -137,3 +137,6 @@ def test_actual_forcing_port_keeps_version_and_accuracy_boundaries():
     assert smoke["native_frames"][0]["peak_speed"] == 0
     assert all(f["force_linf_error"] == 0 for f in smoke["native_frames"])
     assert report["earlier_output_failure"]["validated"] is False
+    assert report["fine_force"]["passed"]
+    assert len(report["fine_force"]["cases"]) == 18
+    assert {r["n"] for r in report["fine_force"]["cases"]} == {1024, 16384}
