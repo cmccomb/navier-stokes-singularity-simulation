@@ -72,7 +72,7 @@ def generate(source: Path, destination: Path) -> None:
                 "                });\n            }\n    }\n}\n",
                 (
                     "                });\n            }\n    }\n"
-                    "    ns_case::add_force(vel_forces, geom[lev], force_time, force_time_end, m_mu);\n}\n"
+                    "    ns_case::add_force(lev, vel_forces, geom[lev], force_time, force_time_end, m_mu);\n}\n"
                 ),
             ),
         ],
@@ -130,9 +130,15 @@ def generate(source: Path, destination: Path) -> None:
             (
                 "    // Don't overshoot specified plot times",
                 (
-                    "    dt_new = ns_case::limit_dt(m_cur_time, dt_new);\n\n"
+                    "    dt_new = ns_case::limit_dt(m_cur_time, dt_new, comb_cfl == 0);\n\n"
                     "    // Don't overshoot specified plot times"
                 ),
+            ),
+            (
+                "dt_new = std::trunc((m_cur_time + dt_new) / m_plot_per_exact) * m_plot_per_exact - m_cur_time;",
+                # A quiescent step can cross several intervals. Stop at the
+                # first scheduled output, not the last interval crossed.
+                "dt_new = (std::floor((m_cur_time + eps) / m_plot_per_exact) + 1) * m_plot_per_exact - m_cur_time;",
             ),
         ],
     )
@@ -158,7 +164,7 @@ def generate(source: Path, destination: Path) -> None:
                 "    ReadParameters();",
                 (
                     "    ReadParameters();\n"
-                    "    ns_case::validate(m_fixed_dt, m_regrid_int, m_constant_density, m_ro_0);"
+                    "    ns_case::validate(m_fixed_dt, m_regrid_int, m_constant_density, m_ro_0, m_mu);"
                 ),
             ),
             (

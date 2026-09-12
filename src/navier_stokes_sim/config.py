@@ -153,10 +153,11 @@ class SimulationConfig:
         if self.paper_profile_revision not in {
             "legacy-hand-shaped",
             "appendix-b-axis-v1",
+            "appendix-b-axis-v2-localized",
         }:
             raise ValueError(
-                "paper_profile_revision must be 'legacy-hand-shaped' or "
-                "'appendix-b-axis-v1'"
+                "paper_profile_revision must be 'legacy-hand-shaped', "
+                "'appendix-b-axis-v1', or 'appendix-b-axis-v2-localized'"
             )
         if not (0 < self.paper_annulus_xa < self.paper_annulus_xb):
             raise ValueError("paper annulus must satisfy 0 < Xa < Xb")

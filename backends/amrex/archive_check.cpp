@@ -27,10 +27,17 @@ int main(int argc, char** argv) {
                 if (comparison.boxArray()!=mf.boxArray()) Abort("restart mesh changed");
             }
             auto dx=data.cellSize(lev); auto lo=data.probLo();
+            auto hi=data.probHi();
+            RealBox physical(lo.data(),hi.data()); int periodic[3]={1,1,1};
+            Geometry geometry(data.probDomain(lev),&physical,data.coordSys(),periodic);
             stored+=mf.boxArray().numPts();
             for (MFIter mfi(mf);mfi.isValid();++mfi) {
                 auto a=mf.const_array(mfi);
                 auto b=reference ? comparison.const_array(mfi) : a;
+                FArrayBox paper_force;
+                if (ns_case::options().force=="paper")
+                    paper_force=ns_paper::force(ns_case::profile(),mfi.validbox(),geometry,data.time(),ns_case::options().epsilon_tau_ratio);
+                auto external=paper_force.const_array();
                 LoopOnCpu(mfi.validbox(),[&](int i,int j,int k) {
                     Real x=lo[0]+(i+0.5)*dx[0], y=lo[1]+(j+0.5)*dx[1], z=lo[2]+(k+0.5)*dx[2];
                     Real speed2=0;
@@ -39,7 +46,8 @@ int main(int argc, char** argv) {
                             Abort("non-finite archived vector");
                         speed2+=a(i,j,k,c)*a(i,j,k,c);
                         max_velocity_difference=std::max(max_velocity_difference,std::abs(a(i,j,k,c)-b(i,j,k,c)));
-                        Real f=ns_case::force_value(ns_case::options().force,x,y,z,data.time(),c,nu);
+                        Real f=ns_case::options().force=="paper" ? external(i,j,k,c)
+                            : ns_case::force_value(ns_case::options().force,x,y,z,data.time(),c,nu);
                         max_force_error=std::max(max_force_error,std::abs(a(i,j,k,c+3)-f));
                     }
                     max_speed=std::max(max_speed,std::sqrt(speed2));

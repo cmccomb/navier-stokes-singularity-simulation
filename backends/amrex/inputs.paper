@@ -1,0 +1,37 @@
+# Finite three-family paper surrogate, integrated from exact rest.
+# The runner supplies the versioned table, mesh, clock, and output schedule.
+stop_time = 0.85
+max_step = 10000000
+incflo.advection_type = MOL
+incflo.diffusion_type = 1
+incflo.constant_density = 1
+incflo.ro_0 = 1
+incflo.mu = 0.01
+incflo.cfl = 0.4
+incflo.init_shrink = 1
+incflo.initial_iterations = 2
+incflo.advect_tracer = 0
+incflo.probtype = 0
+incflo.ic_u = 0
+incflo.ic_v = 0
+incflo.ic_w = 0
+incflo.verbose = 1
+amr.n_cell = 32 32 32
+amr.max_level = 0
+amr.max_grid_size = 32
+amr.blocking_factor = 8
+amr.ref_ratio = 2
+amr.n_error_buf = 0
+amr.regrid_int = -1
+amr.plot_int = -1
+amr.plot_per_exact = 0.025
+amr.check_int = 250
+amr.plotVariables = velx vely velz forcing
+geometry.prob_lo = -1 -1 -1
+geometry.prob_hi = 1 1 1
+geometry.is_periodic = 1 1 1
+ns.max_dt = 0.00025
+ns.quiescent_max_dt = 0.05
+ns.epsilon_tau_ratio = 0
+ns.force = paper
+ns.diagnostics = 1

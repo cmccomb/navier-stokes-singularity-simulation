@@ -471,6 +471,17 @@ def _paper_vector_potentials(
         _plateau_cutoff(radius, cfg.localization_inner, cfg.localization_outer)
         * axial_localization
     )
+    if cfg.paper_profile_revision == "appendix-b-axis-v2-localized":
+        # v1 omitted this cutoff on the core swirl term. Keep that revision
+        # reproducible, but remove its exterior leakage in the new case. The
+        # exterior tail already integrates its radial cutoff; do not apply it
+        # twice. This remains a potential-level change, preserving div(curl A).
+        a_z = a_z_core * localization + (
+            exterior_coefficient
+            * exterior_blend
+            * exterior_potential
+            * axial_localization
+        )
     a_theta *= localization
     background = (-sine * a_theta, cosine * a_theta, a_z)
 
