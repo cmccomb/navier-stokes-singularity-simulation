@@ -38,9 +38,14 @@ provenance. Archive validation does not establish convergence or a singularity.
 | Maximum timestep / phase advance | `0.00025` / `0.0375` radians |
 | Force-difference half-window | `2e-7` |
 
-Arrow-free GIFs and MP4s use the established site styling, with a fixed midplane
-or a horizontal slice following the height of the active 3D peak speed. Both
-choices retain every saved state. [Run details and limitations](site/results.html#oliver-complete).
+Arrow-free GIFs and MP4s use the established site styling and fixed midplanes.
+The homepage movies retain every saved state. [Run details and limitations](site/results.html#oliver-complete).
+
+The [native-voxel explorer](https://huggingface.co/spaces/ccm/navier-stokes-singularity-simulation)
+adds x/y/z slice controls, velocity/forcing selection, and saved-time playback.
+Prototype subsets are explicitly labeled. The
+[dataset documentation](https://cmccomb.com/navier-stokes-singularity-simulation/voxels.html)
+covers the lossless float64 format, native-grid sampling, validation, and publication.
 
 The earlier PhiFlow from-rest 32³ cubic-profile temporal pilot recovered a successive-difference
 ratio of 3.989, consistent with second-order time convergence at that coarse

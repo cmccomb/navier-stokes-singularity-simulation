@@ -144,10 +144,17 @@
             <p class="plot-scroll-hint">Scroll sideways to see the cell detail →</p>
             <figcaption><span>Fixed refinement regions · not individual cells</span><a href="media/oliver-mesh.svg" download>SVG ↓</a></figcaption>
           </figure>
-        <p class="measure-note">Full-resolution 3D velocity and forcing are saved. An interactive 3D export of this refined run is not yet prepared; <a href="results.html#legacy-media">older uniform-grid explorers</a> remain separate.</p>
+        <details class="native-explorer" id="native-explorer">
+          <summary>Explore the native voxels</summary>
+          <p class="measure-note" id="native-coverage">Prototype: 3 selected states from Oliver's completed run. The full 280-state export is being prepared; the GIFs above already contain all 280.</p>
+          <p class="measure-note">Move x, y, and z to inspect perpendicular slices of velocity or forcing, then play through the available saved times. Cold loads can take several seconds. <a href="https://huggingface.co/spaces/ccm/navier-stokes-singularity-simulation" target="_blank" rel="noopener">Open full-screen ↗</a> · <a href="https://huggingface.co/datasets/ccm/navier-stokes-singularity-simulation">Download dataset ↗</a> · <a href="voxels.html">Dataset documentation →</a></p>
+          <iframe id="native-frame" title="Native velocity and forcing slice explorer with x, y, z, and saved-time controls" data-src="https://ccm-navier-stokes-singularity-simulation.hf.space" loading="lazy" sandbox="allow-scripts allow-same-origin allow-downloads" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+          <noscript><p>Use the full-screen link to open the explorer. The embedded app requires JavaScript.</p></noscript>
+        </details>
         <p class="archive-link"><a href="results.html">Earlier runs and numerical record →</a></p>
       </section>
     </main>
+    <script src="native-explorer.js" defer></script>
 
     <footer>
       <p><a href="faq.html">FAQ</a> · Independent open numerical work · not affiliated with OpenAI.</p>

@@ -122,6 +122,9 @@ if(NS_BUILD_INCFLO)
   add_executable(ns_slice_export slice_export.cpp)
   target_compile_features(ns_slice_export PRIVATE cxx_std_20)
   target_link_libraries(ns_slice_export PRIVATE amrex_hydro)
+  add_executable(ns_volume_export volume_export.cpp)
+  target_compile_features(ns_volume_export PRIVATE cxx_std_20)
+  target_link_libraries(ns_volume_export PRIVATE amrex_hydro)
 endif()
 
 # Bound regression resource use even when the developer's shell has no OMP cap.

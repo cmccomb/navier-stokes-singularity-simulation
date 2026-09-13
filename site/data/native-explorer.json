@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "validated": true,
+  "complete_history": false,
+  "saved_frames": 3,
+  "source_frames": 280,
+  "start_time": 0,
+  "end_time": 0.995,
+  "dataset": {
+    "repo_id": "ccm/navier-stokes-singularity-simulation",
+    "revision": "b9dbe25cad913ba3c6f7254ba56afeecf9d7b100",
+    "prefix": "releases/381d76c6dd535877"
+  },
+  "space": "ccm/navier-stokes-singularity-simulation",
+  "space_url": "https://ccm-navier-stokes-singularity-simulation.hf.space",
+  "native_integration_tests": "Exact equality for all three midplanes and both vector fields at t=0, 0.851212301475714, and 0.995",
+  "source_record_sha256": "036814dd3dcb1f15758c8061532c070dadef80b0df704778f61eeb9ee2e5295a"
+}

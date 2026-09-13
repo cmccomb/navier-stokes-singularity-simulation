@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Native velocity and forcing voxels: dataset structure, slice controls, validation, and reproduction." />
+    <meta name="theme-color" content="#07111f" />
+    <title>Native voxels · Navier–Stokes Singularity Simulation</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#content">Skip to content</a>
+    <header class="site-header">
+      <a class="wordmark" href="index.html"><span class="mark" aria-hidden="true">∇</span><span>Navier–Stokes Simulation</span></a>
+      <nav aria-label="Project navigation"><a href="index.html">Results</a><a href="documentation.html" aria-current="page">Documentation</a><a class="nav-cta" href="https://github.com/cmccomb/navier-stokes-singularity-simulation">GitHub ↗</a></nav>
+    </header>
+    <main class="docs-shell" id="content">
+      <nav class="docs-nav" aria-label="Documentation pages">
+        <a href="method.html">Model &amp; method</a><a href="running.html">Run it</a><a href="results.html">Numerical record</a><a href="refinement.html">Refined-mesh pilot</a><a href="voxels.html" aria-current="page">Native voxels</a>
+      </nav>
+      <article class="doc-page">
+        <p class="eyebrow">Guide 09 · September 13, 2026</p>
+        <h1>The fields behind the movie.</h1>
+        <p class="dek">The native voxel dataset preserves velocity and forcing on the solver's fixed nested grids. An interactive slice explorer makes those fields inspectable without downloading the whole history.</p>
+        <h2>Explore three perpendicular planes</h2>
+        <p>Move x to select a YZ plane, y for XZ, and z for XY. Choose velocity or forcing, then select a saved state or press Play. The displayed time is the actual output time. Saved times are not uniformly spaced, and playback waits for data instead of skipping or interpolating states.</p>
+        <p>The <a href="https://huggingface.co/spaces/ccm/navier-stokes-singularity-simulation">Hugging Face explorer</a> labels prototype subsets explicitly. Oliver's complete source archive and the homepage movies have 280 states from exact rest to 0.995. Check the explorer's own frame count before treating its current release as complete.</p>
+        <p>Cold loads can take several seconds, especially for an uncached frame or a sleeping Space. Small native slabs are cached; memory does not grow with the whole time series. Up to four queued renders can make progress, with plotting serialized for thread safety. The <a href="index.html#result">GIFs and videos</a> remain available independently of the app.</p>
+        <p>When the selected archive fits an 18 GiB raw-data budget and leaves 5 GiB free, the Space also warms a lossless disk cache in the background. The app stays usable through remote slice reads until the complete pinned snapshot is ready. This cache lives on the server's ephemeral disk, not in the browser, and larger future runs fall back to remote reads.</p>
+        <h2>Native resolution, not an enlarged image</h2>
+        <p>Each saved state contains five 64³ patches: a full-domain base and four nested refined cubes. The stored count is 1,310,720 cells, including covered coarse cells; 1,179,648 cells contribute to the active composite solution. The finest spacing is equivalent to a 1024³ grid only in the innermost core.</p>
+        <p>The viewer selects the finest native cell containing each display location. Increasing the 2D display sampling can reveal smaller stored cells but cannot improve the solver's outer resolution. No smoothing, vector arrows, or automatic peak-height tracking is applied. At cell boundaries the positive-side cell is selected, except at the domain's upper edge, where the last cell is used.</p>
+        <h2>Dataset structure</h2>
+        <p>The <a href="https://huggingface.co/datasets/ccm/navier-stokes-singularity-simulation">public dataset</a> stores immutable releases under <code>releases/&lt;manifest-hash-prefix&gt;/</code>. Each has <code>manifest.json</code>, the source record <code>source-best.json</code>, and <code>fields.zarr</code>. Pin the dataset commit and release prefix for reproducibility.</p>
+        <p>Zarr arrays <code>level_0</code> through <code>level_4</code> have axes <code>(t, x, y, z, component)</code>. Components are <code>u_x, u_y, u_z, f_x, f_y, f_z</code> in nondimensional model units. Origins describe cell boundaries; add half a cell spacing to obtain a cell center. All values remain float64, with lossless Zstd/bitshuffle compression. Covered coarse cells are retained but must be excluded from composite integrals.</p>
+        <p>The full raw field payload is 16.40625 GiB. Small 8³ chunks support plane reads, while per-level, per-time shards keep the file count manageable. This is a field dataset, not a restart archive: pressure, ghost cells, and checkpoint state are not included.</p>
+        <h2>Reproduce the export</h2>
+        <pre><code>uv venv .venv-hf --python 3.12
+uv pip install --python .venv-hf/bin/python -r spaces/native_explorer/requirements.txt
+cmake -S backends/amrex -B build/amrex
+cmake --build build/amrex --target ns_volume_export -j 2
+.venv-hf/bin/python -m scripts.export_native_dataset \
+  --source /path/to/frozen/native/archive --best site/data/best.json \
+  --exporter build/amrex/ns_volume_export --output outputs/native-voxels
+NS_DATASET_LOCAL=outputs/native-voxels .venv-hf/bin/python spaces/native_explorer/app.py</code></pre>
+        <p>The output directory must be new; a 20 GiB free-space guard protects local storage. An explicit <code>--indices 0 85 279</code> produces a clearly labeled prototype. The exporter does not mutate the native source or change any simulation settings.</p>
+        <h2>Validate before publishing</h2>
+        <p>Every exported level round-trips exactly against its source values. Per-frame checks cover finite values, exact rest, timestamps, composite peak speed, and full-domain volume; the endpoint also checks kinetic energy. SHA-256 digests retain per-level provenance. Independent native slice comparisons and synthetic nested-grid tests check all axes and refinement boundaries.</p>
+        <pre><code>.venv-hf/bin/python -m scripts.publish_native_dataset \
+  --folder outputs/native-voxels --repo ccm/navier-stokes-singularity-simulation
+# Record the returned immutable reference in spaces/native_explorer/dataset.json.
+.venv-hf/bin/python -m scripts.deploy_native_space \
+  --repo ccm/navier-stokes-singularity-simulation</code></pre>
+        <p>Publication rechecks the stored digests, uploads only an allowlist, and compares public remote slices with local values before advertising a release. The app requires no viewing credentials. The basic CPU Space has no hourly hardware charge under the existing account plan; deployment does not request a paid hardware upgrade. <a href="https://huggingface.co/docs/hub/en/spaces-overview">Hosting details ↗</a></p>
+        <p>These checks establish archive and visualization integrity, not spatial convergence or blowup. The finite manufactured-force surrogate remains distinct from the analytical construction. Read the <a href="method.html">method</a> and <a href="accuracy.html">accuracy budget</a> before interpreting its peaks.</p>
+      </article>
+    </main>
+    <footer><p>Independent open numerical work · not affiliated with OpenAI.</p></footer>
+  </body>
+</html>
