@@ -53,6 +53,7 @@ NS_DATASET_LOCAL=outputs/native-voxels .venv-hf/bin/python spaces/native_explore
 .venv-hf/bin/python -m scripts.deploy_native_space \
   --repo ccm/navier-stokes-singularity-simulation</code></pre>
         <p>Publication rechecks the stored digests, uploads only an allowlist, and compares public remote slices with local values before advertising a release. The app requires no viewing credentials. The basic CPU Space has no hourly hardware charge under the existing account plan; deployment does not request a paid hardware upgrade. <a href="https://huggingface.co/docs/hub/en/spaces-overview">Hosting details ↗</a></p>
+        <p>The optional <code>scripts.finish_native_release</code> command combines the transfer, export, publication, deployment, and final reference update in one bounded job, not a recurring watcher. It records its phase and failure state, limits the default run to six hours, and keeps native sources intact. It updates only the Space dataset reference and the site's release record on GitHub main after the hosted full-history endpoint passes. Concurrent changes to those records or the app source stop promotion for review.</p>
         <p>These checks establish archive and visualization integrity, not spatial convergence or blowup. The finite manufactured-force surrogate remains distinct from the analytical construction. Read the <a href="method.html">method</a> and <a href="accuracy.html">accuracy budget</a> before interpreting its peaks.</p>
       </article>
     </main>

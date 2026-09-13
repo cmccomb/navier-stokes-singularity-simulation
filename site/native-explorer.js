@@ -7,6 +7,7 @@
   panel.addEventListener("toggle", () => {
     if (panel.open && !frame.getAttribute("src")) frame.src = frame.dataset.src;
   });
+  if (window.location.hash === "#native-explorer") panel.open = true;
   fetch("data/native-explorer.json", { cache: "no-cache" })
     .then(response => {
       if (!response.ok) throw new Error("No verified release record");
