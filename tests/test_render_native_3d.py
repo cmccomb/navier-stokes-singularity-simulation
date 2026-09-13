@@ -86,6 +86,22 @@ def test_rest_produces_no_surfaces():
     assert all(m.n_points == 0 for m in contours(axes, np.zeros((8, 8, 8))))
 
 
+def test_contours_preserve_nonuniform_xyz_coordinates():
+    pytest.importorskip("pyvista")
+    axes = [
+        np.array([-1, -0.6, -0.1, 0.04, 0.3, 1.0]),
+        np.linspace(-1, 1, 7),
+        np.linspace(-1, 1, 9),
+    ]
+    x, y, z = np.meshgrid(*axes, indexing="ij")
+    meshes = contours(axes, x + 2 * y + 3 * z)
+    for value, mesh in zip((0.15, 1.5, 4.0), meshes):
+        assert mesh.n_points
+        np.testing.assert_allclose(
+            mesh.points @ np.array([1, 2, 3]), value, rtol=0, atol=1e-6
+        )
+
+
 def test_camera_refresh_and_core_visibility():
     pv = pytest.importorskip("pyvista")
     scene = Scene(800, 600)
@@ -142,3 +158,21 @@ def test_encoder_retains_identical_rest_states(tmp_path):
     with Image.open(tmp_path / "test.gif") as gif:
         gif.seek(2)
         assert gif.convert("RGB").getpixel((80, 60)) == (0, 255, 255)
+
+
+def test_gif_reserves_white_type_despite_blue_dominance(tmp_path):
+    if not shutil.which("ffmpeg"):
+        pytest.skip("ffmpeg not installed")
+    folder = tmp_path / "frames"
+    folder.mkdir()
+    for i in range(3):
+        im = Image.new("RGB", (160, 120), (20, 70 + i * 20, 110 + i * 20))
+        im.putpixel((80, 60), (255, 255, 255))
+        im.putpixel((81, 60), (233, 241, 245))
+        im.save(folder / f"frame-{i:04d}.png")
+    encode_frames(folder, tmp_path / "test", [0, 0.5, 0.995])
+    with Image.open(tmp_path / "test.gif") as gif:
+        for i in range(3):
+            gif.seek(i)
+            assert gif.convert("RGB").getpixel((80, 60)) == (255, 255, 255)
+            assert gif.convert("RGB").getpixel((81, 60)) == (233, 241, 245)

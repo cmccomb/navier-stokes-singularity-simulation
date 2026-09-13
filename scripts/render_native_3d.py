@@ -16,7 +16,7 @@ import time
 from pathlib import Path
 
 import numpy as np
-from PIL import GifImagePlugin, Image, ImageDraw, ImageFont
+from PIL import GifImagePlugin, Image, ImageColor, ImageDraw, ImageFont
 
 from spaces.native_explorer.reader import NativeDataset
 
@@ -358,8 +358,12 @@ def fit_camera_scales(meshes, scales):
 def encode_frames(folder, stem, times):
     """Bounded GIF writer: all states, fixed global palette, exact holds."""
     paths = sorted(folder.glob("frame-*.png"))
-    if len(paths) != len(times):
+    if len(paths) != len(times) or any(
+        path.name != f"frame-{i:04d}.png" for i, path in enumerate(paths)
+    ):
         raise ValueError("Missing render frames")
+    if times[0] != 0 or not np.isfinite(times).all() or np.any(np.diff(times) <= 0):
+        raise ValueError("Movie times must increase from rest")
     holds = durations(len(paths))
     # One global palette sampled across the entire history, not just endpoint.
     samples = []
@@ -369,7 +373,29 @@ def encode_frames(folder, stem, times):
     atlas = Image.new("RGB", (80 * 20, 60 * ((len(samples) + 19) // 20)), BACKGROUND)
     for i, im in enumerate(samples):
         atlas.paste(im, ((i % 20) * 80, (i // 20) * 60))
-    palette = atlas.quantize(colors=256, method=Image.Quantize.MEDIANCUT)
+    palette = atlas.quantize(colors=240, method=Image.Quantize.MEDIANCUT)
+    # Small atlas thumbnails dilute white type and bright core highlights.
+    # Preserve semantic colors explicitly instead of tinting them cyan.
+    reserved = (
+        BACKGROUND,
+        TEXT,
+        MUTED,
+        *COLORS,
+        "#29445d",
+        "#ffffff",
+        "#dae5ec",
+        "#c8d6df",
+        "#b9cbd8",
+        "#91a5b7",
+        "#718a9f",
+        "#4e697f",
+        "#334b61",
+        "#15263a",
+    )
+    palette.putpalette(
+        palette.getpalette()[: 240 * 3]
+        + [value for color in reserved for value in ImageColor.getrgb(color)]
+    )
     with stem.with_suffix(".gif").open("wb") as stream:
         for i, path in enumerate(paths):
             with Image.open(path) as im:
