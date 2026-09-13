@@ -80,11 +80,14 @@ def interpolate_scalar(values, coordinates):
     return result
 
 
-def sample_speed(fields, levels, axes):
+def sample_speed(fields, levels, axes, quantity="velocity"):
     """Native scalar reconstruction with fine-over-coarse ownership."""
+    if quantity not in {"velocity", "force"}:
+        raise ValueError("Unknown vector quantity")
+    components = slice(0, 3) if quantity == "velocity" else slice(3, 6)
     output = np.full(tuple(len(x) for x in axes), np.nan, dtype=np.float64)
     for field, level in zip(fields, levels, strict=True):
-        native = np.linalg.norm(field[..., :3], axis=-1)
+        native = np.linalg.norm(field[..., components], axis=-1)
         indices, coordinates = [], []
         for d, axis in enumerate(axes):
             lo, dx, n = level["origin"][d], level["spacing"][d], level["shape"][d]
@@ -109,13 +112,13 @@ def audited_fields(dataset, index):
     return fields
 
 
-def contours(axes, scalar):
+def contours(axes, scalar, thresholds=THRESHOLDS):
     import pyvista as pv
 
     grid = pv.RectilinearGrid(*axes)
     grid.point_data["speed"] = scalar.ravel(order="F")
     meshes = []
-    for value in THRESHOLDS:
+    for value in thresholds:
         if scalar.min() < value < scalar.max():
             mesh = grid.contour([value], scalars="speed", compute_normals=True)
             if mesh.n_points and not np.isfinite(mesh.points).all():
@@ -355,7 +358,7 @@ def fit_camera_scales(meshes, scales):
     return scales
 
 
-def encode_frames(folder, stem, times):
+def encode_frames(folder, stem, times, gif_size=(1000, 750)):
     """Bounded GIF writer: all states, fixed global palette, exact holds."""
     paths = sorted(folder.glob("frame-*.png"))
     if len(paths) != len(times) or any(
@@ -400,7 +403,7 @@ def encode_frames(folder, stem, times):
         for i, path in enumerate(paths):
             with Image.open(path) as im:
                 rgb = im.convert("RGB")
-                rgb.thumbnail((1000, 750), Image.Resampling.LANCZOS)
+                rgb.thumbnail(gif_size, Image.Resampling.LANCZOS)
                 frame = rgb.quantize(
                     palette=palette, dither=Image.Dither.FLOYDSTEINBERG
                 )

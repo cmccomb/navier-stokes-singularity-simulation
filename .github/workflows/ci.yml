@@ -33,4 +33,4 @@ jobs:
           python-version: "3.12"
       - run: uv venv .venv-hf
       - run: uv pip install --python .venv-hf/bin/python -r spaces/native_explorer/requirements.txt pytest
-      - run: .venv-hf/bin/python -m pytest tests/test_native_explorer.py tests/test_native_release.py tests/test_render_native_3d.py -q
+      - run: .venv-hf/bin/python -m pytest tests/test_native_explorer.py tests/test_native_release.py tests/test_render_native_3d.py tests/test_native_triptych.py -q

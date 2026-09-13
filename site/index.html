@@ -10,8 +10,8 @@
     <meta name="theme-color" content="#07111f" />
     <title>From smooth flow to a singularity · Navier–Stokes Simulation</title>
     <link rel="icon" href="favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="styles.css" />
-    <script type="module" src="best.js"></script>
+    <link rel="stylesheet" href="styles.css?v=three-view-1" />
+    <script type="module" src="best.js?v=three-view-1"></script>
   </head>
   <body>
     <a class="skip-link" href="#result">Skip to the simulation</a>
@@ -109,41 +109,48 @@
 
       <section class="measure featured-measure" aria-labelledby="flow-title">
         <h2 id="flow-title">How the fluid moves</h2>
-        <p class="measure-note">Our best completed run: Oliver, from exact rest through t = 0.995. Speed in a vertical x–z slice and a horizontal x–y slice. All 280 saved states are included.</p>
+        <p class="measure-note">Our best completed run: Oliver, from exact rest through t = 0.995. Left to right: x–y slice, x–z slice, isometric 3D view. All 280 saved states are included.</p>
         <p class="measure-note" id="flow-view-note">Fixed planes: y = 0 and z = 0. No vector arrows.</p>
         <p class="media-pending" id="flow-pending">Loading the completed velocity movie.</p>
-        <figure class="stream-movie" id="flow-figure" hidden>
-          <div class="plot-viewport" tabindex="0" role="region" aria-label="Velocity plot; scroll horizontally on narrow screens"><video id="flow-video" controls loop muted playsinline preload="metadata" aria-label="Velocity magnitude evolving through saved times in x-z and x-y slices"></video></div>
-          <p class="plot-scroll-hint">Scroll sideways to see both planes →</p>
+        <figure class="stream-movie three-view" id="flow-figure" hidden>
+          <div class="plot-viewport" tabindex="0" role="region" aria-label="Velocity views; scroll horizontally on narrow screens"><video id="flow-video" controls loop muted playsinline preload="metadata" aria-label="Velocity magnitude: x-y slice, x-z slice, then isometric surfaces, synchronized through all saved times"></video></div>
+          <p class="plot-scroll-hint">Scroll sideways: x–y → x–z → isometric</p>
           <figcaption>
             <span>Velocity magnitude · <span data-clip-range>saved times</span></span>
-            <span class="media-links"><a id="flow-gif" href="media/oliver-flow-midplane.gif" download>GIF ↓</a><a id="flow-mp4" href="media/oliver-flow-midplane.mp4" download>MP4 ↓</a></span>
+            <span class="media-links"><a id="flow-gif" href="media/oliver-flow-views.gif" download>GIF ↓</a><a id="flow-mp4" href="media/oliver-flow-views.mp4" download>MP4 ↓</a></span>
           </figcaption>
         </figure>
-        <p class="measure-note">Five saved frames per second, with nonuniform simulation-time spacing. Color scales are fixed across both planes and all saved times within each quantity; no states are interpolated. Completion and archive checks do not establish spatial convergence or a singularity. <a href="results.html#oliver-complete">Run details →</a></p>
+        <p class="measure-note">Each row shares one playback clock. Slice color scales, 3D surface thresholds, and cameras stay fixed through all saved times; no intermediate states are invented. The isometric panel shows magnitude surfaces, not streamlines. <a href="rendering-3d.html">Rendering details →</a></p>
       </section>
       <section class="measure" aria-labelledby="force-title">
         <h2 id="force-title">The force driving it</h2>
-        <p class="measure-note">Applied force magnitude in the same x–z and x–y slices. Force and velocity are different quantities.</p>
+        <p class="measure-note">Applied force in the same order: x–y slice, x–z slice, isometric 3D view. Force uses its own magnitude scale and fixed surface thresholds.</p>
         <p class="measure-note" id="force-view-note">Fixed planes: y = 0 and z = 0. No vector arrows.</p>
         <p class="media-pending" id="force-pending">Loading the completed forcing movie.</p>
-        <figure class="stream-movie" id="force-figure" hidden>
-          <div class="plot-viewport" tabindex="0" role="region" aria-label="Force plot; scroll horizontally on narrow screens"><video id="force-video" controls loop muted playsinline preload="metadata" aria-label="Applied force magnitude evolving through saved times in x-z and x-y slices"></video></div>
-          <p class="plot-scroll-hint">Scroll sideways to see both planes →</p>
+        <figure class="stream-movie three-view" id="force-figure" hidden>
+          <div class="plot-viewport" tabindex="0" role="region" aria-label="Force views; scroll horizontally on narrow screens"><video id="force-video" controls loop muted playsinline preload="metadata" aria-label="Applied force magnitude: x-y slice, x-z slice, then isometric surfaces, synchronized through all saved times"></video></div>
+          <p class="plot-scroll-hint">Scroll sideways: x–y → x–z → isometric</p>
           <figcaption>
             <span>Force magnitude · <span data-clip-range>saved times</span></span>
-            <span class="media-links"><a id="force-gif" href="media/oliver-force-midplane.gif" download>GIF ↓</a><a id="force-mp4" href="media/oliver-force-midplane.mp4" download>MP4 ↓</a></span>
+            <span class="media-links"><a id="force-gif" href="media/oliver-force-views.gif" download>GIF ↓</a><a id="force-mp4" href="media/oliver-force-views.mp4" download>MP4 ↓</a></span>
           </figcaption>
         </figure>
       </section>
       <section class="measure" aria-labelledby="mesh-title">
         <h2 id="mesh-title">The mesh beneath the motion</h2>
         <p class="measure-note">A 64³ base covers the full periodic box. Four fixed nested cubes refine the core, reaching 1024³-equivalent spacing only inside the innermost cube. The hierarchy stores 1,310,720 cells; 1,179,648 remain active after covered coarse cells are excluded.</p>
+        <figure class="stream-movie mesh-diagram three-view">
+          <div class="plot-viewport" tabindex="0" role="region" aria-label="Native grid views; scroll horizontally on narrow screens"><img src="media/oliver-grid-views.svg" width="2400" height="960" loading="lazy" alt="Native active grid edges, left to right: x-y center slice, x-z center slice, and isometric projection of three central grid sections. Covered coarse interiors are excluded. The grid is fixed in time." /></div>
+          <p class="plot-scroll-hint">Scroll sideways: x–y → x–z → isometric</p>
+          <figcaption><span>Actual native cell edges · fixed in time · same physical scale</span><a href="media/oliver-grid-views.svg" download>SVG ↓</a></figcaption>
+        </figure>
+        <details class="grid-schematic"><summary>Refinement-region schematic</summary>
           <figure class="stream-movie mesh-diagram">
             <div class="plot-viewport" tabindex="0" role="region" aria-label="Refinement regions; scroll horizontally on narrow screens"><img src="media/oliver-mesh.svg" width="720" height="432" loading="lazy" alt="Five fixed refinement regions centered in the full box: half-widths 1, 0.5, 0.25, 0.125 and 0.0625. Core spacing is 0.001953125 model length units. Region boundaries, not individual cells, are drawn." /></div>
             <p class="plot-scroll-hint">Scroll sideways to see the cell detail →</p>
             <figcaption><span>Fixed refinement regions · not individual cells</span><a href="media/oliver-mesh.svg" download>SVG ↓</a></figcaption>
           </figure>
+        </details>
         <details class="native-explorer" id="native-explorer">
           <summary>Explore the native voxels</summary>
           <p class="measure-note" id="native-coverage">Prototype: 3 selected states from Oliver's completed run. The full 280-state export is being prepared; the GIFs above already contain all 280.</p>

@@ -98,11 +98,12 @@ def test_best_videos_preserve_the_gif_clock():
 def test_homepage_uses_only_fixed_midplane_media():
     html = (SITE / "index.html").read_text()
     script = (SITE / "best.js").read_text()
-    assert 'src="best.js"' in html and 'src="app.js"' not in html
-    assert 'fetch("data/best.json"' in script and "data/stream.json" not in script
+    assert 'src="best.js?v=three-view-1"' in html and 'src="app.js"' not in html
+    assert '"data/best.json"' in script and "data/stream.json" not in script
     assert "At peak-speed height" not in html and "moving slice" not in script
     assert 'data-view="peak"' not in html and 'role="tab' not in html
-    assert 'run.media[`${kind}_midplane`]' in script
+    assert 'views.media[kind].files' in script
+    assert '["xy","xz","isometric"]' in script
     assert html.count("Fixed planes: y = 0 and z = 0.") == 2
     assert "Active solver cells" in html and "1024³-equivalent core only" in html
     assert "media/stream-flow-3d.html" not in html

@@ -21,6 +21,11 @@
         <p class="eyebrow">Rendering guide · September 13, 2026</p>
         <h1>See the flow in three dimensions.</h1>
         <p class="dek">Fixed-camera movies show how the same speed surfaces evolve through Oliver's complete, 280-state sequence. An isometric view establishes depth; side and top views expose the geometry; a separate core close-up makes the concentrated flow easier to inspect.</p>
+        <h2>The homepage's three views</h2>
+        <p>Each row reads left to right: x–y slice at z = 0, x–z slice at y = 0, then an isometric projection of magnitude surfaces. The first two panels sample native cells on fixed planes; they are not projections of the 3D surfaces. One encoded movie keeps all three panels on the same saved state when playing or scrubbing.</p>
+        <p>Velocity surfaces use |u| = 0.15, 1.5, and 4. Applied-force surfaces use |f| = 10, 100, and 1000. These are fixed display thresholds, not thresholds for instability. A blank 3D panel can mean the field is nonzero but below the lowest surface. The slice colorbar uses a shared, fixed scale within each quantity, linear near zero and logarithmic above the labeled transition. Velocity and force have different units and scales. Each isometric camera is fitted once to its complete history; the reference cube supplies its physical scale.</p>
+        <p>The grid row shows actual native cell edges, with covered coarse interiors excluded. Its isometric panel projects three central grid sections, not all edges of every voxel. Both center slices look alike because the fixed refinement geometry is symmetric. The grid does not evolve with time. The older refinement-region schematic remains available below it.</p>
+        <p>The combined MP4 is 2400 × 960; the GIF is 1600 × 640. Both retain all 280 saved states and the same 57.1-second playback clock. <a href="data/three-view.json">Three-view rendering record</a>.</p>
         <h2>What the surfaces mean</h2>
         <p>Each surface joins locations with the same velocity magnitude, |u|, in nondimensional model units. The overview uses fixed thresholds of 0.15, 1.5, and 4. The lowest surface is translucent blue, the middle is translucent cyan, and the highest is opaque pale cyan. Lighting communicates shape, not a second scalar quantity. These are speed surfaces, not vortex boundaries, particle trajectories, streamlines, or a liquid's free surface.</p>
         <p>The core close-up shows only the 1.5 and 4 surfaces. It hides the 0.15 shell explicitly, with no automatic threshold change or peak tracking. A reference cube has half-width 0.5 in overview views and 0.125 in the core view. These cubes provide scale; they are not simulation boundaries. The native periodic domain is [−1, 1]³.</p>
@@ -39,6 +44,13 @@ uv pip install --python .venv-render/bin/python -r scripts/requirements-render.t
   --dataset outputs/native-voxels --output outputs/native-3d \
   --views isometric side top core --width 1600</code></pre>
         <p>For a quick rendering check, add <code>--stills 0 140 279</code>. This produces explicitly selected stills, not a full-history animation. The output manifest records source hashes, thresholds, opacity, camera position and scale, per-frame surface counts, and movie hashes. A geometric check rejects a camera that would clip the visible flow beneath captions or outside the image. GIF and MP4 readback checks verify frame counts and timing, including repeated identical rest states.</p>
+        <p>After preparing the complete velocity geometry above, reproduce the ordered homepage rows with:</p>
+        <pre><code>.venv-render/bin/python -m scripts.render_native_triptych \
+  --dataset outputs/native-voxels \
+  --velocity-geometry outputs/native-3d \
+  --output outputs/native-three-view
+.venv-render/bin/python -m scripts.render_grid_views \
+  --output outputs/native-grid-views.svg</code></pre>
         <p>These movies visualize a finite manufactured-force surrogate. Rendering integrity is separate from numerical accuracy and does not provide evidence of a singularity. See the <a href="method.html">method</a> and <a href="accuracy.html">accuracy budget</a> for the simulation's scope.</p>
       </article>
     </main>
