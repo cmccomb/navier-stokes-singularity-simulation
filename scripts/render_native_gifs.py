@@ -1,4 +1,4 @@
-"""Render every validated native event in perpendicular views, with fixed scales.
+"""Render every validated native event as arrow-free magnitude maps with fixed scales.
 
 Display pixels use the finest containing cell, without spatial smoothing or
 invented time frames. Zero-plane ties use the positive-side native cell. This
@@ -160,6 +160,7 @@ def main() -> None:
         "native_checks": native_frames,
         "frames": [],
         "gifs": {},
+        "vector_arrows": False,
     }
     for frame in native_frames:
         path = output / (frame["path"] + ".bin")
@@ -220,11 +221,8 @@ def main() -> None:
             "savefig.facecolor": "#0a1521",
         }
     )
-    coords = -1 + 2 * (np.arange(n) + 0.5) / n
-    stride = 16
-    xx, yy = np.meshgrid(coords[::stride], coords[::stride], indexing="xy")
-    for plane, (name, horizontal, vertical, components) in enumerate(
-        (("vertical-xz", "x", "z", (0, 2)), ("equatorial-xy", "x", "y", (0, 1)))
+    for plane, (name, horizontal, vertical) in enumerate(
+        (("vertical-xz", "x", "z"), ("equatorial-xy", "x", "y"))
     ):
         for field, k, limit in (("velocity", 0, maxima[0]), ("forcing", 3, maxima[1])):
             frames = []
@@ -265,29 +263,6 @@ def main() -> None:
                     interpolation="nearest",
                     aspect="equal",
                 )
-                u, v = (vector[::stride, ::stride, c].T for c in components)
-                norm = np.hypot(u, v)
-                valid = norm > 0.025 * limit
-                u = np.ma.array(
-                    np.divide(u, norm, out=np.zeros_like(u), where=norm > 0),
-                    mask=~valid,
-                )
-                v = np.ma.array(
-                    np.divide(v, norm, out=np.zeros_like(v), where=norm > 0),
-                    mask=~valid,
-                )
-                ax.quiver(
-                    xx,
-                    yy,
-                    u,
-                    v,
-                    color="#eaf2f7",
-                    angles="xy",
-                    scale_units="xy",
-                    scale=16,
-                    width=0.003,
-                    alpha=0.82,
-                )
                 ax.set(
                     xlabel=horizontal,
                     ylabel=vertical,
@@ -309,7 +284,7 @@ def main() -> None:
                 fig.text(
                     0.11,
                     0.078,
-                    "Arrows: in-plane direction above 2.5% of scale. Native cells; no smoothing.",
+                    "Color: vector magnitude. Native cells; no smoothing.",
                     fontsize=10,
                 )
                 fig.text(
