@@ -115,21 +115,22 @@ def test_ui_renders_all_planes_with_actual_time(dataset):
     pytest.importorskip("gradio")
     from spaces.native_explorer.app import make_app, render_state
 
-    *images, status = render_state(dataset, 1, 0, 0, 0, "velocity", 128)
+    *images, status = render_state(dataset, 1, 0, 0, 0, "velocity")
     assert len(images) == 3 and all(image.shape == (528, 528, 3) for image in images)
-    assert "t = 0.90000000" in status and "Frame 2/2" in status
+    assert "t = 0.90000000" in status and "Saved frame 2/2" in status
     app = make_app(dataset)
     config = app.config
     labels = {c.get("props", {}).get("label") for c in config["components"]}
-    assert {"x · YZ slice", "y · XZ slice", "z · XY slice", "t · saved frame"} <= labels
+    assert {"x · YZ slice", "y · XZ slice", "z · XY slice"} <= labels
+    assert not any(c["type"] in {"dropdown", "markdown"} for c in config["components"])
     assert any(d.get("cancels") for d in config["dependencies"])
     ordered = [f for f in app.fns.values() if f.concurrency_id == "native-manual"]
     assert ordered and all(f.concurrency_limit == 1 for f in ordered)
     assert any(
-        len(d["targets"]) == 6 and d["trigger_mode"] == "always_last"
+        len(d["targets"]) == 5 and d["trigger_mode"] == "always_last"
         for d in config["dependencies"]
     )
-    manual = next(d for d in config["dependencies"] if len(d["targets"]) == 6)
+    manual = next(d for d in config["dependencies"] if len(d["targets"]) == 5)
     assert [target[1] for target in manual["targets"]].count("input") == 4
 
 
@@ -143,12 +144,12 @@ def test_playback_yields_every_state_and_can_close(dataset):
     )
 
     async def verify():
-        events = [event async for event in animate(0, 0, 0, 0, "velocity", 128)]
-        assert [event[0] for event in events] == [0, 1]
-        assert "t = 0.00000000" in events[0][-1]
-        assert "t = 0.90000000" in events[1][-1]
-        generator = animate(0, 0, 0, 0, "force", 128)
-        assert (await anext(generator))[0] == 0
+        events = [event async for event in animate(0, 0, 0, 0, "velocity")]
+        assert [event[-1]["value"] for event in events] == [0, 1]
+        assert "t = 0.00000000" in events[0][-1]["label"]
+        assert "t = 0.90000000" in events[1][-1]["label"]
+        generator = animate(0, 0, 0, 0, "force")
+        assert (await anext(generator))[-1]["value"] == 0
         await generator.aclose()
         with pytest.raises(StopAsyncIteration):
             await anext(generator)
@@ -184,3 +185,78 @@ def test_native_archive_matches_independent_cpp_slice_export(tmp_path):
             for quantity, part in (("velocity", slice(0, 3)), ("force", slice(3, 6))):
                 actual, _ = data.sample_plane(i, plane, 0, quantity)
                 np.testing.assert_array_equal(actual, native[p, ..., part])
+
+
+def test_buffer_prefills_and_stays_bounded(monkeypatch):
+    pytest.importorskip("gradio")
+    from spaces.native_explorer import app as explorer
+
+    monkeypatch.setattr(explorer, "PLAYBACK_INTERVAL", 0)
+    rendered = []
+
+    def render(index):
+        rendered.append(index)
+        return index
+
+    async def verify():
+        generator = explorer.buffered_frames(render, 0, 20, ())
+        assert await anext(generator) == (0, 0)
+        assert len(rendered) >= explorer.PLAYBACK_BUFFER
+        # Let the worker fill ahead while this client is not consuming.
+        await asyncio.sleep(0.1)
+        assert len(rendered) <= explorer.PLAYBACK_BUFFER + 2
+        rest = [event async for event in generator]
+        assert [index for index, _ in rest] == list(range(1, 20))
+        assert rendered == list(range(20))
+
+    asyncio.run(verify())
+
+
+def test_buffer_propagates_loading_errors_and_cancels(monkeypatch):
+    pytest.importorskip("gradio")
+    from spaces.native_explorer import app as explorer
+
+    monkeypatch.setattr(explorer, "PLAYBACK_INTERVAL", 0)
+    rendered = []
+
+    def render(index):
+        rendered.append(index)
+        return index
+
+    def broken(index):
+        if index == 1:
+            raise OSError("missing native frame")
+        return index
+
+    async def verify():
+        generator = explorer.buffered_frames(render, 0, 100, ())
+        assert await anext(generator) == (0, 0)
+        await generator.aclose()
+        await asyncio.sleep(0.05)
+        count = len(rendered)
+        await asyncio.sleep(0.05)
+        assert len(rendered) == count < 100
+        with pytest.raises(OSError, match="missing native frame"):
+            async for _ in explorer.buffered_frames(broken, 0, 10, ()):
+                pass
+
+    asyncio.run(verify())
+
+
+def test_reused_plot_has_no_previous_frame_pixels(dataset):
+    pytest.importorskip("gradio")
+    from spaces.native_explorer.app import render_slice
+
+    rest = render_slice(dataset, 0, "xy", 0, "velocity")
+    moved = render_slice(dataset, 1, "xy", 0, "velocity")
+    assert not np.array_equal(rest, moved)
+    np.testing.assert_array_equal(render_slice(dataset, 0, "xy", 0, "velocity"), rest)
+
+
+@pytest.mark.parametrize("frame", [-1, 2, 0.5, True, float("nan"), "1"])
+def test_render_rejects_invalid_frame_before_cache(dataset, frame):
+    pytest.importorskip("gradio")
+    from spaces.native_explorer.app import render_state
+
+    with pytest.raises(ValueError, match="saved frame"):
+        render_state(dataset, frame, 0, 0, 0, "velocity")

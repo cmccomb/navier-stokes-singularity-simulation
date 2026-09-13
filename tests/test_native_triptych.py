@@ -94,7 +94,7 @@ def test_colorbar_label_does_not_overlap_playback_caption():
 
 
 def test_grid_has_three_ordered_views_and_active_edges_only():
-    from scripts.render_grid_views import hierarchy, plane_edges, render
+    from scripts.render_grid_views import hierarchy, plane_edges, render, render_panel
 
     site = Path(__file__).resolve().parents[1] / "site"
     record = json.loads((site / "data/best.json").read_text())
@@ -107,3 +107,5 @@ def test_grid_has_three_ordered_views_and_active_edges_only():
     svg = render(record)
     assert svg.index("x–y slice") < svg.index("x–z slice") < svg.index("Isometric ·")
     assert svg == (site / "media/oliver-grid-views.svg").read_text()
+    for view in ("xy", "isometric"):
+        assert render_panel(record, view) == (site / f"media/mesh-{view}.svg").read_text()

@@ -18,10 +18,14 @@ forcing, then use the saved-frame playbar, playback, or single-frame buttons.
 The displayed time is the actual solver output time; it is not uniformly spaced.
 
 The app reads a commit-pinned native dataset, preserves float64 values, and
-selects the finest containing cell at each location. Increasing display samples
-does not refine the simulation. Playback waits for rendering and data; it does
-not invent intermediate states. This is an interactive slice explorer, not a
-volume renderer or a solver restart archive.
+selects the finest containing cell at each location on a fixed 256² display
+plane. The time control shows the current saved frame and actual simulation
+time. Playback targets five saved states per second. A three-frame startup
+buffer and bounded read-ahead prepare frames while the browser displays the
+previous frame; revisits reuse a 12-frame image cache. Static plot axes and
+color scales are retained, so only image pixels are redrawn. Playback still
+waits when data is late and never skips or invents saved states. This is an
+interactive slice explorer, not a volume renderer or a solver restart archive.
 
 On the Space, a bounded background download caches the selected archive on
 ephemeral server disk when it fits (18 GiB raw limit, 5 GiB free-space reserve).

@@ -48,6 +48,67 @@ def plane_edges(levels):
     return edges
 
 
+def edge_paths(edges, center, scale, isometric=False):
+    """Project the same native edges for composite and individual panels."""
+    right = np.array([1, 1, 0]) / np.sqrt(2)
+    up = np.array([-1, 1, 2]) / np.sqrt(6)
+    paths = []
+    for level, a, b in edges:
+        planes = ((0, 1), (0, 2), (1, 2)) if isometric else ((0, 1),)
+        for h, v in planes:
+            points = []
+            for end in (a, b):
+                if isometric:
+                    world = np.zeros(3)
+                    world[h], world[v] = end
+                    projected = np.array([world @ right, -(world @ up)])
+                else:
+                    projected = np.array([end[0], -end[1]])
+                points.append(center + scale * projected)
+            p, q = points
+            paths.append(
+                f'<path d="M{p[0]:.3f},{p[1]:.3f}L{q[0]:.3f},{q[1]:.3f}" fill="none" stroke="{COLORS[level]}" stroke-width="0.8"/>'
+            )
+    return paths
+
+
+def render_panel(record, view):
+    """A square XY or isometric panel for the interactive homepage row."""
+    if view not in ("xy", "isometric"):
+        raise ValueError("Expected xy or isometric")
+    center, scale = np.array([400, 400]), 220
+    parts = [
+        '<svg xmlns="http://www.w3.org/2000/svg" width="800" height="800" viewBox="0 0 800 800" role="img" aria-labelledby="title desc">',
+        f'<title id="title">Native mesh: {view}</title>',
+        '<desc id="desc">Actual active cell edges in central sections. Covered coarse interiors are omitted.</desc>',
+        "<style>text{font-family:Arial,Helvetica,sans-serif;fill:#9fb3c2;font-size:27px}</style>",
+        *edge_paths(plane_edges(hierarchy(record)), center, scale, view == "isometric"),
+    ]
+    if view == "xy":
+        for value in (-1, 0, 1):
+            parts.append(
+                f'<text x="{400 + scale * value}" y="663" text-anchor="middle">{value}</text>'
+            )
+            parts.append(
+                f'<text x="164" y="{400 - scale * value + 9}" text-anchor="end">{value}</text>'
+            )
+        parts.extend(
+            [
+                '<text x="400" y="707" text-anchor="middle">x</text>',
+                '<text x="120" y="400">y</text>',
+            ]
+        )
+    else:
+        right = np.array([1, 1, 0]) / np.sqrt(2)
+        up = np.array([-1, 1, 2]) / np.sqrt(6)
+        for d, name in enumerate("xyz"):
+            end = center + 1.16 * scale * np.array([right[d], -up[d]])
+            parts.append(
+                f'<text x="{end[0]:.2f}" y="{end[1]:.2f}" text-anchor="middle">{name}</text>'
+            )
+    return "\n".join([*parts, "</svg>"]) + "\n"
+
+
 def render(record):
     levels = hierarchy(record)
     edges = plane_edges(levels)
@@ -71,22 +132,7 @@ def render(record):
         parts.append(
             f'<text class="heading" x="{center[0]}" y="160" text-anchor="middle">{label}</text>'
         )
-        for level, a, b in edges:
-            planes = ((0, 1), (0, 2), (1, 2)) if view == 2 else ((0, 1),)
-            for h, v in planes:
-                points = []
-                for end in (a, b):
-                    if view == 2:
-                        world = np.zeros(3)
-                        world[h], world[v] = end
-                        projected = np.array([world @ right, -(world @ up)])
-                    else:
-                        projected = np.array([end[0], -end[1]])
-                    points.append(center + scale * projected)
-                p, q = points
-                parts.append(
-                    f'<path d="M{p[0]:.3f},{p[1]:.3f}L{q[0]:.3f},{q[1]:.3f}" fill="none" stroke="{COLORS[level]}" stroke-width="0.8"/>'
-                )
+        parts.extend(edge_paths(edges, center, scale, view == 2))
         if view < 2:
             for value in (-1, 0, 1):
                 parts.append(
@@ -119,8 +165,12 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--record", type=Path, default=Path("site/data/best.json"))
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--panel", choices=("xy", "isometric"))
     args = parser.parse_args()
-    args.output.write_text(render(json.loads(args.record.read_text())))
+    record = json.loads(args.record.read_text())
+    args.output.write_text(
+        render_panel(record, args.panel) if args.panel else render(record)
+    )
 
 
 if __name__ == "__main__":

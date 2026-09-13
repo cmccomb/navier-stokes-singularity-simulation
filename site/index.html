@@ -10,7 +10,7 @@
     <meta name="theme-color" content="#07111f" />
     <title>From smooth flow to a singularity · Navier–Stokes Simulation</title>
     <link rel="icon" href="favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="styles.css?v=three-view-1" />
+    <link rel="stylesheet" href="styles.css?v=mesh-row-1" />
     <script type="module" src="best.js?v=three-view-1"></script>
   </head>
   <body>
@@ -139,29 +139,41 @@
       <section class="measure" aria-labelledby="mesh-title">
         <h2 id="mesh-title">The mesh beneath the motion</h2>
         <p class="measure-note">A 64³ base covers the full periodic box. Four fixed nested cubes refine the core, reaching 1024³-equivalent spacing only inside the innermost cube. The hierarchy stores 1,310,720 cells; 1,179,648 remain active after covered coarse cells are excluded.</p>
-        <figure class="stream-movie mesh-diagram three-view">
-          <div class="plot-viewport" tabindex="0" role="region" aria-label="Native grid views; scroll horizontally on narrow screens"><img src="media/oliver-grid-views.svg" width="2400" height="960" loading="lazy" alt="Native active grid edges, left to right: x-y center slice, x-z center slice, and isometric projection of three central grid sections. Covered coarse interiors are excluded. The grid is fixed in time." /></div>
-          <p class="plot-scroll-hint">Scroll sideways: x–y → x–z → isometric</p>
-          <figcaption><span>Actual native cell edges · fixed in time · same physical scale</span><a href="media/oliver-grid-views.svg" download>SVG ↓</a></figcaption>
-        </figure>
+        <div class="plot-viewport mesh-row-viewport" tabindex="0" role="region" aria-label="Mesh row: x-y, isometric, rotatable whole mesh; scroll horizontally on narrow screens">
+          <div class="mesh-row">
+            <figure>
+              <h3>x–y slice · z = 0</h3>
+              <img src="media/mesh-xy.svg" width="800" height="800" loading="lazy" alt="Active native cell edges in the central x-y slice; covered coarse interiors excluded." />
+            </figure>
+            <figure>
+              <h3>Isometric</h3>
+              <img src="media/mesh-isometric.svg" width="800" height="800" loading="lazy" alt="Isometric view of three central sections through the active native cells." />
+            </figure>
+            <figure>
+              <h3>Whole mesh · rotate</h3>
+              <iframe src="mesh-explorer.html?embed=whole" title="Rotatable whole native mesh" loading="lazy" sandbox="allow-scripts allow-same-origin"></iframe>
+            </figure>
+          </div>
+        </div>
+        <p class="plot-scroll-hint mesh-row-hint">Scroll sideways: x–y → isometric → rotatable mesh</p>
+        <div class="mesh-row-legend" aria-label="Refinement levels">
+          <span style="--level: #42677e">L0 · Δ = 0.03125</span>
+          <span style="--level: #328daf">L1 · Δ = 0.015625</span>
+          <span style="--level: #55becf">L2 · Δ = 0.0078125</span>
+          <span style="--level: #9bddd9">L3 · Δ = 0.00390625</span>
+          <span style="--level: #ffe8a3">L4 · Δ = 0.001953125</span>
+        </div>
+        <p class="measure-note">Central sections show actual active cell edges; outlines mark the refinement regions. Covered coarse interiors are excluded.</p>
         <details class="grid-schematic"><summary>Refinement-region schematic</summary>
           <figure class="stream-movie mesh-diagram">
             <div class="plot-viewport" tabindex="0" role="region" aria-label="Refinement regions; scroll horizontally on narrow screens"><img src="media/oliver-mesh.svg" width="720" height="432" loading="lazy" alt="Five fixed refinement regions centered in the full box: half-widths 1, 0.5, 0.25, 0.125 and 0.0625. Core spacing is 0.001953125 model length units. Region boundaries, not individual cells, are drawn." /></div>
-            <p class="plot-scroll-hint">Scroll sideways to see the cell detail →</p>
+            <p class="plot-scroll-hint">Scroll sideways to see the refinement levels →</p>
             <figcaption><span>Fixed refinement regions · not individual cells</span><a href="media/oliver-mesh.svg" download>SVG ↓</a></figcaption>
           </figure>
-        </details>
-        <details class="native-explorer" id="native-explorer">
-          <summary>Explore the native voxels</summary>
-          <p class="measure-note" id="native-coverage">Prototype: 3 selected states from Oliver's completed run. The full 280-state export is being prepared; the GIFs above already contain all 280.</p>
-          <p class="measure-note">Move x, y, and z to inspect perpendicular slices of velocity or forcing, then play through the available saved times. Cold loads can take several seconds. <a href="https://huggingface.co/spaces/ccm/navier-stokes-singularity-simulation" target="_blank" rel="noopener">Open full-screen ↗</a> · <a href="https://huggingface.co/datasets/ccm/navier-stokes-singularity-simulation">Download dataset ↗</a> · <a href="voxels.html">Dataset documentation →</a></p>
-          <iframe id="native-frame" title="Native velocity and forcing slice explorer with x, y, z, and saved-time controls" data-src="https://ccm-navier-stokes-singularity-simulation.hf.space" loading="lazy" sandbox="allow-scripts allow-same-origin allow-downloads" referrerpolicy="strict-origin-when-cross-origin"></iframe>
-          <noscript><p>Use the full-screen link to open the explorer. The embedded app requires JavaScript.</p></noscript>
         </details>
         <p class="archive-link"><a href="results.html">Earlier runs and numerical record →</a></p>
       </section>
     </main>
-    <script src="native-explorer.js" defer></script>
 
     <footer>
       <p><a href="faq.html">FAQ</a> · Independent open numerical work · not affiliated with OpenAI.</p>

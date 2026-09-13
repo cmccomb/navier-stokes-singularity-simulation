@@ -9,6 +9,25 @@ pytest.importorskip("zarr")
 release = pytest.importorskip("scripts.finish_native_release")
 
 
+@pytest.mark.parametrize(
+    "control,expected",
+    [
+        ({"value": 2, "label": "Saved frame 3/3 · t = 0.99500000"}, True),
+        ({"value": 1, "label": "Saved frame 3/3 · t = 0.99500000"}, False),
+        ({"value": 2, "label": "Saved frame 3/3 · t = 0.99000000"}, False),
+        ("Frame 3/3 · t = 0.99500000", False),
+    ],
+)
+def test_hosted_api_verifies_displayed_frame_and_time(control, expected):
+    assert (
+        release.hosted_frame_matches(
+            ("yz.png", "xz.png", "xy.png", control), [0, 0.9, 0.995]
+        )
+        is expected
+    )
+    assert not release.hosted_frame_matches((control,), [0, 0.9, 0.995])
+
+
 def blob(content):
     return hashlib.sha1(f"blob {len(content)}\0".encode() + content).hexdigest()
 

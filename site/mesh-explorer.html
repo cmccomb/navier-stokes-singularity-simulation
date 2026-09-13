@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Explore the native mesh</title>
+    <link rel="icon" href="favicon.svg" />
+    <link rel="stylesheet" href="mesh-explorer.css" />
+    <script src="mesh-explorer.js" defer></script>
+  </head>
+  <body>
+    <main>
+      <div class="toolbar" aria-label="Mesh views">
+        <button id="whole" aria-pressed="true">Whole mesh</button>
+        <button id="core" aria-pressed="false">Focus core</button>
+        <button id="cells" aria-pressed="false">Cell transition</button>
+        <button id="reset">Reset view</button>
+      </div>
+      <p id="mesh-caption">
+        Three central sections through the active cells. Outlines mark the five
+        refinement regions.
+      </p>
+      <div class="canvas-wrap">
+        <canvas
+          id="mesh-canvas"
+          tabindex="0"
+          aria-label="Interactive 3D mesh. Drag or use arrow keys to rotate. Scroll or use plus and minus to zoom."
+        ></canvas
+        ><span class="axis-key" aria-hidden="true">x · y · z</span>
+      </div>
+      <div class="view-controls">
+        <button id="zoom-in" aria-label="Zoom in">+</button
+        ><button id="zoom-out" aria-label="Zoom out">−</button
+        ><button id="reset-whole">Reset</button
+        ><span>Drag to rotate · scroll to zoom · arrow keys rotate</span>
+      </div>
+      <div id="mesh-legend" aria-label="Refinement levels"></div>
+      <p id="mesh-status" role="status">Loading mesh…</p>
+    </main>
+  </body>
+</html>

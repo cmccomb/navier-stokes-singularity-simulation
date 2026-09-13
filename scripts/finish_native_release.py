@@ -29,6 +29,20 @@ ROOT = Path(__file__).resolve().parents[1]
 REFERENCES = ("spaces/native_explorer/dataset.json", "site/data/native-explorer.json")
 
 
+def hosted_frame_matches(result, times):
+    """The fixed-resolution API returns images and the displayed time control."""
+    if not isinstance(result, (tuple, list)) or len(result) != 4:
+        return False
+    control = result[-1]
+    last = len(times) - 1
+    label = f"Saved frame {last + 1}/{len(times)} · t = {times[last]:.8f}"
+    return (
+        isinstance(control, dict)
+        and control.get("value") == last
+        and control.get("label") == label
+    )
+
+
 def gh(repo, path, data=None, method=None):
     command = ["gh", "api", f"repos/{repo}/{path}"]
     if method:
@@ -201,10 +215,9 @@ def run(args):
                         0,
                         0,
                         "velocity",
-                        128,
                         api_name="/slice",
                     )
-                    if "Frame 280/280" in result[-1] and "t = 0.99500000" in result[-1]:
+                    if hosted_frame_matches(result, manifest["times"]):
                         ready = True
                         break
                 except (HTTPError, OSError, ValueError):
