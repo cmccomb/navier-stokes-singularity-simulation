@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Reproducible, fixed-camera 3D movies of the native velocity fields, with transparent speed surfaces and complete saved-state coverage." />
+    <meta name="theme-color" content="#07111f" />
+    <title>3D rendering · Navier–Stokes Simulation</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#content">Skip to content</a>
+    <header class="site-header">
+      <a class="wordmark" href="index.html"><span class="mark" aria-hidden="true">∇</span><span>Navier–Stokes Simulation</span></a>
+      <nav aria-label="Project navigation"><a href="index.html">Results</a><a href="documentation.html" aria-current="page">Documentation</a><a class="nav-cta" href="https://github.com/cmccomb/navier-stokes-singularity-simulation">GitHub ↗</a></nav>
+    </header>
+    <main class="docs-shell" id="content">
+      <nav class="docs-nav" aria-label="Documentation pages"><a href="method.html">Model &amp; method</a><a href="running.html">Run it</a><a href="voxels.html">Native voxels</a><a href="rendering-3d.html" aria-current="page">3D rendering</a></nav>
+      <article class="doc-page">
+        <p class="eyebrow">Rendering guide · September 13, 2026</p>
+        <h1>See the flow in three dimensions.</h1>
+        <p class="dek">Fixed-camera movies show how the same speed surfaces evolve through Oliver's complete, 280-state sequence. An isometric view establishes depth; side and top views expose the geometry; a separate core close-up makes the concentrated flow easier to inspect.</p>
+        <h2>What the surfaces mean</h2>
+        <p>Each surface joins locations with the same velocity magnitude, |u|, in nondimensional model units. The overview uses fixed thresholds of 0.15, 1.5, and 4. The lowest surface is translucent blue, the middle is translucent cyan, and the highest is opaque pale cyan. Lighting communicates shape, not a second scalar quantity. These are speed surfaces, not vortex boundaries, particle trajectories, streamlines, or a liquid's free surface.</p>
+        <p>The core close-up shows only the 1.5 and 4 surfaces. It hides the 0.15 shell explicitly, with no automatic threshold change or peak tracking. A reference cube has half-width 0.5 in overview views and 0.125 in the core view. These cubes provide scale; they are not simulation boundaries. The native periodic domain is [−1, 1]³.</p>
+        <h2>Stable cameras and complete time history</h2>
+        <p>All four cameras use orthographic projection and stay fixed throughout each movie. A preflight pass fits the cameras to all visible surfaces across the complete saved history, including the wider early pulses. The three overview cameras share a physical scale; the core camera has its own fixed, labeled magnification. There are no velocity-vector arrows or camera orbits.</p>
+        <p>Every saved state from t = 0 to 0.995 is retained, including the exact-rest interval through 0.55. Playback shows five saved states per second, with a one-second initial hold and a half-second final hold: 57.1 seconds in total. The simulation times are nonuniform. The timestamp, not elapsed movie time, is the simulation clock. No intermediate fluid states are invented. A blank view after rest can mean that speed remains below its lowest displayed threshold.</p>
+        <h2>Rendering quality without a resolution claim</h2>
+        <p>The renderer reads the lossless, float64 <a href="voxels.html">native voxel dataset</a> and checks every frame's per-level SHA-256 digests. It computes speed at native cell centers, then constructs a nonuniform display grid that retains the fine core spacing. For this hierarchy the display grid has 192 points per axis; that number is not the solver resolution.</p>
+        <p>At each display point, the finest containing native level supplies the scalar value through trilinear interpolation, clamped at that level's outer cell centers. Contouring then reconstructs a surface between display points. This interpolation serves visualization only. It cannot add resolved physics, remove coarse-grid error, or establish convergence. No spatial filter, surface-position smoothing, or mesh decimation is applied.</p>
+        <p><a href="https://docs.pyvista.org/api/core/grids">VTK/PyVista's nonuniform grid support</a> preserves physical coordinate spacing. <a href="https://docs.pyvista.org/api/plotting/_autosummary/pyvista.plotter.enable_depth_peeling">Depth peeling</a> handles overlapping translucent surfaces, and fixed lights with smooth normal shading expose depth. Each image is rendered at 3200 × 2400 and reduced to 1600 × 1200. The MP4 preserves more color detail than the 1000 × 750, 256-color GIF. Download the MP4 for the clearest presentation.</p>
+        <h2>Reproduce the movies</h2>
+        <p>Use a separate rendering environment and a completed native dataset export. FFmpeg and an offscreen-capable OpenGL context are required. The renderer refuses an incomplete dataset for movie production and requires a new output directory.</p>
+        <pre><code>uv venv .venv-render --python 3.12
+uv pip install --python .venv-render/bin/python -r scripts/requirements-render.txt
+.venv-render/bin/python -m scripts.render_native_3d \
+  --dataset outputs/native-voxels --output outputs/native-3d \
+  --views isometric side top core --width 1600</code></pre>
+        <p>For a quick rendering check, add <code>--stills 0 140 279</code>. This produces explicitly selected stills, not a full-history animation. The output manifest records source hashes, thresholds, opacity, camera position and scale, per-frame surface counts, and movie hashes. A geometric check rejects a camera that would clip the visible flow beneath captions or outside the image. GIF and MP4 readback checks verify frame counts and timing, including repeated identical rest states.</p>
+        <p>These movies visualize a finite manufactured-force surrogate. Rendering integrity is separate from numerical accuracy and does not provide evidence of a singularity. See the <a href="method.html">method</a> and <a href="accuracy.html">accuracy budget</a> for the simulation's scope.</p>
+      </article>
+    </main>
+    <footer><p>Independent open numerical work · not affiliated with OpenAI.</p></footer>
+  </body>
+</html>
