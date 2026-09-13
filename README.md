@@ -10,12 +10,6 @@ The featured completed run uses [AMReX / incflo](backends/amrex/README.md)
 with fixed nested grids and multilevel projection. The earlier PhiFlow 3.4
 backend, projected RK2 and periodic FFT projection remain available.
 
-Oliver's current best completed native run reaches `t = 0.995` from exact rest,
-with all 280 saved states verified. Its 64³ base and four refined levels give
-1024³-equivalent spacing **only in the core**. The
-[numerical record](site/results.html#oliver-complete) documents the result and
-its limits. Archive validation does not establish convergence or a singularity.
-
 The experiment starts from rest, smoothly activates a compactly supported
 manufactured force, and follows an inward-spiraling, axially stretching vortex
 toward the normalized singular time `t*=1`.
@@ -28,28 +22,37 @@ toward the normalized singular time `t*=1`.
 ## Current best
 
 The [results site](https://cmccomb.com/navier-stokes-singularity-simulation/)
-features the completed **192³ start-from-rest run: 487 saved states through t = 0.985**.
-The [stream record](site/data/stream.json) is the authoritative published
-configuration and saved history; completion at the configured endpoint is not a singularity claim.
+features **Oliver's completed AMReX run: 280 saved states from exact rest through t = 0.995**.
+Its 64³ base and four fixed refined levels give 1024³-equivalent spacing
+**only in the core**, not throughout the domain. The
+[completion record](site/data/best.json) preserves native checks and media
+provenance. Archive validation does not establish convergence or a singularity.
 
 | Completed run configuration | Value |
 |---|---:|
-| Grid / domain | `192^3`, full `[-1,1]^3` box |
-| Saved time interval | `0` to `0.985` |
+| Grid / domain | `64^3` base, 5 fixed levels, full `[-1,1]^3` box |
+| Stored / active cells | `1,310,720` / `1,179,648` |
+| Saved time interval | `0` to `0.995`, all 280 states |
 | Exact rest interval | `0` to `0.55` |
-| Profile interpolation | Cubic, source `9d2afb8` |
+| Profile | `appendix-b-axis-v2-localized`, finite three-pulse surrogate |
 | Maximum timestep / phase advance | `0.00025` / `0.0375` radians |
 | Force-difference half-window | `2e-7` |
 
-The from-rest 32³ cubic-profile temporal pilot recovered a successive-difference
+Arrow-free GIFs and MP4s use the established site styling, with a fixed midplane
+or a horizontal slice following the height of the active 3D peak speed. Both
+choices retain every saved state. [Run details and limitations](site/results.html#oliver-complete).
+
+The earlier PhiFlow from-rest 32³ cubic-profile temporal pilot recovered a successive-difference
 ratio of 3.989, consistent with second-order time convergence at that coarse
 resolution. Spatial convergence is not established. This remains a best-guess
 finite-surrogate experiment, not a singularity demonstration.
 
-The new [refined-mesh operator pilot](https://cmccomb.com/navier-stokes-singularity-simulation/refinement.html)
-validates AMReX-Hydro pressure projection on a fixed, full-domain hierarchy,
-including 1024³-equivalent core spacing. It is not yet a new flow simulation;
-the linked documentation records the tests, memory measurement, and remaining gates.
+The [refined-backend documentation](https://cmccomb.com/navier-stokes-singularity-simulation/refinement.html)
+separates operator validation, completed flow histories, memory measurements
+and the remaining accuracy gates. The previous uniform-grid movies and 3D
+explorers remain in the [numerical record](site/results.html#legacy-media).
+
+## Earlier PhiFlow publication workflow
 
 With noninteractive GitHub authentication configured, the publisher detects
 finalized phase-clock snapshots every 30 seconds and commits the latest

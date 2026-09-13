@@ -37,7 +37,7 @@
 
         <h2>Governing equation</h2>
         <div class="equation">∂<sub>t</sub>u + (u · ∇)u − νΔu + ∇p = f, &nbsp;&nbsp; ∇ · u = 0.</div>
-        <p>The experiment computes a continuous-time manufactured force from the target’s numerical time derivative and the same discrete momentum operators used by the solver. This makes trajectory tracking testable, but it also means growth of the residual force is a limitation—not evidence of a reproduced singularity.</p>
+        <p>The manufactured force combines the target's centered numerical time derivative, advection and viscous terms. This makes trajectory tracking testable, but it does not eliminate discretization differences in the coupled AMReX solver. Growth of the residual force is a limitation, not evidence of a reproduced singularity.</p>
 
         <h2>Start from rest</h2>
         <p>Velocity and force are exactly zero through <span class="math">t = 0.55</span>. A compact-flat smooth cutoff activates the target over <span class="math">0.55 &lt; t &lt; 0.775</span>; the target is fully active afterward. The solver advances the exact-zero interval analytically.</p>
