@@ -160,7 +160,7 @@ Export and Python/PhiFlow comparisons require the project's scientific Python
 dependencies. `paper_run` itself uses only the standard library and built C++
 binaries. Each run pins its binary, input, table, manifest, and adapter sources;
 it records every solver step and reads back all native velocity/force frames.
-It refuses existing output directories and has a bounded runtime. `run.json`
+It refuses existing output directories and defaults to a bounded runtime. `run.json`
 starts as `running`; a `completed` status also requires clock and archive checks.
 
 The force clock retains the exported log-phase ceiling in addition to CFL and
@@ -261,10 +261,35 @@ frame-phase step preserves uniform output scheduling.
 
 `--max-rss-mib` and `--min-disk-free-gib` optionally stop the owned solver if a
 resource threshold is crossed. They are polled every five seconds, not OS hard
-limits. `--timeout` limits solver wall time. A stop records failure and leaves
+limits. `--timeout` limits solver wall time; `--timeout 0` removes only this
+cutoff for a new run. Keep positive RAM and disk guards for long experiments.
+A stop records failure and leaves
 existing native frames and checkpoints intact. The runner itself is copied
 and hashed along with the solver inputs; per-process loader overrides are
 recorded. No fleet machine's global library configuration is changed.
+
+For an already running Mac experiment, changing the input file or `run.json`
+does not change the original supervisor's in-memory deadline. The explicit
+`scripts.paper_supervisor` handoff registers Darwin kernel exit-status tracking,
+preserves the original record, and replaces only the verified parent supervisor.
+The solver PID, in-memory fields, input clock, output schedule, and endpoint stay
+unchanged. Positive RAM/disk limits remain checked every five seconds. A failed
+preparation resumes the original supervisor; a fatal error after adoption stops
+only the identity-verified solver and retains its saved data.
+
+```sh
+python -m scripts.paper_supervisor --run outputs/recorded-run \
+  --supervisor-pid VERIFIED_PARENT_PID --state outputs/fresh-supervision-record \
+  --remove-wall-limit --reason "Operator authorized unlimited wall time"
+```
+
+Replace `VERIFIED_PARENT_PID` with the inspected Python runner PID, not the
+solver PID. Use a fresh state directory and a sleep-prevention wrapper for
+unattended Mac work. The handoff preserves an original-record snapshot, source
+hashes, process identities, a five-second supervision heartbeat, and the actual
+kernel-reported solver exit code. Completion still requires the same full
+history and native-field audit. This changes wall-clock allocation, not the
+simulation's physical endpoint or numerical settings.
 
 The large experiment launched on September 12, 2026, is 128³ base with half-widths
 `0.5 0.25 0.125 0.0625`, from rest to 0.995. At output phase 0.75 and maximum gap

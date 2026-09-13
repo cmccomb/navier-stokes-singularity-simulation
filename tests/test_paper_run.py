@@ -6,10 +6,12 @@ import pytest
 
 from scripts.paper_run import (
     MARKER,
+    audit_completed,
     output_times,
     resource_check,
     thread_environment,
     validate_history,
+    wait_bounded,
 )
 
 
@@ -156,3 +158,63 @@ def test_activation_roundoff_still_enforces_active_step_caps():
     changed[-1]["time"] = rows[2]["time"] + 0.025
     with pytest.raises(ValueError, match="phase step|timestep ceiling"):
         validate_history(text(changed), record)
+
+
+def test_unlimited_wait_keeps_resource_checks(monkeypatch, tmp_path):
+    import subprocess
+    from types import SimpleNamespace
+
+    waits, guards = [], []
+
+    def wait(timeout):
+        waits.append(timeout)
+        if len(waits) == 1:
+            raise subprocess.TimeoutExpired("fixture", timeout)
+        return 0
+
+    monkeypatch.setattr(
+        "scripts.paper_run.resource_check", lambda *args: guards.append(args)
+    )
+    process = SimpleNamespace(pid=123, args=["fixture"], wait=wait)
+    assert wait_bounded(process, tmp_path, 0, 100, 20) == 0
+    assert waits == [5, 5] and guards == [(tmp_path, 123, 100, 20)]
+    for bad in (-1, float("inf"), float("nan")):
+        with pytest.raises(ValueError, match="timeout"):
+            wait_bounded(process, tmp_path, bad, 100, 20)
+
+
+def test_finite_wait_still_expires(monkeypatch, tmp_path):
+    import subprocess
+    from types import SimpleNamespace
+
+    ticks = iter([0, 2])
+    monkeypatch.setattr("scripts.paper_run.time.monotonic", lambda: next(ticks))
+    process = SimpleNamespace(pid=123, args=["fixture"])
+    with pytest.raises(subprocess.TimeoutExpired):
+        wait_bounded(process, tmp_path, 1, 100, 20)
+
+
+def test_shared_completion_audit_preserves_full_archive_gate(monkeypatch, tmp_path):
+    from types import SimpleNamespace
+
+    record, rows = fixture()
+    record["parameters"].update(frame_dt=0.5, epsilon_tau_ratio=0)
+    record.update(status="running", validated=False, native_frames=[])
+    (tmp_path / "run.log").write_text(text(rows))
+    for step in (0, 1, 3):
+        (tmp_path / f"plt{step:05d}").mkdir()
+
+    def check(command, **kwargs):
+        name = command[1].split("/")[-1]
+        row = rows[int(name[3:])]
+        return SimpleNamespace(
+            returncode=0, stderr="", stdout="NS_ARCHIVE_RESULT " + json.dumps(row)
+        )
+
+    monkeypatch.setattr("scripts.paper_run.subprocess.run", check)
+    audit_completed(tmp_path, record, {})
+    assert record["validated"] and record["status"] == "completed"
+    assert len(record["native_frames"]) == 3
+    (tmp_path / "plt00001").rmdir()
+    with pytest.raises(ValueError, match="missing scheduled"):
+        audit_completed(tmp_path, record, {})
