@@ -108,13 +108,17 @@ def wait_bounded(
     max_rss_mib: float,
     min_disk_free_gib: float,
 ) -> int:
-    deadline = time.monotonic() + timeout
+    if not math.isfinite(timeout) or timeout < 0:
+        raise ValueError("timeout must be finite and nonnegative")
+    deadline = time.monotonic() + timeout if timeout else None
     while True:
-        remaining = deadline - time.monotonic()
-        if remaining <= 0:
+        remaining = deadline - time.monotonic() if deadline is not None else None
+        if remaining is not None and remaining <= 0:
             raise subprocess.TimeoutExpired(process.args, timeout)
         try:
-            return process.wait(timeout=min(5, remaining))
+            return process.wait(
+                timeout=min(5, remaining) if remaining is not None else 5
+            )
         except subprocess.TimeoutExpired:
             resource_check(output, process.pid, max_rss_mib, min_disk_free_gib)
 
@@ -183,6 +187,55 @@ def validate_history(text: str, record: dict) -> list[dict]:
     return rows
 
 
+def audit_completed(output: Path, record: dict, child_env: dict) -> None:
+    """Retain the same full-history and native-field gate for every supervisor."""
+    record["history"] = validate_history((output / "run.log").read_text(), record)
+    record["native_frames"] = []
+    for plot in sorted(output.glob("plt[0-9]*")):
+        if not plot.is_dir() or not plot.name[3:].isdigit():
+            continue
+        checked = subprocess.run(
+            [
+                str(output / "ns_archive_check"),
+                f"plot={plot}",
+                "ns.force=paper",
+                f"ns.table_file={output / 'profile.tbl'}",
+                f"ns.epsilon_tau_ratio={record['parameters']['epsilon_tau_ratio']:.17g}",
+            ],
+            cwd=output,
+            capture_output=True,
+            text=True,
+            timeout=1800,
+            check=False,
+            env=child_env,
+        )
+        (output / f"{plot.name}-read.log").write_text(checked.stdout + checked.stderr)
+        if checked.returncode:
+            raise ValueError(f"native frame verification failed: {plot.name}")
+        rows = [
+            json.loads(s.removeprefix("NS_ARCHIVE_RESULT "))
+            for s in checked.stdout.splitlines()
+            if s.startswith("NS_ARCHIVE_RESULT ")
+        ]
+        if len(rows) != 1:
+            raise ValueError("missing archive verification record")
+        record["native_frames"].append({"path": plot.name, **rows[0]})
+        write(output / "run.json", record)
+    params = record["parameters"]
+    expected_times = record.get("planned_frames") or output_times(
+        params["end"],
+        params["frame_dt"],
+        params.get("frame_phase_step", 0),
+        record["profile_manifest"]["parameters"],
+    )
+    frames = record["native_frames"]
+    if len(frames) != len(expected_times) or any(
+        abs(f["time"] - t) > 1e-12 for f, t in zip(frames, expected_times)
+    ):
+        raise ValueError("native archive is missing scheduled frames from rest")
+    record.update(status="completed", validated=True)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -209,7 +262,12 @@ def main() -> None:
         default=0,
         help="optional forcing-phase output spacing, never an integration timestep",
     )
-    parser.add_argument("--timeout", type=float, default=86400)
+    parser.add_argument(
+        "--timeout",
+        type=float,
+        default=86400,
+        help="solver wall-clock seconds; zero removes only the wall-clock cutoff",
+    )
     parser.add_argument(
         "--max-rss-mib",
         type=float,
@@ -245,7 +303,7 @@ def main() -> None:
         and args.max_dt > 0
         and args.frame_dt > 0
         and args.frame_phase_step >= 0
-        and args.timeout > 0
+        and args.timeout >= 0
         and args.max_rss_mib >= 0
         and args.min_disk_free_gib >= 0
         and all(
@@ -348,7 +406,7 @@ def main() -> None:
         },
         "planned_frames": planned_frames,
         "limits": {
-            "wall_seconds": args.timeout,
+            "wall_seconds": args.timeout or None,
             "max_rss_mib": args.max_rss_mib,
             "min_disk_free_gib": args.min_disk_free_gib,
             "poll_seconds": 5,
@@ -389,45 +447,7 @@ def main() -> None:
                 raise
         if code:
             raise ValueError(f"solver exited with status {code}")
-        history = validate_history((output / "run.log").read_text(), record)
-        record["history"] = history
-        for plot in sorted(output.glob("plt[0-9]*")):
-            checked = subprocess.run(
-                [
-                    str(output / "ns_archive_check"),
-                    f"plot={plot}",
-                    "ns.force=paper",
-                    f"ns.table_file={output / 'profile.tbl'}",
-                    f"ns.epsilon_tau_ratio={args.epsilon_tau_ratio:.17g}",
-                ],
-                cwd=output,
-                capture_output=True,
-                text=True,
-                timeout=1800,
-                check=False,
-                env=child_env,
-            )
-            (output / f"{plot.name}-read.log").write_text(
-                checked.stdout + checked.stderr
-            )
-            if checked.returncode:
-                raise ValueError(f"native frame verification failed: {plot.name}")
-            rows = [
-                json.loads(s.removeprefix("NS_ARCHIVE_RESULT "))
-                for s in checked.stdout.splitlines()
-                if s.startswith("NS_ARCHIVE_RESULT ")
-            ]
-            if len(rows) != 1:
-                raise ValueError("missing archive verification record")
-            record["native_frames"].append({"path": plot.name, **rows[0]})
-            write(output / "run.json", record)
-        frames = record["native_frames"]
-        expected_times = planned_frames
-        if len(frames) != len(expected_times) or any(
-            abs(f["time"] - t) > 1e-12 for f, t in zip(frames, expected_times)
-        ):
-            raise ValueError("native archive is missing scheduled frames from rest")
-        record.update(status="completed", validated=True)
+        audit_completed(output, record, child_env)
     except Exception as exc:
         record.update(status="failed", error=str(exc))
         raise
