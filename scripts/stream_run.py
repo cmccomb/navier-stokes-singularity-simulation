@@ -236,6 +236,10 @@ def render_pair(
     resolution: int,
     half_domain: float = 1.0,
     slow_motion_after: float | None = None,
+    *,
+    mesh_label: str | None = None,
+    color_max: float | None = None,
+    save_poster: bool = False,
 ) -> dict:
     playback = build_playback(
         [float(frame["time"]) for frame in frames], slow_motion_after
@@ -243,7 +247,9 @@ def render_pair(
     peak = max(
         float(np.max(p)) for frame in frames for p in frame_magnitudes(frame, field)
     )
-    vmax = peak if peak > 0 else 1.0
+    vmax = color_max if color_max is not None else (peak if peak > 0 else 1.0)
+    if not np.isfinite(vmax) or vmax <= 0 or peak > vmax + 1e-12:
+        raise ValueError("color scale must cover the sampled magnitude")
     norm = SymLogNorm(linthresh=0.02 * vmax, vmin=0, vmax=vmax)
     cmap = LinearSegmentedColormap.from_list(
         "stream", ["#07111f", "#177eab", "#69d2e7", "#fff2c0"]
@@ -255,7 +261,9 @@ def render_pair(
     extent = (coord[0] - spacing / 2, coord[-1] + spacing / 2) * 2
     images = []
     initial_magnitudes = frame_magnitudes(frames[0], field)
-    coordinate = plane_vectors(frames[0], field)[2]
+    coordinate = frames[0].get(
+        "plane_coordinates", [plane_vectors(frames[0], field)[2]]
+    )[0]
     for j, (axis, label) in enumerate(zip(axes, ("x–z", "x–y"))):
         axis.set_facecolor("#07111f")
         images.append(
@@ -304,7 +312,7 @@ def render_pair(
     fig.text(
         0.5,
         0.035,
-        f"{resolution}³ solver · {len(coord)}² planes · all {len(frames)} saved frames · shared scale",
+        f"{mesh_label or f'{resolution}³ solver'} · {len(coord)}² planes · all {len(frames)} frames · shared scale",
         ha="center",
         color="#9fb3c2",
         fontsize=11.2,
@@ -323,6 +331,16 @@ def render_pair(
         magnitudes = frame_magnitudes(frames[index], field)
         for j, image in enumerate(images):
             image.set_data(magnitudes[j].T)
+            coordinates = frames[index].get(
+                "plane_coordinates", [coordinate, coordinate]
+            )
+            moving = frames[index].get("moving_xy", False) and j == 1
+            axes[j].set_title(
+                f"{'x–z · y' if j == 0 else 'x–y · z'}={coordinates[j]:.5f}"
+                + (" · peak" if moving else ""),
+                color="#e9f1f5",
+                fontsize=12.8,
+            )
         time_label.set_text(f"t = {float(frames[index]['time']):.6f}")
         status_label.set_text(
             "zero field" if all(not np.any(p) for p in magnitudes) else ""
@@ -423,6 +441,8 @@ def render_pair(
                     process.terminate()
                     process.wait(timeout=10)
         verification = verify_gif(gif, playback["source_frame_duration_ms"])
+        if save_poster:
+            fig.savefig(stem.with_suffix(".png"), facecolor="#07111f")
         video.replace(stem.with_suffix(".mp4"))
         gif.replace(stem.with_suffix(".gif"))
     finally:

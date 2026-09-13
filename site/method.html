@@ -25,7 +25,10 @@
       <article class="doc-page">
         <p class="eyebrow">Guide 01</p>
         <h1>Model &amp; numerical method</h1>
-        <p class="dek">A finite, proof-informed manufactured-solution experiment advanced with PhiFlow on a periodic Cartesian grid.</p>
+        <p class="dek">A finite, proof-informed manufactured-force experiment. The current completed run uses AMReX / incflo on fixed nested Cartesian grids in the full periodic box.</p>
+        <h2>Current refined backend</h2>
+        <p>Oliver's completed run uses a 64³ base and four fixed refined levels, reaching 1024³-equivalent spacing only in the innermost cube. The established incflo integrator and AMReX-Hydro multilevel projection advance velocity; a centered numerical derivative, advection term and Laplacian of the localized target construct the prescribed force. This force construction is not identical to every term of the incflo discretization, so agreement must be measured, not assumed.</p>
+        <p>The maximum timestep is 0.00025 and the forcing-phase ceiling is 0.0375. A separate output clock preserves all 280 native velocity/force states from rest through 0.995. See the <a href="results.html#oliver-complete">completion record</a> and <a href="refinement.html">backend validation and refinement notes</a>. The target formulas below are shared; the discrete representation and diagnostic list describe the earlier PhiFlow backend unless explicitly stated otherwise.</p>
 
         <h2>Analytical target</h2>
         <p>Let <span class="math">τ = 1 − t</span>. The paper’s leading core contracts anisotropically while its peak velocity grows:</p>
@@ -39,7 +42,7 @@
         <h2>Start from rest</h2>
         <p>Velocity and force are exactly zero through <span class="math">t = 0.55</span>. A compact-flat smooth cutoff activates the target over <span class="math">0.55 &lt; t &lt; 0.775</span>; the target is fully active afterward. The solver advances the exact-zero interval analytically.</p>
 
-        <h2>Discrete representation</h2>
+        <h2>Earlier PhiFlow representation</h2>
         <ul>
           <li>Cell-centered periodic Cartesian grid and double precision.</li>
           <li>Velocity generated as a centered discrete curl, giving divergence-free target fields to roundoff.</li>
@@ -48,7 +51,7 @@
           <li>Finite multiscale annular pulse families plus a bounded grid-deconvolution correction at vector-potential level.</li>
         </ul>
 
-        <h2>What is measured</h2>
+        <h2>Earlier PhiFlow diagnostics</h2>
         <p>Every saved frame records component maxima, energy, enstrophy, helicity, dissipation, force norms, momentum cancellation, divergence, tracking error, Fourier occupancy, BKM accumulation, and cells per similarity scale. Structure diagnostics additionally measure axial-outflow alignment, upper and lower axial flux, measured versus theoretical core aspect ratio, pulse localization, pulse covariance, exterior leakage, and fixed-mesh clearance. Production runs can also preserve the complete three-component 3D force field in <code>forces.npz</code> for volume rendering and spatial audits.</p>
 
         <div class="callout warning"><strong>Interpretation boundary.</strong> This is not an independent numerical proof and is not yet the paper’s exact all-order construction. The informative interval ends when either similarity scale spans fewer than four cells or the spectral tail audit fails. Overflow, CFL failure, or an under-resolved spike is a numerical failure—not a positive result.</div>

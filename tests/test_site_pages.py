@@ -121,7 +121,7 @@ def test_coupled_validation_remains_distinct_from_the_project_force():
 def test_actual_forcing_port_keeps_version_and_accuracy_boundaries():
     page = (SITE / "refinement.html").read_text()
     assert 'href="data/paper-port.json"' in page
-    assert "Existing homepage movies remain v1" in page
+    assert "earlier homepage movies remain archived as v1" in page
     assert "convergence probes, not accepted production meshes" in page
     report = json.loads((SITE / "data/paper-port.json").read_text())
     assert report["localization"]["default_changed"] is False
