@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "kind": "runtime-policy-change",
+  "machine": "kay",
+  "status": "running",
+  "observed_at": "2026-09-13T11:12:04.122926+00:00",
+  "handoff_at": "2026-09-13T11:10:51.140669+00:00",
+  "scope": "Wall-clock allocation only. The existing from-rest solver continued without restarting; no numerical settings or endpoint changed.",
+  "authorization": "User requested as much wall-clock time as needed on 2026-09-13.",
+  "supervision_source_commit": "499f3e7e9385666fd978670b92ab1246ec1dfb10",
+  "source_hashes": {
+    "paper_supervisor.py": "9c4b25c458ff2364533d4f580ae3c5e65ec155f06acee11ff5aa208f0a68b2dc",
+    "paper_run.py": "c67845bfa676630a999670ab7136ddd47dbad15907fa66b3659a5ade09da462b"
+  },
+  "original_record_sha256": "ddddd8d94b96b3edc9391687889d0e8b8b0ab828a2eaea50e87bb63a0a710875",
+  "current_record_sha256": "c8b8dd215c33100cb97d5505148fe17bda6ddfb52326f7a3df461d23a37148f3",
+  "original_limits": {
+    "wall_seconds": 172800,
+    "max_rss_mib": 11776,
+    "min_disk_free_gib": 20,
+    "poll_seconds": 5
+  },
+  "effective_limits": {
+    "wall_seconds": null,
+    "max_rss_mib": 11776,
+    "min_disk_free_gib": 20,
+    "poll_seconds": 5
+  },
+  "solver_restarted": false,
+  "solver_pid_unchanged": true,
+  "original_supervisor_retired": true,
+  "sleep_prevention_verified": true,
+  "unchanged_solver_assets_and_configuration": true,
+  "target_time": 0.995,
+  "planned_native_frames": 280,
+  "handoff_step": 1107,
+  "handoff_time": 0.7662225849365458,
+  "verified_later_step": 1108,
+  "verified_later_time": 0.7664278343132478,
+  "whole_history_prefix_passed": true,
+  "exit_tracking": "Darwin kqueue NOTE_EXITSTATUS; actual exit status remains observable after reparenting.",
+  "completion_gate": "Zero solver exit status, complete from-rest diagnostic history, and all scheduled native velocity/forcing field checks.",
+  "validation": {
+    "unit_tests_passed": 145,
+    "live_reparented_exit_status_probe_passed": true,
+    "destination_python": "3.14.6",
+    "destination_probe_passed": true,
+    "native_completion_fixture": {
+      "passed": true,
+      "base_n": 16,
+      "original_timeout_seconds": 5,
+      "elapsed_seconds": 58.203218,
+      "end_time": 0.552,
+      "native_frames": 3,
+      "solver_restarted": false,
+      "exit_code": 0,
+      "validated": true
+    },
+    "operator_stop_fixture": {
+      "passed": true,
+      "intentionally_interrupted": true,
+      "owned_test_solver_stopped": true,
+      "data_preserved": true
+    }
+  },
+  "limitation": "This verifies supervision and data integrity, not spatial convergence or singularity formation."
+}
