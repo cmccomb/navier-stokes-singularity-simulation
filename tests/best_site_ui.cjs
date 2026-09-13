@@ -7,57 +7,62 @@ const site = path.join(__dirname, "../site");
 const html = fs.readFileSync(path.join(site, "index.html"), "utf8");
 const run = JSON.parse(fs.readFileSync(path.join(site, "data/best.json")));
 
-async function exercise(reduced) {
+async function exercise(reduced, invalidRecord = false) {
   const nodes = new Map([...html.matchAll(/\bid="([^"]+)"/g)].map((m) => [m[1], {
-    id: m[1], attributes: {}, listeners: {}, currentTime: 0, duration: 57.1,
+    id: m[1], currentTime: 0, duration: 57.1,
     paused: true, plays: 0, hidden: false,
-    hasAttribute(name) { return name === "src" ? !!this.src : name in this.attributes; },
-    setAttribute(name, value) { this.attributes[name] = value; },
-    addEventListener(name, fn) { this.listeners[name] = fn; },
     play() { this.plays += 1; this.paused = false; return Promise.resolve(); },
-    focus() { this.focused = true; },
   }]));
-  const tabs = [...html.matchAll(/<button[^>]*id="([^"]+)"[^>]*data-field="([^"]+)"[^>]*data-view="([^"]+)"/g)]
-    .map((m) => Object.assign(nodes.get(m[1]), { dataset: { field: m[2], view: m[3] } }));
+  assert(!html.includes('role="tab'));
+  assert(!nodes.has("flow-tab-peak") && !nodes.has("force-tab-peak"));
   const captions = [{}, {}];
+  const errors = [];
   const document = {
     querySelector(selector) {
-      if (selector.startsWith("#")) { assert(nodes.has(selector.slice(1)), selector); return nodes.get(selector.slice(1)); }
-      const match = selector.match(/^\[data-field="([^"]+)"\]\[data-view="([^"]+)"\]$/);
-      assert(match, selector);
-      return tabs.find((t) => t.dataset.field === match[1] && t.dataset.view === match[2]);
+      assert(selector.startsWith("#") && nodes.has(selector.slice(1)), selector);
+      return nodes.get(selector.slice(1));
     },
     querySelectorAll(selector) {
-      if (selector === "[role=tab]") return tabs;
-      if (selector === "[data-clip-range]") return captions;
-      const match = selector.match(/^\[data-field="([^"]+)"\]$/);
-      assert(match, selector);
-      return tabs.filter((t) => t.dataset.field === match[1]);
+      assert.equal(selector, "[data-clip-range]");
+      return captions;
     },
   };
   vm.runInNewContext(fs.readFileSync(path.join(site, "best.js"), "utf8"), {
     document, URL, window: { location: new URL("http://localhost/"), matchMedia: () => ({ matches: reduced }) },
-    fetch: async () => ({ ok: true, json: async () => run }),
-    console: { error: (error) => { throw error; } },
+    fetch: async () => ({ ok: true, json: async () => invalidRecord ? { ...run, validated: false } : run }),
+    console: { error: (error) => errors.push(error) },
   });
   await new Promise(setImmediate);
-  const video = nodes.get("flow-video");
-  assert(video.src.includes("oliver-flow-midplane.mp4"));
-  assert.equal(video.plays, reduced ? 0 : 1);
-  video.currentTime = 7.2;
-  nodes.get("flow-tab-peak").listeners.click();
-  video.onloadedmetadata();
-  assert(video.src.includes("oliver-flow-peak.mp4"));
-  assert.equal(video.currentTime, 7.2);
-  assert.equal(nodes.get("flow-tab-peak").attributes["aria-selected"], "true");
-  assert(nodes.get("flow-view-note").textContent.includes("moving slice"));
-  assert(nodes.get("flow-gif").href.includes("oliver-flow-peak.gif"));
-  nodes.get("flow-tab-peak").listeners.keydown({ key: "ArrowLeft", preventDefault() {} });
-  assert(video.src.includes("oliver-flow-midplane.mp4"));
-  assert(nodes.get("flow-tab-2d").focused);
-  nodes.get("force-tab-peak").listeners.click();
-  assert(nodes.get("force-video").src.includes("oliver-force-peak.mp4"));
-  assert(video.src.includes("oliver-flow-midplane.mp4"));
+  if (invalidRecord) {
+    assert.equal(errors.length, 1);
+    for (const kind of ["flow", "force"]) {
+      assert.equal(nodes.get(`${kind}-video`).src, undefined);
+      assert.equal(nodes.get(`${kind}-pending`).hidden, false);
+      assert(nodes.get(`${kind}-pending`).textContent.includes("metadata unavailable"));
+      assert.equal(nodes.get(`${kind}-figure`).hidden, false);
+      assert(html.includes(`href="media/oliver-${kind}-midplane.gif"`));
+    }
+    return;
+  }
+  assert.equal(errors.length, 0);
+  for (const kind of ["flow", "force"]) {
+    const video = nodes.get(`${kind}-video`);
+    const media = run.media[`${kind}_midplane`];
+    const expected = (ext) => new URL(`${media[ext].path}?v=${media[ext].sha256.slice(0, 12)}`, "http://localhost/").href;
+    assert.equal(video.src, expected("mp4"));
+    assert.equal(video.poster, expected("png"));
+    assert.equal(nodes.get(`${kind}-gif`).href, expected("gif"));
+    assert.equal(nodes.get(`${kind}-mp4`).href, expected("mp4"));
+    assert.equal(video.plays, reduced ? 0 : 1);
+    assert.equal(video.muted, true);
+    assert.equal(nodes.get(`${kind}-figure`).hidden, false);
+    video.onloadeddata();
+    assert.equal(nodes.get(`${kind}-pending`).hidden, true);
+    video.onerror();
+    assert.equal(nodes.get(`${kind}-pending`).hidden, false);
+    assert(nodes.get(`${kind}-pending`).textContent.includes("GIF download"));
+  }
   assert(captions.every((c) => c.textContent.includes("280 saved frames")));
 }
-exercise(false).then(() => exercise(true)).then(() => console.log("Native view selection, keyboard controls, timing and reduced motion passed."));
+exercise(false).then(() => exercise(true)).then(() => exercise(false, true))
+  .then(() => console.log("Fixed-plane media, downloads, loading errors and reduced motion passed."));

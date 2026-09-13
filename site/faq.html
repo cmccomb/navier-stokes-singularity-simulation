@@ -51,8 +51,8 @@
 
         <h2 id="playback">How does movie time relate to simulation time?</h2>
         <p>All 280 saved states appear in order, with no interpolation or dropped frames. Ordinary states hold for 0.2 seconds, the initial rest state for one second, and the final state for half a second. GIFs and videos use the same holds. The output schedule becomes denser toward the endpoint, so five saved frames per second is not a uniform simulation-time clock. The displayed timestamp identifies the actual state. <a href="data/best.json">Frame times and playback record</a></p>
-        <h2 id="peak-slice">Why does the peak-height slice move?</h2>
-        <p>It follows the height of the largest velocity magnitude among the active 3D cells at each saved time. A different maximum can take over between frames. The changing z label identifies the plane; it is not a tracked fluid parcel. The fixed z = 0 midplane remains available for comparison. Both forcing and velocity views use the velocity-selected height.</p>
+        <h2 id="slice-planes">Which planes do the movies show?</h2>
+        <p>Both movies show a vertical x–z slice at y = 0 and a horizontal x–y slice at z = 0. These planes remain fixed throughout the run. The velocity and forcing movies use the same planes.</p>
 
         <h2 id="compute">How much computation does the run require?</h2>
         <p>Oliver's completed refined run and its completion audit took about <strong>9.02 hours</strong> on one Mac, with four solver threads and up to four forcing threads. We have not measured a FLOP count for this AMReX calculation.</p>
@@ -61,7 +61,7 @@
         <p>We allow <strong>3–10 times that FFT work</strong> for the full calculation, including repeated target and force evaluations and finite-difference kernels. That multiplier is an explicit planning assumption, not a profile or a rigorous bound. Velocity-dependent CFL limits may require more steps. Restarts, validation runs, and rendering are excluded. <a href="https://github.com/cmccomb/navier-stokes-singularity-simulation/blob/main/scripts/estimate_run_compute.py">Estimate script ↗</a> · <a href="data/compute-estimate.json">Inputs and calculation</a></p>
 
         <h2 id="velocity-scale">How is peak speed measured?</h2>
-        <p>The homepage number is the native solver's full-field peak-speed diagnostic at the completed endpoint, t = 0.995, reported in model units. It is not the maximum of the reduced display pixels and does not change as the movie plays. The moving slice locates its maximum on active composite cells, excluding coarse cells covered by finer levels.</p>
+        <p>The homepage number is the native solver's full-field peak-speed diagnostic at the completed endpoint, t = 0.995, reported in model units. It is not the maximum of the reduced display pixels and does not change as the movie plays.</p>
 
         <p class="archive-link"><a href="index.html#result">Back to the simulation →</a></p>
       </article>

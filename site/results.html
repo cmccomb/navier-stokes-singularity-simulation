@@ -44,9 +44,9 @@
           </tbody>
         </table>
         <p>The <a href="data/best.json">completion and media record</a> contains source hashes, the complete output schedule, native checks, slice heights and media checksums. Raw snapshots preserve all three velocity and all three force components in double precision; the web movies sample 256² pixels per plane with the finest containing native cell. This is not a full-resolution 3D web export.</p>
-        <h3>Reading the two slice choices</h3>
-        <p>The midplane movie shows <span class="math">y = 0</span> and <span class="math">z = 0</span>. In the peak-height movie, the x–z plane stays fixed while the horizontal plane follows the height of the active composite-grid maximum of <span class="math">|u|</span> in each saved state. Covered coarse cells are excluded. Exact ties prefer the smallest absolute height, then positive height, then y/x order; the all-zero interval uses z = 0. At the endpoint the selected height is 0.0380859375.</p>
-        <p>The moving slice can change height abruptly when a different maximum takes over. It is not a material plane or a particle trajectory. The force movie uses the same velocity-selected height, not the height of maximum force. Colors use the site's symmetric-log magnitude scale, with fixed limits shared across both views and both slice choices within each quantity. Every saved state is shown at five frames per second, apart from the initial and final holds; no time interpolation, smoothing or arrow overlays are used.</p>
+        <h3>Reading the fixed slices</h3>
+        <p>The homepage movies show a vertical x–z plane at <span class="math">y = 0</span> and a horizontal x–y plane at <span class="math">z = 0</span>. Both planes remain fixed throughout the run, and the force movie uses the same planes as the velocity movie.</p>
+        <p>Colors use the site's symmetric-log magnitude scale, with fixed limits shared across both planes and all saved times within each quantity. Every saved state is shown at five frames per second, apart from the initial and final holds; no time interpolation, smoothing or arrow overlays are used.</p>
         <div class="callout warning">Completion and archive integrity are verified. Spatial convergence, continuum error and singularity formation are not. The finite manufactured force is not the paper's infinite all-order cancellation construction. Kay's finer run remains a separate ongoing refinement experiment, not part of Oliver's movies.</div>
 
         <h2 id="legacy-media">Earlier uniform-grid media</h2>

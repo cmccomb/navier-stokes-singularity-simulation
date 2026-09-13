@@ -95,18 +95,21 @@ def test_best_videos_preserve_the_gif_clock():
         )
 
 
-def test_homepage_uses_only_current_media_and_labels_the_moving_plane():
+def test_homepage_uses_only_fixed_midplane_media():
     html = (SITE / "index.html").read_text()
     script = (SITE / "best.js").read_text()
     assert 'src="best.js"' in html and 'src="app.js"' not in html
     assert 'fetch("data/best.json"' in script and "data/stream.json" not in script
-    assert "At peak-speed height" in html and "moving slice" in script
+    assert "At peak-speed height" not in html and "moving slice" not in script
+    assert 'data-view="peak"' not in html and 'role="tab' not in html
+    assert 'run.media[`${kind}_midplane`]' in script
+    assert html.count("Fixed planes: y = 0 and z = 0.") == 2
     assert "Active solver cells" in html and "1024³-equivalent core only" in html
     assert "media/stream-flow-3d.html" not in html
     assert "media/stream-flow-3d.html" in (SITE / "results.html").read_text()
 
 
-def test_best_page_controller_with_keyboard_and_reduced_motion():
+def test_best_page_controller_with_fixed_planes_and_reduced_motion():
     node = shutil.which("node")
     if node is None:
         pytest.skip("Node is optional for controller unit tests")

@@ -110,11 +110,6 @@
       <section class="measure featured-measure" aria-labelledby="flow-title">
         <h2 id="flow-title">How the fluid moves</h2>
         <p class="measure-note">Our best completed run: Oliver, from exact rest through t = 0.995. Speed in a vertical x–z slice and a horizontal x–y slice. All 280 saved states are included.</p>
-        <div class="view-tabs" role="tablist" aria-label="Velocity view">
-          <button type="button" id="flow-tab-2d" role="tab" aria-selected="true" aria-controls="flow-panel-2d" data-field="flow" data-view="midplane">Midplane</button>
-          <button type="button" id="flow-tab-peak" role="tab" aria-selected="false" aria-controls="flow-panel-2d" tabindex="-1" data-field="flow" data-view="peak">At peak-speed height</button>
-        </div>
-        <div id="flow-panel-2d" role="tabpanel" aria-labelledby="flow-tab-2d">
         <p class="measure-note" id="flow-view-note">Fixed planes: y = 0 and z = 0. No vector arrows.</p>
         <p class="media-pending" id="flow-pending">Loading the completed velocity movie.</p>
         <figure class="stream-movie" id="flow-figure" hidden>
@@ -125,17 +120,11 @@
             <span class="media-links"><a id="flow-gif" href="media/oliver-flow-midplane.gif" download>GIF ↓</a><a id="flow-mp4" href="media/oliver-flow-midplane.mp4" download>MP4 ↓</a></span>
           </figcaption>
         </figure>
-        </div>
-        <p class="measure-note">Five saved frames per second, with nonuniform simulation-time spacing. Color scales are fixed across both slice choices; no states are interpolated. Completion and archive checks do not establish spatial convergence or a singularity. <a href="results.html#oliver-complete">Run details →</a></p>
+        <p class="measure-note">Five saved frames per second, with nonuniform simulation-time spacing. Color scales are fixed across both planes and all saved times within each quantity; no states are interpolated. Completion and archive checks do not establish spatial convergence or a singularity. <a href="results.html#oliver-complete">Run details →</a></p>
       </section>
       <section class="measure" aria-labelledby="force-title">
         <h2 id="force-title">The force driving it</h2>
         <p class="measure-note">Applied force magnitude in the same x–z and x–y slices. Force and velocity are different quantities.</p>
-        <div class="view-tabs" role="tablist" aria-label="Force view">
-          <button type="button" id="force-tab-2d" role="tab" aria-selected="true" aria-controls="force-panel-2d" data-field="force" data-view="midplane">Midplane</button>
-          <button type="button" id="force-tab-peak" role="tab" aria-selected="false" aria-controls="force-panel-2d" tabindex="-1" data-field="force" data-view="peak">At peak-speed height</button>
-        </div>
-        <div id="force-panel-2d" role="tabpanel" aria-labelledby="force-tab-2d">
         <p class="measure-note" id="force-view-note">Fixed planes: y = 0 and z = 0. No vector arrows.</p>
         <p class="media-pending" id="force-pending">Loading the completed forcing movie.</p>
         <figure class="stream-movie" id="force-figure" hidden>
@@ -146,7 +135,6 @@
             <span class="media-links"><a id="force-gif" href="media/oliver-force-midplane.gif" download>GIF ↓</a><a id="force-mp4" href="media/oliver-force-midplane.mp4" download>MP4 ↓</a></span>
           </figcaption>
         </figure>
-        </div>
       </section>
       <section class="measure" aria-labelledby="mesh-title">
         <h2 id="mesh-title">The mesh beneath the motion</h2>
