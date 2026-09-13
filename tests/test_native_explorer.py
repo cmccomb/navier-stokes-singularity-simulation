@@ -129,6 +129,8 @@ def test_ui_renders_all_planes_with_actual_time(dataset):
         len(d["targets"]) == 6 and d["trigger_mode"] == "always_last"
         for d in config["dependencies"]
     )
+    manual = next(d for d in config["dependencies"] if len(d["targets"]) == 6)
+    assert [target[1] for target in manual["targets"]].count("input") == 4
 
 
 def test_playback_yields_every_state_and_can_close(dataset):

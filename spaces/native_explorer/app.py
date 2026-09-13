@@ -153,10 +153,10 @@ def make_app(dataset):
         # bounded group so one long animation cannot monopolize manual controls.
         gr.on(
             triggers=[
-                x.release,
-                y.release,
-                z.release,
-                time.release,
+                x.input,
+                y.input,
+                z.input,
+                time.input,
                 quantity.change,
                 resolution.change,
             ],
