@@ -1,4 +1,4 @@
-"""Render every validated native event in perpendicular views, with fixed scales.
+"""Render every validated native event as arrow-free magnitude maps with fixed scales.
 
 Display pixels use the finest containing cell, without spatial smoothing or
 invented time frames. Zero-plane ties use the positive-side native cell. This
@@ -8,6 +8,8 @@ is a diagnostic comparison-mesh preview, not a high-resolution or blowup claim.
 from __future__ import annotations
 
 import argparse
+import json
+import math
 import os
 import subprocess
 from pathlib import Path
@@ -19,8 +21,73 @@ import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
 
-from scripts.paper_comparison import snapshot
-from scripts.paper_run import sha, thread_environment, write
+from scripts.paper_comparison import frame_headers, matched_frames, snapshot
+from scripts.paper_run import output_times, sha, thread_environment, write
+
+
+def prefix_frames(
+    record: dict, history: list[dict], headers: list[dict], through: float
+):
+    """Select a complete saved prefix, retaining every legacy duplicate file."""
+    if not math.isfinite(through) or not 0 < through <= history[-1]["time"] + 1e-12:
+        raise ValueError("preview endpoint is outside the available history")
+    params = record["parameters"]
+    schedule = record.get("planned_frames") or output_times(
+        params["end"],
+        params["frame_dt"],
+        params.get("frame_phase_step", 0),
+        record["profile_manifest"]["parameters"],
+    )
+    expected = [t for t in schedule if t <= through + 1e-12]
+    if not expected or abs(expected[-1] - through) > 1e-12:
+        raise ValueError("preview must end at a scheduled saved event")
+    selected = [f for f in headers if f["time"] <= through + 1e-12]
+    groups = matched_frames(selected, expected)  # Missing even a zero state fails.
+    if sum(map(len, groups)) != len(selected):
+        raise ValueError("native prefix contains an unscheduled event")
+    for frame in selected:
+        step = int(frame["path"][3:])
+        if step >= len(history) or abs(history[step]["time"] - frame["time"]) > 1e-12:
+            raise ValueError("native frame does not match its diagnostic step")
+    return selected, expected
+
+
+def check_native(
+    source: Path,
+    frame: dict,
+    record: dict,
+    checker: Path,
+    output: Path,
+    environment: dict,
+) -> dict:
+    result = subprocess.run(
+        [
+            str(checker),
+            f"plot={source / frame['path']}",
+            "ns.force=paper",
+            f"ns.table_file={source / 'profile.tbl'}",
+            f"ns.epsilon_tau_ratio={record['parameters']['epsilon_tau_ratio']:.17g}",
+        ],
+        capture_output=True,
+        text=True,
+        env=environment,
+        timeout=1800,
+        check=False,
+    )
+    (output / f"{frame['path']}-read.log").write_text(result.stdout + result.stderr)
+    rows = [
+        json.loads(line.removeprefix("NS_ARCHIVE_RESULT "))
+        for line in result.stdout.splitlines()
+        if line.startswith("NS_ARCHIVE_RESULT ")
+    ]
+    if result.returncode or len(rows) != 1:
+        raise ValueError(f"native prefix check failed: {frame['path']}")
+    row = rows[0]
+    if abs(row["time"] - frame["time"]) > 1e-12 or row["step"] != int(
+        frame["path"][3:]
+    ):
+        raise ValueError("native readback changed the selected event")
+    return {"path": frame["path"], **row}
 
 
 def main() -> None:
@@ -30,17 +97,49 @@ def main() -> None:
         "--executable", type=Path, default=Path("build/amrex-omp/ns_slice_export")
     )
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument(
+        "--through",
+        type=float,
+        help="explicit partial-preview endpoint; audit every saved file from rest",
+    )
+    parser.add_argument(
+        "--checker", type=Path, default=Path("build/amrex-omp/ns_archive_check")
+    )
     args = parser.parse_args()
     source, executable = (
         args.run.resolve(strict=True),
         args.executable.resolve(strict=True),
     )
-    record, _ = snapshot(source)
-    if not record["validated"] or record["status"] != "completed":
+    record, history = snapshot(source)
+    if args.through is None and (
+        not record["validated"] or record["status"] != "completed"
+    ):
         raise ValueError("this renderer requires a validated complete native sequence")
     args.output.mkdir(parents=True, exist_ok=False)
     output = args.output.resolve()
     environment = {**os.environ, **thread_environment(1, 1)}
+    native_frames = record["native_frames"]
+    expected = [f["time"] for f in native_frames]
+    checker = None
+    if args.through is not None:
+        checker = args.checker.resolve(strict=True)
+        selected, expected = prefix_frames(
+            record, history, frame_headers(source), args.through
+        )
+        native_frames = []
+        for frame in selected:
+            checked = check_native(source, frame, record, checker, output, environment)
+            diagnostic = history[checked["step"]]
+            if (
+                checked["levels"] != diagnostic["levels"]
+                or checked["stored_cells"] != diagnostic["stored_cells"]
+                or abs(checked["composite_volume"] - 8) > 1e-10
+            ):
+                raise ValueError(
+                    "native preview mesh differs from the diagnostic history"
+                )
+            native_frames.append(checked)
+            print(f"Checked {frame['path']} at t={frame['time']:.6f}", flush=True)
     n = 256
     slices = []
     provenance = {
@@ -49,10 +148,21 @@ def main() -> None:
         "source_adapter_sha256": record["adapter_sha256"],
         "source_binary_sha256": record["binary_sha256"],
         "exporter_sha256": sha(executable),
+        "checker_sha256": sha(checker) if checker else record["checker_sha256"],
+        "original_run_status": record["status"],
+        "original_run_validated": record["validated"],
+        "render_scope": "audited partial preview"
+        if args.through is not None
+        else "completed sequence",
+        "through": args.through,
+        "scheduled_events": expected,
+        "duplicate_files_retained": len(native_frames) - len(expected),
+        "native_checks": native_frames,
         "frames": [],
         "gifs": {},
+        "vector_arrows": False,
     }
-    for frame in record["native_frames"]:
+    for frame in native_frames:
         path = output / (frame["path"] + ".bin")
         result = subprocess.run(
             [
@@ -95,6 +205,8 @@ def main() -> None:
         max(float(np.max(np.linalg.norm(f[..., k : k + 3], axis=-1))) for f in slices)
         for k in (0, 3)
     ]
+    # An entirely quiescent prefix must still map zero to the bottom of the scale.
+    maxima = [value if value > 0 else 1.0 for value in maxima]
     plt.rcParams.update(
         {
             "font.family": "DejaVu Sans",
@@ -109,17 +221,12 @@ def main() -> None:
             "savefig.facecolor": "#0a1521",
         }
     )
-    coords = -1 + 2 * (np.arange(n) + 0.5) / n
-    stride = 16
-    xx, yy = np.meshgrid(coords[::stride], coords[::stride], indexing="xy")
-    for plane, (name, horizontal, vertical, components) in enumerate(
-        (("vertical-xz", "x", "z", (0, 2)), ("equatorial-xy", "x", "y", (0, 1)))
+    for plane, (name, horizontal, vertical) in enumerate(
+        (("vertical-xz", "x", "z"), ("equatorial-xy", "x", "y"))
     ):
         for field, k, limit in (("velocity", 0, maxima[0]), ("forcing", 3, maxima[1])):
             frames = []
-            for i, (data, native) in enumerate(
-                zip(slices, record["native_frames"], strict=True)
-            ):
+            for i, (data, native) in enumerate(zip(slices, native_frames, strict=True)):
                 vector = data[plane, ..., k : k + 3]
                 magnitude = np.linalg.norm(vector, axis=-1)
                 fig, ax = plt.subplots(figsize=(8.4, 8.2), dpi=110)
@@ -135,7 +242,7 @@ def main() -> None:
                 fig.text(
                     0.11,
                     0.900,
-                    f"AMReX / incflo · from rest · t = {native['time']:.3f}",
+                    f"AMReX / incflo · {'partial from rest' if args.through is not None else 'from rest'} · t = {native['time']:.3f}",
                     fontsize=13,
                 )
                 base = record["parameters"]["base_n"]
@@ -155,29 +262,6 @@ def main() -> None:
                     cmap="magma",
                     interpolation="nearest",
                     aspect="equal",
-                )
-                u, v = (vector[::stride, ::stride, c].T for c in components)
-                norm = np.hypot(u, v)
-                valid = norm > 0.025 * limit
-                u = np.ma.array(
-                    np.divide(u, norm, out=np.zeros_like(u), where=norm > 0),
-                    mask=~valid,
-                )
-                v = np.ma.array(
-                    np.divide(v, norm, out=np.zeros_like(v), where=norm > 0),
-                    mask=~valid,
-                )
-                ax.quiver(
-                    xx,
-                    yy,
-                    u,
-                    v,
-                    color="#eaf2f7",
-                    angles="xy",
-                    scale_units="xy",
-                    scale=16,
-                    width=0.003,
-                    alpha=0.82,
                 )
                 ax.set(
                     xlabel=horizontal,
@@ -200,13 +284,13 @@ def main() -> None:
                 fig.text(
                     0.11,
                     0.078,
-                    "Arrows: in-plane direction above 2.5% of scale. Native cells; no smoothing.",
+                    "Color: vector magnitude. Native cells; no smoothing.",
                     fontsize=10,
                 )
                 fig.text(
                     0.11,
                     0.046,
-                    f"Saved state {i + 1}/{len(slices)} · full periodic domain · not a singularity demonstration",
+                    f"Saved file {i + 1}/{len(slices)} · full domain · {provenance['duplicate_files_retained']} duplicate files retained",
                     fontsize=10,
                     color="#a8bacb",
                 )
