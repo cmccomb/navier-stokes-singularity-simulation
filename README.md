@@ -6,8 +6,15 @@
 
 An open, reproducible 3D incompressible-flow experiment informed by OpenAI's
 [*Finite Time Blowup for Navier–Stokes*](https://cdn.openai.com/pdf/32d9f210-8b73-45e0-91bc-82a30aef8a9a/navier-stokes.pdf).
-The solver uses [PhiFlow 3.4](https://github.com/tum-pbs/PhiFlow), projected RK2,
-and an exact periodic FFT pressure projection.
+The featured completed run uses [AMReX / incflo](backends/amrex/README.md)
+with fixed nested grids and multilevel projection. The earlier PhiFlow 3.4
+backend, projected RK2 and periodic FFT projection remain available.
+
+Oliver's current best completed native run reaches `t = 0.995` from exact rest,
+with all 280 saved states verified. Its 64³ base and four refined levels give
+1024³-equivalent spacing **only in the core**. The
+[numerical record](site/results.html#oliver-complete) documents the result and
+its limits. Archive validation does not establish convergence or a singularity.
 
 The experiment starts from rest, smoothly activates a compactly supported
 manufactured force, and follows an inward-spiraling, axially stretching vortex

@@ -11,7 +11,7 @@
     <title>From smooth flow to a singularity · Navier–Stokes Simulation</title>
     <link rel="icon" href="favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="styles.css" />
-    <script type="module" src="app.js"></script>
+    <script type="module" src="best.js"></script>
   </head>
   <body>
     <a class="skip-link" href="#result">Skip to the simulation</a>
@@ -81,7 +81,7 @@
           <section aria-labelledby="why-simulate">
             <h2 id="why-simulate">Here we run a simulation, which is not a proof</h2>
             <p>
-              Here, PhiFlow advances velocity on a finite grid. We choose
+              Here, AMReX / incflo advances velocity on fixed nested grids. We choose
               a target inspired by the proof and calculate the force needed
               to make it satisfy the discretized momentum equation. This
               <strong>manufactured solution</strong> lets us test whether the
@@ -102,80 +102,61 @@
       </section>
 
       <section class="big-numbers" id="result" aria-label="Simulation in numbers">
-        <div><p class="number-label">Solver cells</p><p class="number-value" id="cell-count">—</p><p class="number-note" id="cell-grid">Loading the published grid</p></div>
-        <div><p class="number-label">Estimated total compute</p><p class="number-value" id="total-flops">—</p><p class="number-note"><a href="faq.html#compute">Full-run FLOP budget ↗</a></p></div>
-        <div><p class="number-label">Peak speed</p><p class="number-value" id="peak-speed">—</p><p class="number-note" id="speed-time">Awaiting a saved diagnostic</p></div>
+        <div><p class="number-label">Active solver cells</p><p class="number-value" id="cell-count">1,179,648</p><p class="number-note" id="cell-grid">64³ base · 5 fixed levels · 1024³-equivalent core only</p></div>
+        <div><p class="number-label">Saved frames from rest</p><p class="number-value" id="frame-count">280</p><p class="number-note">Complete · t = 0 to 0.995</p></div>
+        <div><p class="number-label">Endpoint peak speed</p><p class="number-value" id="peak-speed">7.416</p><p class="number-note" id="speed-time">Model units · full-field diagnostic at t = 0.995</p></div>
       </section>
 
       <section class="measure featured-measure" aria-labelledby="flow-title">
         <h2 id="flow-title">How the fluid moves</h2>
-        <p class="measure-note">Speed in two perpendicular slices: vertical x–z and equatorial x–y.</p>
+        <p class="measure-note">Our best completed run: Oliver, from exact rest through t = 0.995. Speed in a vertical x–z slice and a horizontal x–y slice. All 280 saved states are included.</p>
         <div class="view-tabs" role="tablist" aria-label="Velocity view">
-          <button type="button" id="flow-tab-2d" role="tab" aria-selected="true" aria-controls="flow-panel-2d" data-field="flow" data-view="2d">2D planes</button>
-          <button type="button" id="flow-tab-3d" role="tab" aria-selected="false" aria-controls="flow-panel-3d" tabindex="-1" data-field="flow" data-view="3d" disabled>Interactive 3D</button>
+          <button type="button" id="flow-tab-2d" role="tab" aria-selected="true" aria-controls="flow-panel-2d" data-field="flow" data-view="midplane">Midplane</button>
+          <button type="button" id="flow-tab-peak" role="tab" aria-selected="false" aria-controls="flow-panel-2d" tabindex="-1" data-field="flow" data-view="peak">At peak-speed height</button>
         </div>
         <div id="flow-panel-2d" role="tabpanel" aria-labelledby="flow-tab-2d">
-        <p class="media-pending" id="flow-pending">Waiting for published velocity frames.</p>
+        <p class="measure-note" id="flow-view-note">Fixed planes: y = 0 and z = 0. No vector arrows.</p>
+        <p class="media-pending" id="flow-pending">Loading the completed velocity movie.</p>
         <figure class="stream-movie" id="flow-figure" hidden>
           <div class="plot-viewport" tabindex="0" role="region" aria-label="Velocity plot; scroll horizontally on narrow screens"><video id="flow-video" controls loop muted playsinline preload="metadata" aria-label="Velocity magnitude evolving through saved times in x-z and x-y slices"></video></div>
           <p class="plot-scroll-hint">Scroll sideways to see both planes →</p>
           <figcaption>
             <span>Velocity magnitude · <span data-clip-range>saved times</span></span>
-            <span class="media-links"><a id="flow-gif" download>GIF ↓</a><a id="flow-mp4" download>MP4 ↓</a></span>
+            <span class="media-links"><a id="flow-gif" href="media/oliver-flow-midplane.gif" download>GIF ↓</a><a id="flow-mp4" href="media/oliver-flow-midplane.mp4" download>MP4 ↓</a></span>
           </figcaption>
         </figure>
         </div>
-        <div id="flow-panel-3d" class="volume-panel" role="tabpanel" aria-labelledby="flow-tab-3d" hidden>
-          <p class="measure-note"><span data-volume-resolution>Saved volume samples</span>. Drag to rotate, scroll to zoom, and use the time slider.</p>
-          <button type="button" class="refresh-3d" id="flow-refresh-3d" data-refresh-volume="flow" hidden>Load latest 3D frames</button>
-          <iframe id="flow-3d" title="Interactive three-dimensional Velocity explorer" loading="lazy" sandbox="allow-scripts allow-downloads" allow="fullscreen"></iframe>
-          <p class="volume-link"><a id="flow-3d-link" target="_blank" rel="noopener">Open 3D explorer in a full tab ↗</a></p>
-        </div>
+        <p class="measure-note">Five saved frames per second, with nonuniform simulation-time spacing. Color scales are fixed across both slice choices; no states are interpolated. Completion and archive checks do not establish spatial convergence or a singularity. <a href="results.html#oliver-complete">Run details →</a></p>
       </section>
       <section class="measure" aria-labelledby="force-title">
         <h2 id="force-title">The force driving it</h2>
         <p class="measure-note">Applied force magnitude in the same x–z and x–y slices. Force and velocity are different quantities.</p>
         <div class="view-tabs" role="tablist" aria-label="Force view">
-          <button type="button" id="force-tab-2d" role="tab" aria-selected="true" aria-controls="force-panel-2d" data-field="force" data-view="2d">2D planes</button>
-          <button type="button" id="force-tab-3d" role="tab" aria-selected="false" aria-controls="force-panel-3d" tabindex="-1" data-field="force" data-view="3d" disabled>Interactive 3D</button>
+          <button type="button" id="force-tab-2d" role="tab" aria-selected="true" aria-controls="force-panel-2d" data-field="force" data-view="midplane">Midplane</button>
+          <button type="button" id="force-tab-peak" role="tab" aria-selected="false" aria-controls="force-panel-2d" tabindex="-1" data-field="force" data-view="peak">At peak-speed height</button>
         </div>
         <div id="force-panel-2d" role="tabpanel" aria-labelledby="force-tab-2d">
-        <p class="media-pending" id="force-pending">Waiting for published force frames.</p>
+        <p class="measure-note" id="force-view-note">Fixed planes: y = 0 and z = 0. No vector arrows.</p>
+        <p class="media-pending" id="force-pending">Loading the completed forcing movie.</p>
         <figure class="stream-movie" id="force-figure" hidden>
           <div class="plot-viewport" tabindex="0" role="region" aria-label="Force plot; scroll horizontally on narrow screens"><video id="force-video" controls loop muted playsinline preload="metadata" aria-label="Applied force magnitude evolving through saved times in x-z and x-y slices"></video></div>
           <p class="plot-scroll-hint">Scroll sideways to see both planes →</p>
           <figcaption>
             <span>Force magnitude · <span data-clip-range>saved times</span></span>
-            <span class="media-links"><a id="force-gif" download>GIF ↓</a><a id="force-mp4" download>MP4 ↓</a></span>
+            <span class="media-links"><a id="force-gif" href="media/oliver-force-midplane.gif" download>GIF ↓</a><a id="force-mp4" href="media/oliver-force-midplane.mp4" download>MP4 ↓</a></span>
           </figcaption>
         </figure>
-        </div>
-        <div id="force-panel-3d" class="volume-panel" role="tabpanel" aria-labelledby="force-tab-3d" hidden>
-          <p class="measure-note"><span data-volume-resolution>Saved volume samples</span>. Drag to rotate, scroll to zoom, and use the time slider.</p>
-          <button type="button" class="refresh-3d" id="force-refresh-3d" data-refresh-volume="force" hidden>Load latest 3D frames</button>
-          <iframe id="force-3d" title="Interactive three-dimensional Force explorer" loading="lazy" sandbox="allow-scripts allow-downloads" allow="fullscreen"></iframe>
-          <p class="volume-link"><a id="force-3d-link" target="_blank" rel="noopener">Open 3D explorer in a full tab ↗</a></p>
         </div>
       </section>
       <section class="measure" aria-labelledby="mesh-title">
         <h2 id="mesh-title">The mesh beneath the motion</h2>
-        <p class="measure-note">The 192³ solver divides the domain into equal cubic cells. Zoom into the mesh to see where velocity is stored.</p>
-        <div class="view-tabs" role="tablist" aria-label="Mesh view">
-          <button type="button" id="mesh-tab-2d" role="tab" aria-selected="true" aria-controls="mesh-panel-2d" data-field="mesh" data-view="2d">2D planes</button>
-          <button type="button" id="mesh-tab-3d" role="tab" aria-selected="false" aria-controls="mesh-panel-3d" tabindex="-1" data-field="mesh" data-view="3d">Interactive 3D</button>
-        </div>
-        <div id="mesh-panel-2d" role="tabpanel" aria-labelledby="mesh-tab-2d">
+        <p class="measure-note">A 64³ base covers the full periodic box. Four fixed nested cubes refine the core, reaching 1024³-equivalent spacing only inside the innermost cube. The hierarchy stores 1,310,720 cells; 1,179,648 remain active after covered coarse cells are excluded.</p>
           <figure class="stream-movie mesh-diagram">
-            <div class="plot-viewport" tabindex="0" role="region" aria-label="Mesh diagram; scroll horizontally on narrow screens"><img src="media/mesh-planes.svg" width="720" height="432" loading="lazy" alt="Uniform 192 by 192 grid in an x-z plane and a four by four cell close-up in an x-y plane. Orange dots mark cell centers. Cell spacing is 0.0104167 model length units." /></div>
+            <div class="plot-viewport" tabindex="0" role="region" aria-label="Refinement regions; scroll horizontally on narrow screens"><img src="media/oliver-mesh.svg" width="720" height="432" loading="lazy" alt="Five fixed refinement regions centered in the full box: half-widths 1, 0.5, 0.25, 0.125 and 0.0625. Core spacing is 0.001953125 model length units. Region boundaries, not individual cells, are drawn." /></div>
             <p class="plot-scroll-hint">Scroll sideways to see the cell detail →</p>
-            <figcaption><span>Full domain and cell detail · vector diagram</span><a href="media/mesh-planes.svg" download>SVG ↓</a></figcaption>
+            <figcaption><span>Fixed refinement regions · not individual cells</span><a href="media/oliver-mesh.svg" download>SVG ↓</a></figcaption>
           </figure>
-        </div>
-        <div id="mesh-panel-3d" class="volume-panel" role="tabpanel" aria-labelledby="mesh-tab-3d" hidden>
-          <p class="measure-note">Rotate three central mesh planes, then choose Cell detail to explore a 4 × 4 × 4 block.</p>
-          <iframe id="mesh-3d" data-latest-src="media/mesh-3d.html" title="Interactive uniform solver mesh and cell detail" loading="lazy" sandbox="allow-scripts allow-downloads" allow="fullscreen"></iframe>
-          <p class="volume-link"><a href="media/mesh-3d.html" target="_blank" rel="noopener">Open mesh explorer in a full tab ↗</a></p>
-        </div>
+        <p class="measure-note">Full-resolution 3D velocity and forcing are saved. An interactive 3D export of this refined run is not yet prepared; <a href="results.html#legacy-media">older uniform-grid explorers</a> remain separate.</p>
         <p class="archive-link"><a href="results.html">Earlier runs and numerical record →</a></p>
       </section>
     </main>

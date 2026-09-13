@@ -67,6 +67,7 @@ def main():
         raise ValueError("The complete saved schedule is required")
     args.output.mkdir(parents=True, exist_ok=False)
     output = args.output.resolve()
+    (output / "site/data").mkdir(parents=True)
     slices = output / "slices"
     slices.mkdir()
     frames, maxima = [], np.zeros(2)
@@ -158,7 +159,7 @@ def main():
         "source_binary_sha256": record["binary_sha256"],
         "exporter_sha256": sha(executable),
         "renderer_sha256": sha(Path(__file__)),
-        "completed_at": record.get("completed_at"),
+        "completed_at": record.get("completed_at", record.get("updated_at")),
         "elapsed_seconds": record.get("elapsed_seconds", record.get("wall_seconds")),
         "parameters": record["parameters"],
         "profile": record["profile_manifest"]["parameters"],
