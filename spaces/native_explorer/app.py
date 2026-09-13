@@ -68,7 +68,7 @@ def render_state(dataset, frame, x, y, z, quantity, n):
         render_slice(dataset, frame, plane, coord, quantity, n)
         for plane, coord in zip(("yz", "xz", "xy"), (x, y, z))
     ]
-    status = f"Frame {frame + 1}/{len(dataset.times)} · t = {dataset.times[frame]:.8f} · {n}² display samples per plane\n\n{dataset.cache_status}"
+    status = f"Frame {frame + 1}/{len(dataset.times)} · t = {dataset.times[frame]:.8f} · {quantity} · {n}² display samples per plane\n\nx = {x:.5f} · y = {y:.5f} · z = {z:.5f}\n\n{dataset.cache_status}"
     return (*images, status)
 
 
@@ -143,33 +143,32 @@ def make_app(dataset):
             inputs,
             [time, *outputs],
             api_name=False,
-            concurrency_id="native-render",
+            concurrency_id="native-playback",
             concurrency_limit=4,
             show_progress="hidden",
         )
         pause.click(fn=None, cancels=[playback], queue=False)
-        for slider in (x, y, z, time):
-            slider.release(
-                render,
-                inputs,
-                outputs,
-                cancels=[playback],
-                trigger_mode="always_last",
-                concurrency_id="native-render",
-                concurrency_limit=4,
-                show_progress="hidden",
-            )
-        for control in (quantity, resolution):
-            control.change(
-                render,
-                inputs,
-                outputs,
-                cancels=[playback],
-                trigger_mode="always_last",
-                concurrency_id="native-render",
-                concurrency_limit=4,
-                show_progress="hidden",
-            )
+        # One ordered event for all controls: a slower old request must not
+        # overwrite a newer quantity/coordinate choice. Playback uses a separate
+        # bounded group so one long animation cannot monopolize manual controls.
+        gr.on(
+            triggers=[
+                x.release,
+                y.release,
+                z.release,
+                time.release,
+                quantity.change,
+                resolution.change,
+            ],
+            fn=render,
+            inputs=inputs,
+            outputs=outputs,
+            cancels=[playback],
+            trigger_mode="always_last",
+            concurrency_id="native-manual",
+            concurrency_limit=1,
+            show_progress="hidden",
+        )
         for button, increment in ((previous, -1), (following, 1)):
 
             def advance(frame, *args, amount=increment):
@@ -181,8 +180,8 @@ def make_app(dataset):
                 inputs,
                 [time, *outputs],
                 cancels=[playback],
-                concurrency_id="native-render",
-                concurrency_limit=4,
+                concurrency_id="native-manual",
+                concurrency_limit=1,
                 show_progress="hidden",
             )
         app.load(
@@ -190,8 +189,8 @@ def make_app(dataset):
             inputs,
             outputs,
             api_name="slice",
-            concurrency_id="native-render",
-            concurrency_limit=4,
+            concurrency_id="native-manual",
+            concurrency_limit=1,
         )
     return app.queue(max_size=16, default_concurrency_limit=4)
 

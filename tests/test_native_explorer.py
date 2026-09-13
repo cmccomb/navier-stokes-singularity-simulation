@@ -118,10 +118,17 @@ def test_ui_renders_all_planes_with_actual_time(dataset):
     *images, status = render_state(dataset, 1, 0, 0, 0, "velocity", 128)
     assert len(images) == 3 and all(image.shape == (528, 528, 3) for image in images)
     assert "t = 0.90000000" in status and "Frame 2/2" in status
-    config = make_app(dataset).config
+    app = make_app(dataset)
+    config = app.config
     labels = {c.get("props", {}).get("label") for c in config["components"]}
     assert {"x · YZ slice", "y · XZ slice", "z · XY slice", "t · saved frame"} <= labels
     assert any(d.get("cancels") for d in config["dependencies"])
+    ordered = [f for f in app.fns.values() if f.concurrency_id == "native-manual"]
+    assert ordered and all(f.concurrency_limit == 1 for f in ordered)
+    assert any(
+        len(d["targets"]) == 6 and d["trigger_mode"] == "always_last"
+        for d in config["dependencies"]
+    )
 
 
 def test_playback_yields_every_state_and_can_close(dataset):
