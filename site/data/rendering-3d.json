@@ -5548,6 +5548,7 @@
     "revision": "25266bfc068a729fb169833521eeddfde9c943e9",
     "prefix": "releases/9be10c40938a9d02"
   },
-  "renderer_git_commit": "fc6a1249af6703aefd46faab1b3e3b49bf4e9794",
+  "renderer_git_commit": "be8238ef5437dda26df5a6169fedcfb83791ba99",
+  "encoder_git_commit": "cae00222518e3cb8d3cb0db44b6ad49ce2bea674",
   "validated": true
 }
