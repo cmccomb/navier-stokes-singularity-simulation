@@ -1,0 +1,288 @@
+{
+  "schema_version": 1,
+  "kind": "continuation-runner-native-validation",
+  "scope": "Small-grid workflow validation, not validation of Kay late-time accuracy. Longer probes that failed the strict gate remain failures; the shorter positive-path fixture does not replace them.",
+  "cases": [
+    {
+      "id": "smoke-continuation-v2",
+      "status": "failed",
+      "error": "ValueError: short-tail temporal sensitivity exceeds continuation gates",
+      "parent_end": 0.62,
+      "parent_base_n": 16,
+      "parent_levels": 2,
+      "parent_max_dt": 0.002,
+      "parent_validated": true,
+      "parent_adapter_sha256": "36c8e5aa334a1dc94db25c6f02baced6156f5ccde4c2297f37fee117c6040d76",
+      "parent_profile_sha256": "fb613aa587c4bd42d63af26ac783e71f02b0380f570813a027b752a82f20f994",
+      "runner_sha256": "06a743fe87ddd99ebaa6b68a3ee8559283c4f1cb6e02e79178ca99af74fb3577",
+      "restart_check": {
+        "time": 0.62,
+        "step": 204,
+        "levels": 2,
+        "stored_cells": 8192,
+        "force_linf_error": 0,
+        "peak_speed": 0.11835000584448971,
+        "compared": true,
+        "report_difference": false,
+        "reference_resolution_ratio": 1,
+        "time_difference": 0,
+        "velocity_linf_difference": 0,
+        "velocity_l2_difference": 0,
+        "reference_velocity_l2": 0.031124286429045973,
+        "composite_volume": 8
+      },
+      "restart_replay_check": null,
+      "temporal_comparison": {
+        "relative_composite_l2": 0.0017327427153438749,
+        "linf_over_baseline_peak": 0.0028148852605098707,
+        "l2_limit": 0.001,
+        "linf_limit": 0.01,
+        "passed": false,
+        "scope": "Short shared-checkpoint sensitivity only; inherited errors remain.",
+        "native": {
+          "time": 0.6266172042954152,
+          "step": 226,
+          "levels": 2,
+          "stored_cells": 8192,
+          "force_linf_error": 0,
+          "peak_speed": 0.15855002340320173,
+          "compared": true,
+          "report_difference": true,
+          "reference_resolution_ratio": 1,
+          "time_difference": 0,
+          "velocity_linf_difference": 0.0004463001239311676,
+          "velocity_l2_difference": 0.00007142773700646556,
+          "reference_velocity_l2": 0.041222355964307275,
+          "composite_volume": 8
+        }
+      },
+      "probe_end": 0.6266172042954152,
+      "coarse_max_dt": 0.002,
+      "fine_max_dt": 0.000163909302506402,
+      "combined_frames": null,
+      "end": 0.63,
+      "stages": {
+        "probe-baseline": {
+          "status": "completed",
+          "steps": 22,
+          "start": 0.62,
+          "end": 0.6266172042954152,
+          "frames": 1
+        },
+        "probe-smaller-dt": {
+          "status": "completed",
+          "steps": 41,
+          "start": 0.62,
+          "end": 0.6266172042954152,
+          "frames": 1
+        }
+      }
+    },
+    {
+      "id": "smoke-continuation-finer",
+      "status": "failed",
+      "error": "ValueError: short-tail temporal sensitivity exceeds continuation gates",
+      "parent_end": 0.62,
+      "parent_base_n": 16,
+      "parent_levels": 2,
+      "parent_max_dt": 0.0001,
+      "parent_validated": true,
+      "parent_adapter_sha256": "36c8e5aa334a1dc94db25c6f02baced6156f5ccde4c2297f37fee117c6040d76",
+      "parent_profile_sha256": "fb613aa587c4bd42d63af26ac783e71f02b0380f570813a027b752a82f20f994",
+      "runner_sha256": "72ccace74004c26acd1e08a7f9708210e01dee2c1f582b0b81fc31629fefcf2d",
+      "restart_check": {
+        "time": 0.62,
+        "step": 763,
+        "levels": 2,
+        "stored_cells": 8192,
+        "force_linf_error": 0,
+        "peak_speed": 0.11834906216101505,
+        "compared": true,
+        "report_difference": false,
+        "reference_resolution_ratio": 1,
+        "time_difference": 0,
+        "velocity_linf_difference": 0,
+        "velocity_l2_difference": 0,
+        "reference_velocity_l2": 0.0311234237227776,
+        "composite_volume": 8
+      },
+      "restart_replay_check": {
+        "time": 0.62,
+        "step": 763,
+        "levels": 2,
+        "stored_cells": 8192,
+        "force_linf_error": 0,
+        "peak_speed": 0.11834906216101505,
+        "compared": true,
+        "report_difference": false,
+        "reference_resolution_ratio": 1,
+        "time_difference": 0,
+        "velocity_linf_difference": 0,
+        "velocity_l2_difference": 0,
+        "reference_velocity_l2": 0.0311234237227776,
+        "composite_volume": 8
+      },
+      "temporal_comparison": {
+        "relative_composite_l2": 0.0011162418136856569,
+        "linf_over_baseline_peak": 0.002073463534578723,
+        "l2_limit": 0.001,
+        "linf_limit": 0.01,
+        "passed": false,
+        "scope": "Short shared-checkpoint sensitivity only; inherited errors remain.",
+        "native": {
+          "time": 0.6266172042954152,
+          "step": 832,
+          "levels": 2,
+          "stored_cells": 8192,
+          "force_linf_error": 0,
+          "peak_speed": 0.1585498868070549,
+          "compared": true,
+          "report_difference": true,
+          "reference_resolution_ratio": 1,
+          "time_difference": 0,
+          "velocity_linf_difference": 0.0003287474087060125,
+          "velocity_l2_difference": 0.00004601338495935334,
+          "reference_velocity_l2": 0.041221699810208956,
+          "composite_volume": 8
+        }
+      },
+      "probe_end": 0.6266172042954152,
+      "coarse_max_dt": 0.0001,
+      "fine_max_dt": 0.00005,
+      "combined_frames": null,
+      "end": 0.63,
+      "stages": {
+        "restart-replay": {
+          "status": "completed",
+          "steps": 13,
+          "start": 0.6187547221397808,
+          "end": 0.62,
+          "frames": 1
+        },
+        "probe-baseline": {
+          "status": "completed",
+          "steps": 69,
+          "start": 0.62,
+          "end": 0.6266172042954152,
+          "frames": 1
+        },
+        "probe-smaller-dt": {
+          "status": "completed",
+          "steps": 133,
+          "start": 0.62,
+          "end": 0.6266172042954152,
+          "frames": 1
+        }
+      }
+    },
+    {
+      "id": "smoke-chain-short-window",
+      "status": "completed",
+      "error": null,
+      "parent_end": 0.62,
+      "parent_base_n": 16,
+      "parent_levels": 2,
+      "parent_max_dt": 0.0001,
+      "parent_validated": true,
+      "parent_adapter_sha256": "36c8e5aa334a1dc94db25c6f02baced6156f5ccde4c2297f37fee117c6040d76",
+      "parent_profile_sha256": "fb613aa587c4bd42d63af26ac783e71f02b0380f570813a027b752a82f20f994",
+      "runner_sha256": "72ccace74004c26acd1e08a7f9708210e01dee2c1f582b0b81fc31629fefcf2d",
+      "restart_check": {
+        "time": 0.62,
+        "step": 763,
+        "levels": 2,
+        "stored_cells": 8192,
+        "force_linf_error": 0,
+        "peak_speed": 0.11834906216101505,
+        "compared": true,
+        "report_difference": false,
+        "reference_resolution_ratio": 1,
+        "time_difference": 0,
+        "velocity_linf_difference": 0,
+        "velocity_l2_difference": 0,
+        "reference_velocity_l2": 0.0311234237227776,
+        "composite_volume": 8
+      },
+      "restart_replay_check": {
+        "time": 0.62,
+        "step": 763,
+        "levels": 2,
+        "stored_cells": 8192,
+        "force_linf_error": 0,
+        "peak_speed": 0.11834906216101505,
+        "compared": true,
+        "report_difference": false,
+        "reference_resolution_ratio": 1,
+        "time_difference": 0,
+        "velocity_linf_difference": 0,
+        "velocity_l2_difference": 0,
+        "reference_velocity_l2": 0.0311234237227776,
+        "composite_volume": 8
+      },
+      "temporal_comparison": {
+        "relative_composite_l2": 0.00031908745165701297,
+        "linf_over_baseline_peak": 0.0005423685690526834,
+        "l2_limit": 0.001,
+        "linf_limit": 0.01,
+        "passed": true,
+        "scope": "Short shared-checkpoint sensitivity only; inherited errors remain.",
+        "native": {
+          "time": 0.6206669636981363,
+          "step": 772,
+          "levels": 2,
+          "stored_cells": 8192,
+          "force_linf_error": 0,
+          "peak_speed": 0.12219531587196275,
+          "compared": true,
+          "report_difference": true,
+          "reference_resolution_ratio": 1,
+          "time_difference": 0,
+          "velocity_linf_difference": 0.0000662748986144171,
+          "velocity_l2_difference": 0.000010241994479491648,
+          "reference_velocity_l2": 0.03209776638443547,
+          "composite_volume": 8
+        }
+      },
+      "probe_end": 0.6206669636981363,
+      "coarse_max_dt": 0.0001,
+      "fine_max_dt": 0.00005,
+      "combined_frames": 19,
+      "end": 0.621,
+      "stages": {
+        "restart-replay": {
+          "status": "completed",
+          "steps": 13,
+          "start": 0.6187547221397808,
+          "end": 0.62,
+          "frames": 1
+        },
+        "probe-baseline": {
+          "status": "completed",
+          "steps": 9,
+          "start": 0.62,
+          "end": 0.6206669636981363,
+          "frames": 1
+        },
+        "probe-smaller-dt": {
+          "status": "completed",
+          "steps": 14,
+          "start": 0.62,
+          "end": 0.6206669636981363,
+          "frames": 1
+        },
+        "extension": {
+          "status": "completed",
+          "steps": 4,
+          "start": 0.6206669636981363,
+          "end": 0.621,
+          "frames": 1
+        }
+      }
+    }
+  ],
+  "source_commit": "9ee1991",
+  "python_tests": {
+    "passed": 165,
+    "skipped": 5
+  }
+}

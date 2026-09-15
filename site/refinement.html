@@ -146,7 +146,8 @@ python -m navier_stokes_sim.refinement_design \
   --parent outputs/validated-from-rest \
   --output outputs/continuation-to-09975 \
   --end 0.9975 --wait-parent</code></pre>
-        <p>Use a fresh output directory. The runner saves its own source snapshot and a machine-readable <code>continuation.json</code> receipt. A successful finish produces <code>combined-frames.json</code>; pending or failed work is not labeled complete. The finite surrogate and the unresolved outer forcing regions remain the same modeling and spatial-accuracy limitations described above.</p>
+        <p>Use a fresh output directory on the same filesystem as the parent checkpoint, which is pinned with verified hard links and never modified. The runner saves its own source snapshot and a machine-readable <code>continuation.json</code> receipt. A successful finish produces <code>combined-frames.json</code>; pending or failed work is not labeled complete. The finite surrogate and the unresolved outer forcing regions remain the same modeling and spatial-accuracy limitations described above.</p>
+        <p>The <a href="data/continuation-validation.json">native workflow validation record</a> retains both failure and success cases on a small two-level mesh. Two longer probes exceeded the 0.1% relative-L² gate and correctly prevented extension. A shorter positive-path test recovered and replayed the parent field exactly, measured a 0.0319% relative-L² difference, completed its extension, and preserved all 19 frames in its combined history. Shortening that test interval exercises the workflow; it does not repair or supersede the failed longer probes. The large late-time run must pass its own checks.</p>
 
         <h2>Reproduce the operator test</h2>
         <pre><code>python3 -m venv .venv-amrex
