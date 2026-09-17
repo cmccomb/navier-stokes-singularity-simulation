@@ -116,6 +116,9 @@ def test_storage_recheck_preserves_budget_and_does_not_claim_restart():
     assert required == check["required_bytes"]
     assert check["reserve_bytes"] == 20 * 2**30
     assert check["passed"] == (check["free_bytes"] >= required + check["reserve_bytes"])
+    assert check["shortfall_bytes"] == max(
+        0, required + check["reserve_bytes"] - check["free_bytes"]
+    )
     assert check["planned_new_frames"] == 40 and not check["solver_started"]
     assert "has not restarted" in (site / "results.html").read_text()
 

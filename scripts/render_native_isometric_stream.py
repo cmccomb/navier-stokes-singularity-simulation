@@ -6,12 +6,12 @@ Native plotfiles and checkpoints are never opened for writing or removed.
 
 import argparse
 import json
-from pathlib import Path
 import time
+from pathlib import Path
 
 import pyvista as pv
 
-from scripts.render_native_3d import Scene, SCALES, sha
+from scripts.render_native_3d import SCALES, Scene, sha
 
 # Chosen physical scales, not per-frame fits. Every actual mesh is checked by
 # Scene.image; any clipping aborts the release rather than changing the camera.

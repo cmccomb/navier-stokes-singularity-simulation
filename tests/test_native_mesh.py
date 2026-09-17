@@ -53,4 +53,4 @@ def test_generated_mesh_matches_current_record(levels):
     assert data["planes"] == plane_lines(levels)
     cells, bounds = transition_cells(levels)
     assert data["cells"] == cells and data["detail_bounds"] == bounds
-    assert data["active_cells"] == 1179648
+    assert data["active_cells"] == 9437184

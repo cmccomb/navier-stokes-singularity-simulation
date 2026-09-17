@@ -99,13 +99,15 @@ def test_grid_has_three_ordered_views_and_active_edges_only():
     site = Path(__file__).resolve().parents[1] / "site"
     record = json.loads((site / "data/best.json").read_text())
     levels = hierarchy(record)
-    assert levels[-1]["spacing"] == 2 / 1024
+    assert levels[-1]["spacing"] == 2 / 2048
     for level, a, b in plane_edges(levels):
         if level + 1 < len(levels):
             middle = (np.array(a) + b) / 2
             assert not np.all(abs(middle) < levels[level + 1]["half"])
     svg = render(record)
     assert svg.index("x–y slice") < svg.index("x–z slice") < svg.index("Isometric ·")
-    assert svg == (site / "media/oliver-grid-views.svg").read_text()
+    assert svg == (site / "media/kay-grid-views.svg").read_text()
     for view in ("xy", "isometric"):
-        assert render_panel(record, view) == (site / f"media/mesh-{view}.svg").read_text()
+        assert (
+            render_panel(record, view) == (site / f"media/mesh-{view}.svg").read_text()
+        )

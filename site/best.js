@@ -2,8 +2,8 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
 function asset(record) {
   const url = new URL(record.path, window.location.href);
-  if (url.origin !== window.location.origin || !record.path.startsWith("media/oliver-")) {
-    throw new Error("Expected an Oliver media asset");
+  if (url.origin !== window.location.origin || !record.path.startsWith("media/kay-")) {
+    throw new Error("Expected a Kay media asset");
   }
   url.searchParams.set("v", record.sha256.slice(0, 12));
   return url.href;

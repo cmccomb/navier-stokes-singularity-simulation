@@ -27,8 +27,29 @@
         <h1>Numerical record</h1>
         <p class="dek">The strongest completed trajectories, what they establish, and the claims they do not support.</p>
 
-        <h2 id="oliver-complete">Current best completed run: Oliver</h2>
-        <p>The homepage features the completed AMReX / incflo trajectory from exact rest through <span class="math">t = 0.995</span>. All 280 scheduled native states are present and passed the velocity/forcing archive audit. The finite <code>appendix-b-axis-v2-localized</code> profile uses three pulse families. “Best” identifies the completed run selected for presentation; it does not certify the force as spatially resolved.</p>
+        <h2 id="kay-complete">Current best completed run: Kay</h2>
+        <p>Kay completed the AMReX / incflo trajectory from exact rest through <span class="math">t = 0.995</span>, with all 280 scheduled native states and zero archived-force readback discrepancy. The native audit finished on September 16, 2026 (UTC). The homepage's flow, forcing, and mesh views now describe this same run. “Best” identifies the higher-resolution completed run selected for presentation, not a convergence or singularity certificate.</p>
+        <table>
+          <thead><tr><th>Completed native run</th><th>Value</th></tr></thead>
+          <tbody>
+            <tr><td>Base grid / fixed levels</td><td>128³ / 5</td></tr>
+            <tr><td>Stored / active cells</td><td>10,485,760 / 9,437,184</td></tr>
+            <tr><td>Finest spacing</td><td>2 / 2048, only inside the ±0.0625 core cube</td></tr>
+            <tr><td>Saved states / final step</td><td>280 / 5,510</td></tr>
+            <tr><td>Maximum timestep / forcing-phase ceiling</td><td>0.00025 / 0.0375</td></tr>
+            <tr><td>Endpoint peak speed</td><td>7.415298767 model units</td></tr>
+            <tr><td>Endpoint kinetic energy</td><td>0.038289232 model units</td></tr>
+            <tr><td>Archived-force readback discrepancy</td><td>0 across all 280 native states</td></tr>
+            <tr><td>Elapsed run and completion audit</td><td>78.58 hours</td></tr>
+          </tbody>
+        </table>
+        <p>The <a href="data/best.json">completion record</a> and <a href="data/three-view.json">movie record</a> bind the full native history to the featured assets. Kay has half the cell spacing and eight times the active cells of Oliver in the same refinement regions. That is a resolution increase, not an eightfold accuracy claim.</p>
+        <h3 id="continuation-status">Extension storage recheck</h3>
+        <p>The first extension attempt stopped at its storage preflight without advancing the solver. The latest recheck, on September 17 at 12:51 UTC after native movie preparation, does not pass: 47.21 GiB free versus 30.93 GiB budgeted for new outputs and checks plus a retained 20 GiB reserve. At least 3.72 GiB more free space is needed under the unchanged budget. An earlier check at 12:08 UTC passed with 53.23 GiB free; the later measurement supersedes it. These are dated capacity measurements, not guarantees. <a href="data/continuation-storage-check.json">Exact byte counts and both readings →</a></p>
+        <p>The proposed continuation to 0.9975 would add 40 saved states. It has not restarted; restart recovery, replay, and the smaller-timestep comparison still need to pass. The homepage stops at the validated 0.995 endpoint. See <a href="refinement.html#continuation">continuation gates</a>.</p>
+
+        <h2 id="oliver-complete">Earlier completed reference: Oliver</h2>
+        <p>Oliver's completed trajectory covers the same output schedule and localized three-pulse profile on a coarser mesh. It remains a separate reference and the source of the published Hugging Face voxel release; it is no longer the homepage movie.</p>
         <table>
           <thead><tr><th>Completed native run</th><th>Value</th></tr></thead>
           <tbody>
@@ -43,11 +64,11 @@
             <tr><td>Elapsed run and completion audit</td><td>9.02 hours</td></tr>
           </tbody>
         </table>
-        <p>The <a href="data/best.json">completion and media record</a> contains source hashes, the complete output schedule, native checks, slice heights and media checksums. Raw snapshots preserve all three velocity and all three force components in double precision; the web movies sample 256² pixels per plane with the finest containing native cell. This is not a full-resolution 3D web export.</p>
+        <p>The archived <a href="data/oliver-best.json">Oliver completion and media record</a> contains source hashes, the complete output schedule, native checks, slice heights and media checksums. Its <a href="media/oliver-flow-views.gif">flow GIF</a> and <a href="media/oliver-force-views.gif">forcing GIF</a> remain available. Raw snapshots preserve all three velocity and all three force components in double precision; both runs' web slices sample 256² pixels using the finest containing native cell.</p>
         <h3>Reading the fixed slices</h3>
         <p>The homepage movies show a vertical x–z plane at <span class="math">y = 0</span> and a horizontal x–y plane at <span class="math">z = 0</span>. Both planes remain fixed throughout the run, and the force movie uses the same planes as the velocity movie.</p>
         <p>Colors use the site's symmetric-log magnitude scale, with fixed limits shared across both planes and all saved times within each quantity. Every saved state is shown at five frames per second, apart from the initial and final holds; no time interpolation, smoothing or arrow overlays are used.</p>
-        <div class="callout warning">Completion and archive integrity are verified. Spatial convergence, continuum error and singularity formation are not. The finite manufactured force is not the paper's infinite all-order cancellation construction. Kay's finer run remains a separate ongoing refinement experiment, not part of Oliver's movies.</div>
+        <div class="callout warning">Completion and archive integrity are verified for both runs. Spatial convergence, continuum error and singularity formation are not. The finite manufactured force is not the paper's infinite all-order cancellation construction. Kay and Oliver remain separate trajectories; their frames are never mixed.</div>
 
         <h2 id="legacy-media">Earlier uniform-grid media</h2>
         <p>The previous PhiFlow movies and browser-volume explorers remain archived separately: <a href="media/stream-flow.gif">velocity GIF</a>, <a href="media/stream-force.gif">forcing GIF</a>, <a href="media/stream-flow-3d.html">velocity 3D</a>, <a href="media/stream-force-3d.html">force 3D</a>, and <a href="media/mesh-3d.html">uniform mesh explorer</a>. They do not show the current refined run. Their original <a href="data/stream.json">publication record</a> is unchanged.</p>

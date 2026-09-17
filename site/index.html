@@ -11,7 +11,7 @@
     <title>From smooth flow to a singularity · Navier–Stokes Simulation</title>
     <link rel="icon" href="favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="styles.css?v=mesh-row-1" />
-    <script type="module" src="best.js?v=three-view-1"></script>
+    <script type="module" src="best.js?v=kay-three-view-1"></script>
   </head>
   <body>
     <a class="skip-link" href="#result">Skip to the simulation</a>
@@ -102,14 +102,14 @@
       </section>
 
       <section class="big-numbers" id="result" aria-label="Simulation in numbers">
-        <div><p class="number-label">Active solver cells</p><p class="number-value" id="cell-count">1,179,648</p><p class="number-note" id="cell-grid">64³ base · 5 fixed levels · 1024³-equivalent core only</p></div>
+        <div><p class="number-label">Active solver cells</p><p class="number-value" id="cell-count">9,437,184</p><p class="number-note" id="cell-grid">128³ base · 5 fixed levels · 2048³-equivalent core only</p></div>
         <div><p class="number-label">Saved frames from rest</p><p class="number-value" id="frame-count">280</p><p class="number-note">Complete · t = 0 to 0.995</p></div>
-        <div><p class="number-label">Endpoint peak speed</p><p class="number-value" id="peak-speed">7.416</p><p class="number-note" id="speed-time">Model units · full-field diagnostic at t = 0.995</p></div>
+        <div><p class="number-label">Endpoint peak speed</p><p class="number-value" id="peak-speed">7.415</p><p class="number-note" id="speed-time">Model units · full-field diagnostic at t = 0.995</p></div>
       </section>
 
       <section class="measure featured-measure" aria-labelledby="flow-title">
         <h2 id="flow-title">How the fluid moves</h2>
-        <p class="measure-note">Our best completed run: Oliver, from exact rest through t = 0.995. Left to right: x–y slice, x–z slice, isometric 3D view. All 280 saved states are included.</p>
+        <p class="measure-note">Our best completed run: Kay, from exact rest through t = 0.995. Left to right: x–y slice, x–z slice, isometric 3D view. All 280 saved states are included.</p>
         <p class="measure-note" id="flow-view-note">Fixed planes: y = 0 and z = 0. No vector arrows.</p>
         <p class="media-pending" id="flow-pending">Loading the completed velocity movie.</p>
         <figure class="stream-movie three-view" id="flow-figure" hidden>
@@ -117,7 +117,7 @@
           <p class="plot-scroll-hint">Scroll sideways: x–y → x–z → isometric</p>
           <figcaption>
             <span>Velocity magnitude · <span data-clip-range>saved times</span></span>
-            <span class="media-links"><a id="flow-gif" href="media/oliver-flow-views.gif" download>GIF ↓</a><a id="flow-mp4" href="media/oliver-flow-views.mp4" download>MP4 ↓</a></span>
+            <span class="media-links"><a id="flow-gif" href="media/kay-flow-views.gif" download>GIF ↓</a><a id="flow-mp4" href="media/kay-flow-views.mp4" download>MP4 ↓</a></span>
           </figcaption>
         </figure>
         <p class="measure-note">Each row shares one playback clock. Slice color scales, 3D surface thresholds, and cameras stay fixed through all saved times; no intermediate states are invented. The isometric panel shows magnitude surfaces, not streamlines. <a href="rendering-3d.html">Rendering details →</a></p>
@@ -132,43 +132,43 @@
           <p class="plot-scroll-hint">Scroll sideways: x–y → x–z → isometric</p>
           <figcaption>
             <span>Force magnitude · <span data-clip-range>saved times</span></span>
-            <span class="media-links"><a id="force-gif" href="media/oliver-force-views.gif" download>GIF ↓</a><a id="force-mp4" href="media/oliver-force-views.mp4" download>MP4 ↓</a></span>
+            <span class="media-links"><a id="force-gif" href="media/kay-force-views.gif" download>GIF ↓</a><a id="force-mp4" href="media/kay-force-views.mp4" download>MP4 ↓</a></span>
           </figcaption>
         </figure>
       </section>
       <section class="measure" aria-labelledby="mesh-title">
         <h2 id="mesh-title">The mesh beneath the motion</h2>
-        <p class="measure-note">A 64³ base covers the full periodic box. Four fixed nested cubes refine the core, reaching 1024³-equivalent spacing only inside the innermost cube. The hierarchy stores 1,310,720 cells; 1,179,648 remain active after covered coarse cells are excluded.</p>
+        <p class="measure-note">A 128³ base covers the full periodic box. Four fixed nested cubes refine the core, reaching 2048³-equivalent spacing only inside the innermost cube. The hierarchy stores 10,485,760 cells; 9,437,184 remain active after covered coarse cells are excluded.</p>
         <div class="plot-viewport mesh-row-viewport" tabindex="0" role="region" aria-label="Mesh row: x-y, isometric, rotatable whole mesh; scroll horizontally on narrow screens">
           <div class="mesh-row">
             <figure>
               <h3>x–y slice · z = 0</h3>
-              <img src="media/mesh-xy.svg" width="800" height="800" loading="lazy" alt="Active native cell edges in the central x-y slice; covered coarse interiors excluded." />
+              <img src="media/mesh-xy.svg?v=kay128" width="800" height="800" loading="lazy" alt="Active native cell edges in the central x-y slice; covered coarse interiors excluded." />
             </figure>
             <figure>
               <h3>Isometric</h3>
-              <img src="media/mesh-isometric.svg" width="800" height="800" loading="lazy" alt="Isometric view of three central sections through the active native cells." />
+              <img src="media/mesh-isometric.svg?v=kay128" width="800" height="800" loading="lazy" alt="Isometric view of three central sections through the active native cells." />
             </figure>
             <figure>
               <h3>Whole mesh · rotate</h3>
-              <iframe src="mesh-explorer.html?embed=whole" title="Rotatable whole native mesh" loading="lazy" sandbox="allow-scripts allow-same-origin"></iframe>
+              <iframe src="mesh-explorer.html?embed=whole&amp;v=kay128" title="Rotatable whole native mesh" loading="lazy" sandbox="allow-scripts allow-same-origin"></iframe>
             </figure>
           </div>
         </div>
         <p class="plot-scroll-hint mesh-row-hint">Scroll sideways: x–y → isometric → rotatable mesh</p>
         <div class="mesh-row-legend" aria-label="Refinement levels">
-          <span style="--level: #42677e">L0 · Δ = 0.03125</span>
-          <span style="--level: #328daf">L1 · Δ = 0.015625</span>
-          <span style="--level: #55becf">L2 · Δ = 0.0078125</span>
-          <span style="--level: #9bddd9">L3 · Δ = 0.00390625</span>
-          <span style="--level: #ffe8a3">L4 · Δ = 0.001953125</span>
+          <span style="--level: #42677e">L0 · Δ = 0.015625</span>
+          <span style="--level: #328daf">L1 · Δ = 0.0078125</span>
+          <span style="--level: #55becf">L2 · Δ = 0.00390625</span>
+          <span style="--level: #9bddd9">L3 · Δ = 0.001953125</span>
+          <span style="--level: #ffe8a3">L4 · Δ = 0.0009765625</span>
         </div>
         <p class="measure-note">Central sections show actual active cell edges; outlines mark the refinement regions. Covered coarse interiors are excluded.</p>
         <details class="grid-schematic"><summary>Refinement-region schematic</summary>
           <figure class="stream-movie mesh-diagram">
-            <div class="plot-viewport" tabindex="0" role="region" aria-label="Refinement regions; scroll horizontally on narrow screens"><img src="media/oliver-mesh.svg" width="720" height="432" loading="lazy" alt="Five fixed refinement regions centered in the full box: half-widths 1, 0.5, 0.25, 0.125 and 0.0625. Core spacing is 0.001953125 model length units. Region boundaries, not individual cells, are drawn." /></div>
+            <div class="plot-viewport" tabindex="0" role="region" aria-label="Refinement regions; scroll horizontally on narrow screens"><img src="media/kay-mesh.svg" width="720" height="432" loading="lazy" alt="Five fixed refinement regions centered in the full box: half-widths 1, 0.5, 0.25, 0.125 and 0.0625. Core spacing is 0.0009765625 model length units. Region boundaries, not individual cells, are drawn." /></div>
             <p class="plot-scroll-hint">Scroll sideways to see the refinement levels →</p>
-            <figcaption><span>Fixed refinement regions · not individual cells</span><a href="media/oliver-mesh.svg" download>SVG ↓</a></figcaption>
+            <figcaption><span>Fixed refinement regions · not individual cells</span><a href="media/kay-mesh.svg" download>SVG ↓</a></figcaption>
           </figure>
         </details>
         <p class="archive-link"><a href="results.html">Earlier runs and numerical record →</a></p>

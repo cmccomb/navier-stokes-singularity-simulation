@@ -22,8 +22,8 @@ toward the normalized singular time `t*=1`.
 ## Current best
 
 The [results site](https://cmccomb.com/navier-stokes-singularity-simulation/)
-features **Oliver's completed AMReX run: 280 saved states from exact rest through t = 0.995**.
-Its 64³ base and four fixed refined levels give 1024³-equivalent spacing
+features **Kay's completed AMReX run: 280 saved states from exact rest through t = 0.995**.
+Its 128³ base and four fixed refined levels give 2048³-equivalent spacing
 **only in the core**, not throughout the domain. The
 [completion record](site/data/best.json) preserves native checks and media
 provenance. Archive validation does not establish convergence or a singularity.

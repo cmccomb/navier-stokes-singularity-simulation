@@ -253,7 +253,7 @@
     .getElementById("zoom-out")
     .addEventListener("click", () => magnify(0.8));
   new ResizeObserver(resize).observe(canvas);
-  fetch("data/native-mesh.json")
+  fetch("data/native-mesh.json", { cache: "no-store" })
     .then((r) => {
       if (!r.ok) throw Error("Mesh data unavailable");
       return r.json();

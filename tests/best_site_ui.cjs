@@ -41,7 +41,7 @@ async function exercise(reduced, invalidRecord = false, invalidViews = false) {
       assert.equal(nodes.get(`${kind}-pending`).hidden, false);
       assert(nodes.get(`${kind}-pending`).textContent.includes("metadata unavailable"));
       assert.equal(nodes.get(`${kind}-figure`).hidden, false);
-      assert(html.includes(`href="media/oliver-${kind}-views.gif"`));
+      assert(html.includes(`href="media/kay-${kind}-views.gif"`));
     }
     return;
   }

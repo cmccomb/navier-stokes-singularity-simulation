@@ -1,6 +1,7 @@
 {
-  "checked_at": "2026-09-17T12:08:41.401849+00:00",
+  "checked_at": "2026-09-17T12:51:37.798825+00:00",
   "kind": "continuation-storage-preflight",
+  "stage": "after-complete-movie-preparation",
   "target_end": 0.9975,
   "source_record_sha256": "f831732d6cad4aaee4ae7f864da41fdbd406f0c329f8adcbc1b325c0ebb27f71",
   "source_runner_sha256": "72ccace74004c26acd1e08a7f9708210e01dee2c1f582b0b81fc31629fefcf2d",
@@ -12,9 +13,18 @@
   "budgeted_checkpoints": 9,
   "extra_margin_bytes": 1073741824,
   "required_bytes": 33209153738,
-  "free_bytes": 57160081408,
+  "free_bytes": 50692091904,
   "reserve_bytes": 21474836480,
-  "shortfall_bytes": 0,
-  "passed": true,
-  "solver_started": false
+  "shortfall_bytes": 3991898314,
+  "passed": false,
+  "solver_started": false,
+  "continuation_record_status": "failed",
+  "earlier_measurement": {
+    "checked_at": "2026-09-17T12:08:41.401849+00:00",
+    "free_bytes": 57160081408,
+    "required_bytes": 33209153738,
+    "reserve_bytes": 21474836480,
+    "shortfall_bytes": 0,
+    "passed": true
+  }
 }

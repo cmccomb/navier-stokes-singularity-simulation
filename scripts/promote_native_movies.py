@@ -2,16 +2,17 @@
 
 import argparse
 import json
-from pathlib import Path
 import shutil
+from itertools import pairwise
+from pathlib import Path
 
-from scripts.render_native_3d import durations, sha
 from scripts.render_grid_views import render, render_panel
+from scripts.render_native_3d import durations, sha
 from scripts.render_native_mesh import (
     hierarchy,
     plane_lines,
-    transition_cells,
     render_svg,
+    transition_cells,
 )
 
 
@@ -38,7 +39,7 @@ def stage(source, slices, movies, site):
         for a, b in zip(native, cached["frames"], strict=True)
     ):
         raise ValueError("Native slice or force audit mismatch")
-    if any(a >= b for a, b in zip(times, times[1:])) or any(
+    if any(a >= b for a, b in pairwise(times)) or any(
         abs(a - b) > 1e-12 for a, b in zip(times, record["planned_frames"], strict=True)
     ):
         raise ValueError("Saved history differs from the prescribed schedule")
@@ -47,7 +48,7 @@ def stage(source, slices, movies, site):
         clip = views["media"][quantity]
         if clip["saved_states"] != len(times):
             raise ValueError("Movie drops native states")
-        for ext, asset in clip["files"].items():
+        for asset in clip["files"].values():
             path = movies / asset["name"]
             if path.stat().st_size >= 100 * 1024**2 or sha(path) != asset["sha256"]:
                 raise ValueError("Invalid movie asset")
