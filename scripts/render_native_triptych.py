@@ -69,7 +69,7 @@ def center_plane(fields, levels, plane, n=256):
 
 
 class Triptych:
-    def __init__(self, quantity, limit, thresholds):
+    def __init__(self, quantity, limit, thresholds, machine="Oliver", saved_states=280):
         self.quantity = quantity
         self.fig = plt.figure(figsize=(15, 6), dpi=160, facecolor=BACKGROUND)
         cmap = LinearSegmentedColormap.from_list(
@@ -141,7 +141,7 @@ class Triptych:
         self.fig.text(
             0.045,
             0.018,
-            "Oliver · from rest · all 280 saved states · model units · 5 states/s · nonuniform simulation time · no temporal interpolation",
+            f"{machine} · from rest · all {saved_states} saved states · model units · 5 states/s · nonuniform simulation time · no temporal interpolation",
             color=MUTED,
             size=10,
         )

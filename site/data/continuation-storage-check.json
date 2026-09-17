@@ -1,0 +1,20 @@
+{
+  "checked_at": "2026-09-17T12:08:41.401849+00:00",
+  "kind": "continuation-storage-preflight",
+  "target_end": 0.9975,
+  "source_record_sha256": "f831732d6cad4aaee4ae7f864da41fdbd406f0c329f8adcbc1b325c0ebb27f71",
+  "source_runner_sha256": "72ccace74004c26acd1e08a7f9708210e01dee2c1f582b0b81fc31629fefcf2d",
+  "planned_new_frames": 40,
+  "estimated_steps": 790,
+  "plotfile_bytes": 503485073,
+  "checkpoint_bytes": 941290387,
+  "budgeted_plotfiles": 47,
+  "budgeted_checkpoints": 9,
+  "extra_margin_bytes": 1073741824,
+  "required_bytes": 33209153738,
+  "free_bytes": 57160081408,
+  "reserve_bytes": 21474836480,
+  "shortfall_bytes": 0,
+  "passed": true,
+  "solver_started": false
+}
