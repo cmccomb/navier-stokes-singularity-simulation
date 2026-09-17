@@ -18,6 +18,7 @@ import tempfile
 import time
 
 import numpy as np
+from PIL import Image
 
 from scripts.render_native_3d import (
     SCALES,
@@ -156,7 +157,12 @@ def prepare(args):
             raise ValueError("Cached slices do not match audited native history")
     output.mkdir(parents=True, exist_ok=True)
     source_hash, exporter_hash = sha(source / "run.json"), sha(args.exporter)
-    indices = list(range(len(native))) if args.indices is None else args.indices
+    if args.indices is not None:
+        indices = args.indices
+    elif args.worker:
+        indices = list(range(0 if args.worker == "-even" else 1, len(native), 2))
+    else:
+        indices = list(range(len(native)))
     manifest = {
         "schema_version": 1,
         "kind": "native-plotfile-movie-preparation",
@@ -223,6 +229,8 @@ def prepare(args):
                     len(rows) != 1
                     or rows[0]["time"] != frame["time"]
                     or rows[0]["bytes"] != raw.stat().st_size
+                    or rows[0]["dtype"] != "<f8"
+                    or rows[0]["order"] != "xyz-component"
                 ):
                     raise ValueError("Native export schema/clock differs")
                 levels = rows[0]["levels"]
@@ -319,6 +327,86 @@ def prepare(args):
     write(output / f"manifest{args.worker}.json", manifest)
 
 
+def assemble(args):
+    """Join disjoint completed workers without reloading large surface caches."""
+    root = args.prepared
+    source = json.loads((root / "source-run.json").read_text())
+    workers = [
+        json.loads((root / f"manifest-{w}.json").read_text()) for w in ("even", "odd")
+    ]
+    key_fields = (
+        "source_record_sha256",
+        "exporter_sha256",
+        "slice_manifest_sha256",
+        "renderer_sha256",
+        "machine",
+        "sampling",
+    )
+    if any(not w["validated"] for w in workers) or any(
+        workers[0][k] != workers[1][k] for k in key_fields
+    ):
+        raise ValueError("Preparation workers disagree")
+    if workers[0]["source_record_sha256"] != sha(root / "source-run.json"):
+        raise ValueError("Prepared source changed")
+    records = sorted(
+        [r for w in workers for r in w["records"]], key=lambda r: r["index"]
+    )
+    if len(records) != len(source["native_frames"]):
+        raise ValueError("Missing prepared native frames")
+    for index, (record, native) in enumerate(
+        zip(records, source["native_frames"], strict=True)
+    ):
+        if (
+            record["index"] != index
+            or record["time"] != native["time"]
+            or record["path"] != native["path"]
+        ):
+            raise ValueError("Preparation history mismatch")
+        if json.loads((root / f"frame-{index:04d}.json").read_text()) != record:
+            raise ValueError("Prepared frame receipt changed")
+        if len(record["levels"]) != native["levels"]:
+            raise ValueError("Prepared native level count differs")
+        base = source["parameters"]["base_n"]
+        widths = [
+            source["profile_manifest"]["parameters"]["half_domain"],
+            *source["parameters"]["widths"],
+        ]
+        for level, half in zip(record["levels"], widths, strict=True):
+            if (
+                level["shape"] != [base, base, base, 6]
+                or level["origin"] != [-half] * 3
+                or level["spacing"] != [2 * half / base] * 3
+            ):
+                raise ValueError("Native display hierarchy differs from solver")
+    merged = dict(workers[0], records=records, complete_history=True)
+    merged["limits"] = list(np.maximum(workers[0]["limits"], workers[1]["limits"]))
+    merged["scales"] = {
+        q: {v: max(w["scales"][q][v] for w in workers) for v in SCALES}
+        for q in ("flow", "force")
+    }
+    merged["worker_manifest_sha256"] = [
+        sha(root / f"manifest-{w}.json") for w in ("even", "odd")
+    ]
+    write(root / "manifest.json", merged)
+
+
+def rendered_image(root, receipt, preparation, index, quantity):
+    if (
+        receipt["index"] != index
+        or receipt["time"] != preparation["time"]
+        or receipt["source_record_sha256"] != preparation["source_record_sha256"]
+    ):
+        raise ValueError("Isometric image has wrong native lineage")
+    item = receipt["images"][quantity]
+    path = root / item["name"]
+    if item["name"] != f"{quantity}-{index:04d}.png" or sha(path) != item["sha256"]:
+        raise ValueError("Isometric image hash mismatch")
+    with Image.open(path) as image:
+        if image.size != (800, 600):
+            raise ValueError("Unexpected isometric image dimensions")
+        return np.asarray(image.convert("RGB"))
+
+
 def render(args):
     import pyvista as pv
 
@@ -330,6 +418,23 @@ def render(args):
         raise ValueError("Wrong slice archive")
     args.output.mkdir(parents=True, exist_ok=False)
     times = [r["time"] for r in manifest["records"]]
+    isometric = None
+    if args.isometric_cache:
+        isometric = json.loads((args.isometric_cache / "manifest.json").read_text())
+        if (
+            not isometric["validated"]
+            or not isometric["complete_history"]
+            or isometric["source_record_sha256"] != manifest["source_record_sha256"]
+            or [r["time"] for r in isometric["frames"]] != times
+        ):
+            raise ValueError("Isometric history does not match preparation")
+        for index, receipt in enumerate(isometric["frames"]):
+            if receipt["scales"] != isometric["isometric_parallel_scale"]:
+                raise ValueError("Isometric camera changes during history")
+            if receipt["preparation_sha256"] != sha(
+                args.prepared / f"frame-{index:04d}.json"
+            ):
+                raise ValueError("Isometric preparation changed")
     report = {
         "schema_version": 1,
         "kind": "native-three-view",
@@ -351,10 +456,16 @@ def render(args):
         },
         "media": {},
     }
+    if isometric:
+        report["isometric_parallel_scale"] = isometric["isometric_parallel_scale"]
+        report["isometric_manifest_sha256"] = sha(
+            args.isometric_cache / "manifest.json"
+        )
+        report["camera_policy"] = isometric["camera_policy"]
     for j, q in enumerate(("flow", "force")):
         folder = args.output / q
         folder.mkdir()
-        scene = Scene(800, 600, scales=manifest["scales"][q])
+        scene = None if isometric else Scene(800, 600, scales=manifest["scales"][q])
         triptych = Triptych(
             "velocity" if q == "flow" else "force",
             manifest["limits"][j] or 1,
@@ -364,21 +475,32 @@ def render(args):
         )
         try:
             for index, record in enumerate(manifest["records"]):
-                meshes = []
-                for k, digest in enumerate(record["geometry"][q]):
-                    path = args.prepared / f"{q}-{index:04d}-{k}.vtp"
-                    if digest and sha(path) != digest:
-                        raise ValueError("Geometry hash mismatch")
-                    meshes.append(pv.read(path) if digest else pv.PolyData())
-                scene.set_surfaces(meshes)
+                if isometric:
+                    iso = rendered_image(
+                        args.isometric_cache,
+                        isometric["frames"][index],
+                        record,
+                        index,
+                        q,
+                    )
+                else:
+                    meshes = []
+                    for k, digest in enumerate(record["geometry"][q]):
+                        path = args.prepared / f"{q}-{index:04d}-{k}.vtp"
+                        if digest and sha(path) != digest:
+                            raise ValueError("Geometry hash mismatch")
+                        meshes.append(pv.read(path) if digest else pv.PolyData())
+                    scene.set_surfaces(meshes)
+                    iso = scene.image("isometric")
                 planes = read_planes(args.slices, cached["frames"][index])
-                triptych.image(
-                    planes, scene.image("isometric"), index, times[index], len(times)
-                ).save(folder / f"frame-{index:04d}.png")
+                triptych.image(planes, iso, index, times[index], len(times)).save(
+                    folder / f"frame-{index:04d}.png"
+                )
                 print(f"Rendered {q} {index + 1}/{len(times)}", flush=True)
         finally:
             triptych.close()
-            scene.close()
+            if scene is not None:
+                scene.close()
         report["media"][q] = encode_frames(
             folder, args.output / f"kay-{q}-views", times, gif_size=(1600, 640)
         )
@@ -397,11 +519,19 @@ def main():
     r = sub.add_parser("render")
     for name in ("prepared", "slices", "output"):
         r.add_argument("--" + name, required=True, type=Path)
+    r.add_argument("--isometric-cache", type=Path)
+    a = sub.add_parser("assemble")
+    a.add_argument("--prepared", required=True, type=Path)
     s = sub.add_parser("slices")
     for name in ("run", "exporter", "output"):
         s.add_argument("--" + name, required=True, type=Path)
     args = parser.parse_args()
-    {"prepare": prepare, "render": render, "slices": export_slices}[args.command](args)
+    {
+        "prepare": prepare,
+        "render": render,
+        "slices": export_slices,
+        "assemble": assemble,
+    }[args.command](args)
 
 
 if __name__ == "__main__":

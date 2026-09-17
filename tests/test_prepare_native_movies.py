@@ -9,7 +9,7 @@ import numpy as np
 import pytest
 
 pytest.importorskip("zarr")
-from scripts.prepare_native_movies import check_fields, read_planes
+from scripts.prepare_native_movies import check_fields, read_planes, rendered_image
 from scripts.render_native_3d import composite_axes, sha
 from scripts.render_native_triptych import Triptych
 
@@ -72,6 +72,37 @@ def test_triptych_caption_uses_selected_run():
         assert fig.fig.texts[-1].get_text().startswith("Kay · from rest · all 280")
     finally:
         fig.close()
+
+
+def test_isometric_image_must_match_frame_source_and_hash(tmp_path):
+    from PIL import Image
+
+    path = tmp_path / "flow-0000.png"
+    Image.new("RGB", (800, 600), "black").save(path)
+    preparation = {"time": 0, "source_record_sha256": "source"}
+    receipt = {
+        "index": 0,
+        **preparation,
+        "images": {"flow": {"name": path.name, "sha256": sha(path)}},
+    }
+    assert rendered_image(tmp_path, receipt, preparation, 0, "flow").shape == (
+        600,
+        800,
+        3,
+    )
+    with pytest.raises(ValueError, match="lineage"):
+        rendered_image(tmp_path, {**receipt, "time": 0.5}, preparation, 0, "flow")
+    with pytest.raises(ValueError, match="lineage"):
+        rendered_image(
+            tmp_path,
+            {**receipt, "source_record_sha256": "other"},
+            preparation,
+            0,
+            "flow",
+        )
+    receipt["images"]["flow"]["sha256"] = "changed"
+    with pytest.raises(ValueError, match="hash"):
+        rendered_image(tmp_path, receipt, preparation, 0, "flow")
 
 
 def test_storage_recheck_preserves_budget_and_does_not_claim_restart():

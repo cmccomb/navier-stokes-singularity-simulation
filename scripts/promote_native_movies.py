@@ -38,6 +38,10 @@ def stage(source, slices, movies, site):
         for a, b in zip(native, cached["frames"], strict=True)
     ):
         raise ValueError("Native slice or force audit mismatch")
+    if any(a >= b for a, b in zip(times, times[1:])) or any(
+        abs(a - b) > 1e-12 for a, b in zip(times, record["planned_frames"], strict=True)
+    ):
+        raise ValueError("Saved history differs from the prescribed schedule")
     media = {}
     for quantity in ("flow", "force"):
         clip = views["media"][quantity]
