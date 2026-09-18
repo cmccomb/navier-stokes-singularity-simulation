@@ -26,20 +26,16 @@ from PIL import Image, ImageDraw
 from scripts.prepare_native_movies import check_fields, write
 from scripts.render_native_3d import (
     BACKGROUND,
-    COLORS,
     MUTED,
     TEXT,
-    THRESHOLDS,
-    composite_axes,
-    contours,
     encode_frames,
     font,
     sample_speed,
     sha,
 )
-from scripts.render_native_triptych import FORCE_THRESHOLDS
 
 CORE_HALF = 0.0625
+OVERVIEW_N = 512
 CAMERA = np.array([1.25, -1.65, 0.95])
 SCALES = {"flow": 1.45, "force": 1.0, "core": 0.118}
 SIZE = (2400, 1440)
@@ -57,6 +53,35 @@ FORCE_COLORS = (BACKGROUND, "#12364e", "#247f9f", "#57c6d5", "#c0ece7", "#fff0bd
 OPACITY = np.interp(
     np.linspace(0, 5, 256), [0, 1, 2, 3, 4, 5], [0, 0, 0.01, 0.06, 0.22, 0.45]
 )
+FLOW_VOLUME_COLORS = (BACKGROUND, "#123449", "#247899", "#65ccdc", "#d9f7ef", "#fff0bd")
+FLOW_VOLUME_OPACITY = np.interp(
+    np.linspace(0, 1, 256),
+    np.log10(1 + np.array([0, 0.02, 0.15, 0.5, 1.5, 4, 9])),
+    [0, 0, 0.012, 0.045, 0.14, 0.32, 0.52],
+)
+
+
+def overview_volume(axes, scalar):
+    """Fixed uniform display lattice; source sampling still uses native ownership."""
+    if (
+        scalar.shape != tuple(len(x) for x in axes)
+        or not np.isfinite(scalar).all()
+        or scalar.min() < 0
+    ):
+        raise ValueError("Invalid native-reconstructed volume")
+    spacing = [float(a[1] - a[0]) for a in axes]
+    if any(
+        not np.allclose(np.diff(a), dx, rtol=1e-12, atol=1e-14)
+        for a, dx in zip(axes, spacing, strict=True)
+    ):
+        raise ValueError("Volume ray casting requires a uniform display lattice")
+    grid = pv.ImageData(
+        dimensions=scalar.shape, origin=[float(a[0]) for a in axes], spacing=spacing
+    )
+    grid.point_data["log_magnitude"] = (
+        np.log10(1 + scalar).astype(np.float32).ravel(order="F")
+    )
+    return grid
 
 
 def quarter_cut(mesh):
@@ -178,17 +203,32 @@ class DetailScene:
         )
         self.dynamic.append(actor)
 
-    def volume(self, core):
+    def volume(self, core, quantity="force", *, cutaway=False, context=False):
+        if quantity not in ("flow", "force"):
+            raise ValueError("Unknown volume quantity")
+        force = quantity == "force"
+        opacity = OPACITY if force else FLOW_VOLUME_OPACITY
+        scalar = "log_magnitude"
+        if scalar not in core.point_data:
+            if force:
+                scalar = "log_force"
+            else:
+                core = core.copy(deep=False)
+                core.point_data[scalar] = np.log10(1 + core["speed"])
         actor = self.plotter.add_volume(
             core,
-            scalars="log_force",
-            clim=(0, 5),
+            scalars=scalar,
+            clim=(0, 5 if force else 1),
             # A full-length PyVista transfer table is already in byte units;
             # passing 256 floats in [0, 1] silently rounds opacity to zero.
-            opacity=np.rint(OPACITY * 255).astype(np.uint8),
-            opacity_unit_distance=0.0125,
-            cmap=LinearSegmentedColormap.from_list("force", FORCE_COLORS),
-            shade=True,
+            opacity=np.rint(opacity * (0.18 if context else 1) * 255).astype(np.uint8),
+            opacity_unit_distance=0.075 if cutaway else 0.0125,
+            cmap=LinearSegmentedColormap.from_list(
+                "magnitude", FORCE_COLORS if force else FLOW_VOLUME_COLORS
+            ),
+            mapper="smart",
+            blending="composite",
+            shade=False,
             ambient=0.35,
             diffuse=0.7,
             specular=0.1,
@@ -196,6 +236,13 @@ class DetailScene:
             reset_camera=False,
             render=False,
         )
+        if cutaway:
+            # VTK's 27-region crop mask removes the front quarter at exact
+            # physical planes, without changing scalars or fading boundary cells.
+            _, xmax, ymin, _, zmin, zmax = core.bounds
+            actor.mapper.SetCroppingRegionPlanes(0, xmax, ymin, 0, zmin, zmax)
+            actor.mapper.SetCroppingRegionFlags(((1 << 27) - 1) ^ (1 << 13))
+            actor.mapper.CroppingOn()
         self.dynamic.append(actor)
         return actor
 
@@ -284,19 +331,39 @@ def compose(images, quantity, native, index, count, stream_count):
         TEXT,
     )
     draw.line((1376, 160, 1376, 1285), fill="#263c51", width=1)
-    thresholds = THRESHOLDS if quantity == "flow" else FORCE_THRESHOLDS
     text(
         52,
         1280,
-        "Speed surfaces |u|" if quantity == "flow" else "Force surfaces |f|",
+        "Speed volume |u|" if quantity == "flow" else "Force volume |f|",
         25,
         TEXT,
     )
-    for j, (value, color) in enumerate(zip(thresholds, COLORS, strict=True)):
-        x = 380 + j * 175
+    labels = (
+        ("0.15", "0.5", "1.5", "4", "≥9")
+        if quantity == "flow"
+        else ("10", "100", "1,000", "10,000", "≥100,000")
+    )
+    values = (
+        (0.15, 0.5, 1.5, 4, 9) if quantity == "flow" else (10, 100, 1000, 10000, 100000)
+    )
+    cmap = LinearSegmentedColormap.from_list(
+        "legend", FLOW_VOLUME_COLORS if quantity == "flow" else FORCE_COLORS
+    )
+    colors = [
+        tuple(
+            round(c * 255)
+            for c in cmap(
+                float(min(1, np.log10(1 + v) / (1 if quantity == "flow" else 5)))
+            )[:3]
+        )
+        for v in values
+    ]
+    for j, (value, color) in enumerate(zip(labels, colors, strict=True)):
+        x = 345 + j * 174
         draw.ellipse((x, 1288, x + 16, 1304), fill=color)
-        text(x + 28, 1280, f"{value:g}", 25, TEXT)
-    text(52, 1325, "Front quarter removed · reference cube ±0.5", 24)
+        text(x + 28, 1280, value, 21, TEXT)
+    text(52, 1325, "Fixed logarithmic transfer · front quarter removed", 24)
+    text(52, 1358, "Opacity is not density · reference cube ±0.5", 21)
     if quantity == "flow":
         text(1400, 1277, "Axial fraction u_z / |u|", 24, TEXT)
         for j, (label, color) in enumerate(
@@ -337,7 +404,7 @@ def compose(images, quantity, native, index, count, stream_count):
 def render_frame(fields, levels, scenes, native, index, count, quantities):
     core = native_core(fields[-1], levels[-1])
     lines = core_streamlines(core) if "flow" in quantities else pv.PolyData()
-    axes = composite_axes(levels)
+    axes = [np.linspace(-1 + 1 / OVERVIEW_N, 1 - 1 / OVERVIEW_N, OVERVIEW_N)] * 3
     images = {}
     stats = {
         "streamline_branches": lines.n_cells,
@@ -350,22 +417,13 @@ def render_frame(fields, levels, scenes, native, index, count, quantities):
         scalar = sample_speed(
             fields, levels, axes, "velocity" if quantity == "flow" else "force"
         )
-        full = contours(
-            axes, scalar, THRESHOLDS if quantity == "flow" else FORCE_THRESHOLDS
-        )
+        volume = overview_volume(axes, scalar)
         del scalar
-        cut = [quarter_cut(mesh) for mesh in full]
-        for mesh, color, opacity in zip(cut, COLORS, (0.30, 0.58, 1.0), strict=True):
-            overview.surface(mesh, color, opacity)
-        main_image = overview.image(cut)
+        overview.volume(volume, quantity, cutaway=True)
+        main_image = overview.image()
         if quantity == "flow":
-            context = (
-                core.contour([1.5, 4.0], scalars="speed")
-                if core["speed"].max() > 1.5
-                else pv.PolyData()
-            )
-            context = quarter_cut(context)
-            detail.surface(context, "#719bad", 0.13)
+            if core["speed"].max() > 0:
+                detail.volume(core, "flow", context=True)
             if lines.n_points:
                 tube = lines.tube(radius=0.00025, n_sides=10, capping=True)
                 actor = detail.plotter.add_mesh(
@@ -382,7 +440,7 @@ def render_frame(fields, levels, scenes, native, index, count, quantities):
                     render=False,
                 )
                 detail.dynamic.append(actor)
-            detail_image = detail.image((context, lines))
+            detail_image = detail.image((lines,))
         else:
             if core["log_force"].max() > 1:
                 detail.volume(core)
@@ -392,7 +450,7 @@ def render_frame(fields, levels, scenes, native, index, count, quantities):
         )
         overview.clear()
         detail.clear()
-        del full, cut
+        del volume
     return images, stats
 
 
@@ -450,7 +508,18 @@ def run(args):
         "native_frame_count": len(native),
         "seed_points": SEEDS.tolist(),
         "streamline_policy": "Instantaneous RK45 in finest native patch; fixed 32 seeds; both directions; no temporal advection. Tube radius is a display choice.",
-        "cutaway": "Remove x>0 and y<0 quadrant from all overview surfaces; no caps or smoothing.",
+        "cutaway": "Composite volume ray casting of native magnitudes reconstructed on a fixed 512-cubed display lattice spanning the full domain. Exact VTK crop removes x>0 and y<0. No isosurfaces or temporal interpolation; display resampling does not add solver resolution. The core close-up retains all native 128-cubed samples.",
+        "overview_volume": {
+            "display_resolution": OVERVIEW_N,
+            "sampling": "Trilinear scalar-magnitude reconstruction with finest-containing-level ownership; float32 display scalars, original float64 fields unchanged.",
+            "flow_log_range": [0, 1],
+            "force_log_range": [0, 5],
+            "flow_opacity": FLOW_VOLUME_OPACITY.tolist(),
+            "force_opacity": OPACITY.tolist(),
+            "opacity_unit_distance": 0.075,
+            "shade": False,
+            "interpretation": "Fixed display transfer functions; opacity is not density. Core flow context uses 18% of flow opacity with unit distance 0.0125.",
+        },
         "force_volume": {
             "log_range": [0, 5],
             "opacity": OPACITY.tolist(),

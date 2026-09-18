@@ -16,6 +16,7 @@ from scripts.render_native_detail import (
     assemble,
     core_streamlines,
     native_core,
+    overview_volume,
     quarter_cut,
     sha,
 )
@@ -116,6 +117,47 @@ def test_volume_transfer_function_is_visible_and_cleared():
         assert np.abs(rendered.astype(float) - blank).mean() > 1
         scene.clear()
         np.testing.assert_allclose(np.asarray(scene.image()), blank, atol=1)
+    finally:
+        scene.close()
+
+
+def test_volume_preserves_display_coordinates_and_magnitude():
+    axes = [np.linspace(-0.5, 0.5, 5)] * 3
+    scalar = np.arange(125).reshape(5, 5, 5) / 20
+    grid = overview_volume(axes, scalar)
+    expected_points = np.column_stack(
+        [v.ravel(order="F") for v in np.meshgrid(*axes, indexing="ij")]
+    )
+    np.testing.assert_array_equal(grid.points, expected_points)
+    np.testing.assert_allclose(
+        10 ** grid["log_magnitude"] - 1, scalar.ravel(order="F"), atol=1e-6
+    )
+    with pytest.raises(ValueError):
+        overview_volume(axes, -np.ones((5, 5, 5)))
+
+
+def test_cutaway_is_cropped_volume_not_contour_geometry():
+    axes = [np.linspace(-0.06, 0.06, 6)] * 3
+    grid = overview_volume(axes, np.full((6, 6, 6), 4.0))
+    original = grid["log_magnitude"].copy()
+    scene = DetailScene(320, 320, 0.12, CORE_HALF)
+    try:
+        blank = np.asarray(scene.image()).copy()
+        actor = scene.volume(grid, "flow", cutaway=True)
+        assert actor.mapper.GetCropping() == 1
+        assert actor.mapper.GetCroppingRegionFlags() == ((1 << 27) - 1) ^ (1 << 13)
+        assert actor.mapper.GetCroppingRegionPlanes() == pytest.approx(
+            (
+                0,
+                0.06,
+                -0.06,
+                0,
+                -0.06,
+                0.06,
+            )
+        )
+        assert np.abs(np.asarray(scene.image()).astype(float) - blank).mean() > 1
+        np.testing.assert_array_equal(grid["log_magnitude"], original)
     finally:
         scene.close()
 
