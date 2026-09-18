@@ -76,6 +76,17 @@ def test_published_detail_record_and_all_gif_states():
     assert len(manifest["seed_points"]) == 32
     assert manifest["records"][0]["streamline_branches"] == 0
     assert manifest["records"][-1]["streamline_branches"] > 0
+    assert "no force marker" in manifest["velocity_marker"]["projection"]
+    for frame in manifest["records"]:
+        maximum = frame["core_velocity_maximum"]
+        assert maximum["index"] == frame["index"]
+        assert maximum["time"] == frame["time"]
+        assert maximum["core_sha256"] == frame["native_level_sha256"][-1]
+        assert maximum["value"] <= frame["diagnostics"]["peak_speed"] + 1e-12
+        if maximum["value"] == 0:
+            assert maximum["xyz"] is None
+        else:
+            assert max(abs(v) for v in maximum["xyz"]) < manifest["core_half_width"]
     assert (
         manifest["records"][-1]["diagnostics"]["peak_speed"]
         == best["diagnostics"]["peak_speed"]
