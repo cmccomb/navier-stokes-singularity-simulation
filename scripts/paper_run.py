@@ -251,6 +251,11 @@ def main() -> None:
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--base-n", type=int, default=32)
     parser.add_argument("--widths", type=float, nargs="*", default=[])
+    parser.add_argument(
+        "--refine-rz-file",
+        type=Path,
+        help="fixed revolved bands added to the original cubes; pin the file in the run",
+    )
     parser.add_argument("--box", type=int, default=32)
     parser.add_argument("--end", type=float, default=0.85)
     parser.add_argument("--max-dt", type=float, default=0.00025)
@@ -359,6 +364,12 @@ def main() -> None:
         command.append(
             "ns.refine_half_width=" + " ".join(f"{w:.17g}" for w in args.widths)
         )
+    refinement = None
+    if args.refine_rz_file is not None:
+        target = output / "refinement.bands"
+        shutil.copy2(args.refine_rz_file.resolve(strict=True), target)
+        refinement = {"path": target.name, "sha256": sha(target)}
+        command.append(f"ns.refine_rz_file={target}")
     if args.frame_phase_step:
         command.extend(
             [
@@ -403,6 +414,7 @@ def main() -> None:
             "epsilon_tau_ratio": args.epsilon_tau_ratio,
             "frame_dt": args.frame_dt,
             "frame_phase_step": args.frame_phase_step,
+            "revolved_refinement": refinement,
         },
         "planned_frames": planned_frames,
         "limits": {

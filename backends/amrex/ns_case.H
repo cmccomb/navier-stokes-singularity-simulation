@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <cmath>
 #include <deque>
+#include <fstream>
 #include <iomanip>
 #include <memory>
 #include <sys/resource.h>
@@ -22,12 +23,14 @@ namespace ns_case {
 using namespace amrex;
 constexpr Real pi = 3.1415926535897932384626433832795;
 struct Options {
+    struct Band { int level; Real rlo, rhi, zlo, zhi; };
     std::string force = "none";
     Real max_dt = 1e100;
     Real quiescent_max_dt = 0;
     Real epsilon_tau_ratio = 0;
     std::string table_file;
     Vector<Real> widths;
+    Vector<Band> bands;
     Vector<Real> plot_times;
     bool diagnostics = false;
     int force_threads = 1;
@@ -39,6 +42,26 @@ struct Options {
         pp.query("epsilon_tau_ratio", epsilon_tau_ratio);
         pp.query("table_file", table_file);
         pp.queryarr("refine_half_width", widths);
+        std::string band_file;
+        if (pp.query("refine_rz_file", band_file)) {
+            std::ifstream stream(band_file);
+            std::string version; int count=0;
+            if (!(stream>>version>>count) || version!="NS_RZ_BANDS_V1" || count<1 || count>100000)
+                Abort("invalid fixed revolved-band file header");
+            for (int i=0;i<count;++i) {
+                Band b;
+                if (!(stream>>b.level>>b.rlo>>b.rhi>>b.zlo>>b.zhi) ||
+                    b.level<0 || b.level>=widths.size() ||
+                    !std::isfinite(b.rlo) || !std::isfinite(b.rhi) ||
+                    !std::isfinite(b.zlo) || !std::isfinite(b.zhi) ||
+                    b.rlo<0 || b.rhi<=b.rlo || b.rhi>=1 ||
+                    b.zlo<=-1 || b.zhi>=1 || b.zhi<=b.zlo)
+                    Abort("invalid fixed revolved refinement band");
+                bands.push_back(b);
+            }
+            std::string extra;
+            if (stream>>extra) Abort("unexpected trailing refinement-band data");
+        }
         pp.queryarr("plot_times", plot_times);
         pp.query("diagnostics", diagnostics);
         pp.query("force_threads", force_threads);
@@ -67,6 +90,16 @@ struct Options {
     }
 };
 inline Options const& options() { static Options o; return o; }
+inline bool in_fixed_region(int level, Real x, Real y, Real z) {
+    auto const& o=options();
+    if (level>=o.widths.size()) return false;
+    Real width=o.widths[level];
+    if (std::abs(x)<width && std::abs(y)<width && std::abs(z)<width) return true;
+    Real r=std::hypot(x,y);
+    for (auto const& b:o.bands)
+        if (b.level==level && r>=b.rlo && r<=b.rhi && z>=b.zlo && z<=b.zhi) return true;
+    return false;
+}
 inline Real limit_plot_dt(Real time, Real dt) {
     auto const& events=options().plot_times;
     auto next=std::upper_bound(events.begin(),events.end(),time+1.e-12);
@@ -222,6 +255,13 @@ inline void tag_fixed_region(int level, TagBoxArray& tags, Geometry const& g) {
     auto const& widths=options().widths;
     if (level >= widths.size()) return;
     auto dx=g.CellSizeArray(); auto lo=g.ProbLoArray();
+    int klo=g.Domain().smallEnd(2), nz=g.Domain().length(2);
+    Vector<Vector<std::pair<Real,Real>>> radial(nz);
+    for (int k=0;k<nz;++k) {
+        Real z=lo[2]+(k+klo+0.5)*dx[2];
+        for (auto const& b:options().bands)
+            if (b.level==level && z>=b.zlo && z<=b.zhi) radial[k].emplace_back(b.rlo,b.rhi);
+    }
     Real width=widths[level];
     for (int c=0;c<3;++c)
         if (g.ProbLo(c)!=-1 || g.ProbHi(c)!=1 || !g.isPeriodic(c))
@@ -229,9 +269,14 @@ inline void tag_fixed_region(int level, TagBoxArray& tags, Geometry const& g) {
     for (MFIter mfi(tags); mfi.isValid(); ++mfi) {
         auto a=tags.array(mfi);
         LoopOnCpu(mfi.validbox(), [&](int i,int j,int k) {
-            if (std::abs(lo[0]+(i+0.5)*dx[0]) < width &&
-                std::abs(lo[1]+(j+0.5)*dx[1]) < width &&
-                std::abs(lo[2]+(k+0.5)*dx[2]) < width) a(i,j,k)=TagBox::SET;
+            Real x=lo[0]+(i+0.5)*dx[0],y=lo[1]+(j+0.5)*dx[1],z=lo[2]+(k+0.5)*dx[2];
+            bool selected=std::abs(x)<width && std::abs(y)<width && std::abs(z)<width;
+            if (!selected && !radial[k-klo].empty()) {
+                Real r=std::hypot(x,y);
+                for (auto const& band:radial[k-klo])
+                    if (r>=band.first && r<=band.second) { selected=true; break; }
+            }
+            if (selected) a(i,j,k)=TagBox::SET;
         });
     }
 }
