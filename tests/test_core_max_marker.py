@@ -1,12 +1,15 @@
 """Velocity-only maximum markers use actual native cells, not visual peaks."""
 
+import json
+from argparse import Namespace
+
 import numpy as np
 import pytest
 from PIL import Image
 
 pytest.importorskip("zarr")
 pytest.importorskip("pyvista")
-from scripts.mark_native_core_max import annotate, core_maximum, project
+from scripts.mark_native_core_max import annotate, core_maximum, mark, project, sha
 
 
 def field():
@@ -53,3 +56,82 @@ def test_projection_is_core_panel_center_and_marker_stays_in_core_panel():
         assert len(x) > 20
         assert x.min() >= 1400 and x.max() < 2400
         assert y.min() > 230 and y.max() < 1275
+
+
+@pytest.mark.parametrize("damage", [None, "source", "core", "clock", "incomplete"])
+def test_annotation_is_velocity_only_and_history_bound(tmp_path, damage):
+    rendered, maxima = tmp_path / "rendered", tmp_path / "maxima"
+    rendered.mkdir()
+    maxima.mkdir()
+    original = {
+        "validated": True,
+        "complete_history": True,
+        "source_record_sha256": "native",
+        "frame_times": [0, 0.995],
+        "indices": [0, 1],
+        "records": [],
+        "media": {"stale": "must reencode"},
+    }
+    peaks = {
+        "validated": True,
+        "complete_history": True,
+        "source_record_sha256": "native",
+        "policy": "native cells",
+        "records": [],
+    }
+    for q in ("flow", "force"):
+        (rendered / q).mkdir()
+    for i, t in enumerate(original["frame_times"]):
+        frame = {"index": i, "time": t, "native_level_sha256": [str(i)], "images": {}}
+        for q in ("flow", "force"):
+            path = rendered / q / f"frame-{i:04d}.png"
+            Image.new("RGB", (2400, 1440), "#07111f").save(path)
+            frame["images"][q] = {
+                "name": str(path.relative_to(rendered)),
+                "sha256": sha(path),
+            }
+        original["records"].append(frame)
+        peaks["records"].append(
+            {
+                "index": i,
+                "time": t,
+                "core_sha256": str(i),
+                "xyz": [0, 0, 0] if i else None,
+                "value": float(i),
+            }
+        )
+    if damage == "source":
+        peaks["source_record_sha256"] = "other"
+    elif damage == "core":
+        peaks["records"][1]["core_sha256"] = "different"
+    elif damage == "clock":
+        peaks["records"][1]["time"] = 0.99
+    elif damage == "incomplete":
+        peaks["complete_history"] = False
+    (rendered / "manifest.json").write_text(json.dumps(original))
+    (maxima / "manifest.json").write_text(json.dumps(peaks))
+    args = Namespace(rendered=rendered, maxima=maxima, output=tmp_path / "marked")
+    if damage:
+        with pytest.raises(ValueError):
+            mark(args)
+        assert not args.output.exists()
+        return
+    mark(args)
+    result = json.loads((args.output / "manifest.json").read_text())
+    assert not result["media"]
+    for i in range(2):
+        assert (
+            result["records"][i]["images"]["force"]
+            == original["records"][i]["images"]["force"]
+        )
+        for q in ("flow", "force"):
+            assert (
+                sha(rendered / original["records"][i]["images"][q]["name"])
+                == original["records"][i]["images"][q]["sha256"]
+            )
+        force = f"force/frame-{i:04d}.png"
+        assert sha(args.output / force) == sha(rendered / force)
+    assert (
+        result["records"][1]["images"]["flow"]["sha256"]
+        != original["records"][1]["images"]["flow"]["sha256"]
+    )
