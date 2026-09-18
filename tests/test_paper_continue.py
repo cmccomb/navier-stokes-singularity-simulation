@@ -112,6 +112,16 @@ def test_command_changes_only_integration_not_force_or_mesh():
         command(record, Path("/b"), Path("/chk"), 0.995, [0.995], 0.00025)
 
 
+def test_revolved_mesh_restart_uses_pinned_band_file():
+    record, _ = fixture()
+    record["command"].append("ns.refine_rz_file=/parent/refinement.bands")
+    argv = command(
+        record, Path("/new/bundle"), Path("/chk"), 0.997, [0.995, 0.997], 0.00025
+    )
+    params = dict(s.split("=", 1) for s in argv[2:])
+    assert params["ns.refine_rz_file"] == "/new/bundle/refinement.bands"
+
+
 def test_segment_checks_parent_boundary_and_finer_ceiling():
     record, initial = fixture()
     row = {

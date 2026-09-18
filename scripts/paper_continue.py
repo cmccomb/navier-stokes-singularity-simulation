@@ -110,6 +110,12 @@ def verify_parent(parent: Path) -> tuple[dict, list[dict], Path]:
     ):
         if sha(parent / name) != expected:
             raise ValueError(f"parent asset changed: {name}")
+    refinement = record["parameters"].get("revolved_refinement")
+    if refinement is not None and (
+        refinement["path"] != "refinement.bands"
+        or sha(parent / "refinement.bands") != refinement["sha256"]
+    ):
+        raise ValueError("parent revolved refinement changed")
     history = validate_history((parent / "run.log").read_text(), record)
     frames = record["native_frames"]
     expected = record["planned_frames"]
@@ -163,6 +169,8 @@ def command(
             "ns.plot_times": " ".join(f"{t:.17g}" for t in times),
         }
     )
+    if "ns.refine_rz_file" in args:
+        args["ns.refine_rz_file"] = str(bundle / "refinement.bands")
     return [str(bundle / "ns_incflo"), str(bundle / "inputs.paper")] + [
         key + "=" + value for key, value in args.items()
     ]
@@ -390,6 +398,8 @@ def main() -> None:
             "profile.tbl",
         ):
             shutil.copy2(parent / name, bundle / name)
+        if record["parameters"].get("revolved_refinement") is not None:
+            shutil.copy2(parent / "refinement.bands", bundle / "refinement.bands")
         write(bundle / "parent-run.json", record)
         checkpoint_files = tree(checkpoint)
         pinned_checkpoint = bundle / checkpoint.name

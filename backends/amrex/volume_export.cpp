@@ -1,4 +1,4 @@
-// Lossless export of the fixed rectangular native levels; never resample a field.
+// Lossless rectangular-level or ragged-block export; never resample a field.
 #include <AMReX_PlotFileDataImpl.H>
 #include <AMReX_ParmParse.H>
 #include <AMReX_Print.H>
@@ -16,8 +16,10 @@ int main(int argc, char** argv) {
     {
         using namespace amrex;
         ParmParse pp;
-        std::string plot, output;
+        std::string plot, output, layout="rectangular";
         pp.get("plot", plot); pp.get("output", output);
+        pp.query("layout",layout);
+        if(layout!="rectangular" && layout!="blocks") Abort("unknown volume layout");
         PlotFileDataImpl data(plot);
         Vector<std::string> names{"velx","vely","velz","forcing_x","forcing_y","forcing_z"};
         if (data.spaceDim()!=3 || data.varNames()!=names) Abort("native vectors missing");
@@ -27,11 +29,39 @@ int main(int argc, char** argv) {
         std::ofstream stream(output,std::ios::binary);
         if(!stream) Abort("cannot open output");
         std::ostringstream record;
-        record << std::setprecision(17) << "{\"schema_version\":1,\"time\":" << data.time()
-               << ",\"dtype\":\"<f8\",\"order\":\"xyz-component\",\"levels\":[";
+        record << std::setprecision(17) << "{\"schema_version\":" << (layout=="blocks" ? 2 : 1)
+               << ",\"time\":" << data.time()
+               << ",\"dtype\":\"<f8\",\"order\":\"xyz-component\",\""
+               << (layout=="blocks" ? "blocks" : "levels") << "\":[";
         Long offset=0;
+        int block_count=0;
         for(int lev=0;lev<=data.finestLevel();++lev) {
             auto mf=data.get(lev); auto dx=data.cellSize(lev);
+            if(!mf.boxArray().isDisjoint()) Abort("overlapping native blocks");
+            if(layout=="blocks") {
+                for(MFIter mfi(mf);mfi.isValid();++mfi) {
+                    auto box=mfi.validbox(); auto low=box.smallEnd(); auto size=box.length();
+                    if(box.numPts()>Long(16777216)) Abort("block exceeds bounded export memory");
+                    std::vector<Real> values(box.numPts()*6);
+                    auto a=mf.const_array(mfi);
+                    LoopOnCpu(box,[&](int i,int j,int k) {
+                        Long p=((Long(i-low[0])*size[1]+j-low[1])*size[2]+k-low[2])*6;
+                        for(int c=0;c<6;++c) values[p+c]=a(i,j,k,c);
+                    });
+                    for(auto value:values) if(!std::isfinite(value)) Abort("nonfinite block");
+                    stream.write(reinterpret_cast<char const*>(values.data()),values.size()*sizeof(Real));
+                    if(!stream) Abort("volume export failed");
+                    if(block_count++) record << ",";
+                    record << "{\"level\":" << lev << ",\"block\":" << mfi.index()
+                           << ",\"offset_bytes\":" << offset
+                           << ",\"shape\":[" << size[0] << "," << size[1] << "," << size[2] << ",6]"
+                           << ",\"index_lo\":[" << low[0] << "," << low[1] << "," << low[2] << "]"
+                           << ",\"origin\":[" << lo[0]+low[0]*dx[0] << "," << lo[1]+low[1]*dx[1] << "," << lo[2]+low[2]*dx[2] << "]"
+                           << ",\"spacing\":[" << dx[0] << "," << dx[1] << "," << dx[2] << "]}";
+                    offset+=values.size()*sizeof(Real);
+                }
+                continue;
+            }
             auto bounds=mf.boxArray().minimalBox();
             if(!mf.boxArray().isDisjoint() || bounds.numPts()!=mf.boxArray().numPts())
                 Abort("export requires disjoint, fully tiled rectangular levels");
