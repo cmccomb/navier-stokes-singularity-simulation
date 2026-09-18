@@ -1,9 +1,10 @@
 import copy
 import json
 import math
-from pathlib import Path
 import subprocess
 import sys
+from itertools import pairwise
+from pathlib import Path
 
 import pytest
 
@@ -64,7 +65,7 @@ def test_append_only_phase_clock_and_limits():
     clock = record["profile_manifest"]["parameters"]
     times = continuation_times(initial["time"], 0.9975, 0.025, 0.75, clock)
     assert times[0] == 0.995 and times[-1] == 0.9975 and len(times) == 41
-    for a, b in zip(times, times[1:]):
+    for a, b in pairwise(times):
         assert 0 < b - a <= 0.025
         assert (
             clock["forcing_log_rate_bound"] * math.log((1 - a) / (1 - b)) < 0.75 + 1e-10
@@ -192,6 +193,7 @@ def test_unready_parent_never_launches_or_changes_parent(tmp_path, status):
             "--output",
             str(output),
         ],
+        check=False,
         capture_output=True,
         text=True,
         timeout=10,

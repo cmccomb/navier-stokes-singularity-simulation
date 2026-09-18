@@ -12,12 +12,12 @@ import hashlib
 import json
 import math
 import os
-from pathlib import Path
 import shutil
 import signal
 import subprocess
 import time
 from datetime import UTC, datetime
+from pathlib import Path
 
 from scripts.paper_run import (
     MARKER,

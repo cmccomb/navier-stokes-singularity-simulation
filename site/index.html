@@ -114,7 +114,7 @@
           <button type="button" id="flow-views" aria-pressed="true" aria-controls="flow-video">Slices + 3D</button>
           <button type="button" id="flow-detail" aria-pressed="false" aria-controls="flow-video">3D detail</button>
         </div>
-        <p class="measure-note" id="flow-view-note">Fixed planes: y = 0 and z = 0. No vector arrows.</p>
+        <p class="measure-note" id="flow-view-note" aria-live="polite">Fixed planes: y = 0 and z = 0. No vector arrows.</p>
         <p class="media-pending" id="flow-pending">Loading the completed velocity movie.</p>
         <figure class="stream-movie three-view" id="flow-figure" hidden>
           <div class="plot-viewport" tabindex="0" role="region" aria-label="Velocity views; scroll horizontally on narrow screens"><video id="flow-video" controls loop muted playsinline preload="metadata" aria-label="Velocity magnitude: x-y slice, x-z slice, then isometric surfaces, synchronized through all saved times"></video></div>
@@ -133,7 +133,7 @@
           <button type="button" id="force-views" aria-pressed="true" aria-controls="force-video">Slices + 3D</button>
           <button type="button" id="force-detail" aria-pressed="false" aria-controls="force-video">3D detail</button>
         </div>
-        <p class="measure-note" id="force-view-note">Fixed planes: y = 0 and z = 0. No vector arrows.</p>
+        <p class="measure-note" id="force-view-note" aria-live="polite">Fixed planes: y = 0 and z = 0. No vector arrows.</p>
         <p class="media-pending" id="force-pending">Loading the completed forcing movie.</p>
         <figure class="stream-movie three-view" id="force-figure" hidden>
           <div class="plot-viewport" tabindex="0" role="region" aria-label="Force views; scroll horizontally on narrow screens"><video id="force-video" controls loop muted playsinline preload="metadata" aria-label="Applied force magnitude: x-y slice, x-z slice, then isometric surfaces, synchronized through all saved times"></video></div>
