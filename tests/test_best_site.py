@@ -93,7 +93,7 @@ def test_best_videos_preserve_the_gif_clock():
 def test_homepage_uses_only_fixed_midplane_media():
     html = (SITE / "index.html").read_text()
     script = (SITE / "best.js").read_text()
-    assert 'src="best.js?v=kay-three-view-1"' in html and 'src="app.js"' not in html
+    assert 'src="best.js?v=kay-detail-1"' in html and 'src="app.js"' not in html
     assert '"data/best.json"' in script and "data/stream.json" not in script
     assert "At peak-speed height" not in html and "moving slice" not in script
     assert 'data-view="peak"' not in html and 'role="tab' not in html

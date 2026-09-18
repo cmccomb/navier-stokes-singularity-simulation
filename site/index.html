@@ -10,8 +10,8 @@
     <meta name="theme-color" content="#07111f" />
     <title>From smooth flow to a singularity · Navier–Stokes Simulation</title>
     <link rel="icon" href="favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="styles.css?v=mesh-row-1" />
-    <script type="module" src="best.js?v=kay-three-view-1"></script>
+    <link rel="stylesheet" href="styles.css?v=detail-3d-1" />
+    <script type="module" src="best.js?v=kay-detail-1"></script>
   </head>
   <body>
     <a class="skip-link" href="#result">Skip to the simulation</a>
@@ -110,26 +110,34 @@
       <section class="measure featured-measure" aria-labelledby="flow-title">
         <h2 id="flow-title">How the fluid moves</h2>
         <p class="measure-note">Our best completed run: Kay, from exact rest through t = 0.995. Left to right: x–y slice, x–z slice, isometric 3D view. All 280 saved states are included.</p>
+        <div class="view-switch" id="flow-switch" role="group" aria-label="Velocity presentation" hidden>
+          <button type="button" id="flow-views" aria-pressed="true" aria-controls="flow-video">Slices + 3D</button>
+          <button type="button" id="flow-detail" aria-pressed="false" aria-controls="flow-video">3D detail <span aria-hidden="true">↗</span></button>
+        </div>
         <p class="measure-note" id="flow-view-note">Fixed planes: y = 0 and z = 0. No vector arrows.</p>
         <p class="media-pending" id="flow-pending">Loading the completed velocity movie.</p>
         <figure class="stream-movie three-view" id="flow-figure" hidden>
           <div class="plot-viewport" tabindex="0" role="region" aria-label="Velocity views; scroll horizontally on narrow screens"><video id="flow-video" controls loop muted playsinline preload="metadata" aria-label="Velocity magnitude: x-y slice, x-z slice, then isometric surfaces, synchronized through all saved times"></video></div>
-          <p class="plot-scroll-hint">Scroll sideways: x–y → x–z → isometric</p>
+          <p class="plot-scroll-hint" id="flow-scroll-hint">Scroll sideways: x–y → x–z → isometric</p>
           <figcaption>
-            <span>Velocity magnitude · <span data-clip-range>saved times</span></span>
+            <span>Velocity · <span data-clip-range>saved times</span></span>
             <span class="media-links"><a id="flow-gif" href="media/kay-flow-views.gif" download>GIF ↓</a><a id="flow-mp4" href="media/kay-flow-views.mp4" download>MP4 ↓</a></span>
           </figcaption>
         </figure>
-        <p class="measure-note">Each row shares one playback clock. Slice color scales, 3D surface thresholds, and cameras stay fixed through all saved times; no intermediate states are invented. The isometric panel shows magnitude surfaces, not streamlines. <a href="rendering-3d.html">Rendering details →</a></p>
+        <p class="measure-note">Switch views at the same saved time. The 3D detail view opens the speed surfaces and magnifies circulation in the native core. Cameras and scales stay fixed; no intermediate states are invented. Use fullscreen or download the MP4 for the clearest view. <a href="rendering-3d.html">Rendering details →</a></p>
       </section>
       <section class="measure" aria-labelledby="force-title">
         <h2 id="force-title">The force driving it</h2>
         <p class="measure-note">Applied force in the same order: x–y slice, x–z slice, isometric 3D view. Force uses its own magnitude scale and fixed surface thresholds.</p>
+        <div class="view-switch" id="force-switch" role="group" aria-label="Force presentation" hidden>
+          <button type="button" id="force-views" aria-pressed="true" aria-controls="force-video">Slices + 3D</button>
+          <button type="button" id="force-detail" aria-pressed="false" aria-controls="force-video">3D detail <span aria-hidden="true">↗</span></button>
+        </div>
         <p class="measure-note" id="force-view-note">Fixed planes: y = 0 and z = 0. No vector arrows.</p>
         <p class="media-pending" id="force-pending">Loading the completed forcing movie.</p>
         <figure class="stream-movie three-view" id="force-figure" hidden>
           <div class="plot-viewport" tabindex="0" role="region" aria-label="Force views; scroll horizontally on narrow screens"><video id="force-video" controls loop muted playsinline preload="metadata" aria-label="Applied force magnitude: x-y slice, x-z slice, then isometric surfaces, synchronized through all saved times"></video></div>
-          <p class="plot-scroll-hint">Scroll sideways: x–y → x–z → isometric</p>
+          <p class="plot-scroll-hint" id="force-scroll-hint">Scroll sideways: x–y → x–z → isometric</p>
           <figcaption>
             <span>Force magnitude · <span data-clip-range>saved times</span></span>
             <span class="media-links"><a id="force-gif" href="media/kay-force-views.gif" download>GIF ↓</a><a id="force-mp4" href="media/kay-force-views.mp4" download>MP4 ↓</a></span>

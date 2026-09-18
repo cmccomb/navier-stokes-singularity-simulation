@@ -110,6 +110,13 @@ footer {
 .stream-movie video { display: block; width: 720px; background: #050c16; }
 .stream-movie figcaption { display: flex; flex-wrap: wrap; gap: 0.7rem 1.5rem; justify-content: space-between; padding: 0.8rem 0; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.875rem; }
 .media-links { display: flex; gap: 1.25rem; }
+.view-switch { display: flex; width: fit-content; gap: 0.25rem; margin: 1rem 0 0.6rem; padding: 0.25rem; border: 1px solid var(--line); border-radius: 0.6rem; background: #0b1827; }
+.view-switch[hidden] { display: none; }
+.view-switch button { cursor: pointer; color: var(--muted); border: 1px solid transparent; border-radius: 0.4rem; padding: 0.65rem 1rem; background: transparent; font: inherit; font-size: 0.875rem; }
+.view-switch button[aria-pressed="true"] { color: #e9f5fa; border-color: #365b70; background: #183345; }
+.view-switch button:hover { color: #e9f5fa; }
+.view-switch button:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; }
+.stream-movie.detail-view video { min-width: 820px; }
 .media-links a, .archive-link a { color: var(--cyan); }
 .archive-link { margin: 1rem 0 2rem; }
 

@@ -20,7 +20,16 @@
       <article class="doc-page">
         <p class="eyebrow">Rendering guide · September 17, 2026</p>
         <h1>See the flow in three dimensions.</h1>
-        <p class="dek">The homepage now shows Kay's complete 280-state sequence from exact rest through 0.995. Fixed x–y and x–z slices sit beside an isometric view of the same saved state, for both velocity and applied force.</p>
+        <p class="dek">Kay's complete 280-state sequence is available in two presentations: fixed x–y and x–z slices beside an isometric overview, or a larger 3D cutaway beside a native-core close-up. Both start at exact rest and end at t = 0.995.</p>
+        <h2>Inside the flow: the 3D detail view</h2>
+        <p>Choose <strong>3D detail</strong> above either homepage movie. Switching presentations preserves the playback time and whether the movie was playing or paused. The two presentations contain the same 280 saved states on the same 57.1-second clock. The detail MP4 is 2400 × 1440; the GIF is 1200 × 720. Fullscreen MP4 playback preserves more color and fine structure than the GIF.</p>
+        <p>The left panel removes the front quarter, x &gt; 0 and y &lt; 0, from the magnitude surfaces. These are open cuts: the renderer adds no artificial caps. Fixed thresholds match the three-view movies, and the reference cube remains ±0.5. The right panel magnifies the finest native patch, ±0.0625 in each coordinate. Its separately fixed scale is labeled; the two panels do not share a length scale.</p>
+        <h3>Velocity: instantaneous streamlines</h3>
+        <p>The core panel integrates the saved velocity vector field from 32 fixed seeds, forward and backward. Cyan indicates upward velocity, gold downward velocity, and slate predominantly horizontal motion. The mapped quantity is u<sub>z</sub>/|u|, not speed. Tube radius is a display choice, not a physical radius or flux. Faint cutaway surfaces at |u| = 1.5 and 4 provide geometric context.</p>
+        <p>Each frame is an independent set of <strong>instantaneous streamlines</strong>, not particle trajectories. The integration uses RK45 with a maximum spatial step of half a native cell and stays within the finest patch. This spatial tracing step is separate from the solver's time step. Tests recover straight paths in uniform flow and circular paths in rigid rotation, including a halved-step check. Exact rest produces no streamlines; a colored line in weak flow reports direction, not large speed.</p>
+        <h3>Forcing: native-core volume</h3>
+        <p>The force panel renders |f| at the finest patch's 128³ native cell centers using the fixed mapping log<sub>10</sub>(1 + |f|). Color and opacity remain unchanged across time, with the color range extending to 10<sup>5</sup> model force units. Weak force can be nearly transparent. Opacity exposes spatial structure; it does not represent density, smoke, energy, or uncertainty. Ray interpolation is a display reconstruction, not a refinement of the solver.</p>
+        <p>Fixed lights, transparency ordering, and two-times supersampling improve depth and edges. Neither native values nor surface positions are smoothed. Grid-scale bands, faceting, and discontinuities remain visible. A better rendering is not a better-resolved solution. <a href="data/detail-view.json">Complete detail-rendering record</a>.</p>
         <h2>The homepage's three views</h2>
         <p>Each row reads left to right: x–y slice at z = 0, x–z slice at y = 0, then an isometric projection of magnitude surfaces. The first two panels sample native cells on fixed planes; they are not projections of the 3D surfaces. One encoded movie keeps all three panels on the same saved state when playing or scrubbing.</p>
         <p>Velocity surfaces use |u| = 0.15, 1.5, and 4. Applied-force surfaces use |f| = 10, 100, and 1000. These are fixed display thresholds, not thresholds for instability. A blank 3D panel can mean the field is nonzero but below the lowest surface. The slice colorbar uses a shared, fixed scale within each quantity, linear near zero and logarithmic above the labeled transition. Velocity and force have different units and scales. Each isometric camera remains fixed and is checked against the complete history; the reference cube supplies its physical scale.</p>
@@ -60,6 +69,23 @@ python -m scripts.prepare_native_movies render \
   --prepared outputs/kay-geometry --slices outputs/native-slices \
   --isometric-cache outputs/kay-isometric \
   --output outputs/kay-movies</code></pre>
+        <h2>Reproduce the detail movies</h2>
+        <p>Use the same native plotfiles and completed preparation manifest. The detail renderer rechecks each exported level against the recorded native hash, then checks full-field peak speed and energy. It uses one temporary native snapshot per worker, with a 20 GiB disk reserve plus 2 GiB scratch margin. Original plotfiles, checkpoints, and solver inputs remain read-only. The two workers below process disjoint saved states. Assembly rejects missing frames, duplicates, changed image hashes, or differing cameras and rendering settings.</p>
+        <pre><code>python -m scripts.render_native_detail render \
+  --run /path/to/refined-n128-l5-rest-t0995 \
+  --exporter /path/to/ns_volume_export \
+  --prepared outputs/kay-geometry --output outputs/detail-even --worker 0 &amp;
+python -m scripts.render_native_detail render \
+  --run /path/to/refined-n128-l5-rest-t0995 \
+  --exporter /path/to/ns_volume_export \
+  --prepared outputs/kay-geometry --output outputs/detail-odd --worker 1 &amp;
+wait
+python -m scripts.render_native_detail assemble \
+  --prepared outputs/kay-geometry \
+  --parts outputs/detail-even outputs/detail-odd --output outputs/detail
+python -m scripts.render_native_detail encode --output outputs/detail
+python -m scripts.publish_native_detail --rendered outputs/detail --site site</code></pre>
+        <p>For a prototype, replace <code>--worker</code> with selected <code>--indices</code>. Partial selections cannot be encoded as a complete-history movie. Movie readback checks every saved state and hold duration; publication requires the same source and time history as the current best run.</p>
         <h2>Earlier Oliver camera set</h2>
         <p>The separate <a href="media/oliver-3d-isometric.mp4">isometric</a>, <a href="media/oliver-3d-side.mp4">side</a>, <a href="media/oliver-3d-top.mp4">top</a>, and <a href="media/oliver-3d-core.mp4">core</a> movies remain archived Oliver views. Their <a href="data/rendering-3d.json">original rendering record</a> is unchanged. They do not show Kay.</p>
         <h2>Reproduce the earlier dataset-based movies</h2>
