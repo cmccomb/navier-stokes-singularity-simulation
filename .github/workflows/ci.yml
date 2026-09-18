@@ -34,3 +34,17 @@ jobs:
       - run: uv venv .venv-hf
       - run: uv pip install --python .venv-hf/bin/python -r spaces/native_explorer/requirements.txt pytest
       - run: .venv-hf/bin/python -m pytest tests/test_native_explorer.py tests/test_native_release.py tests/test_render_native_3d.py tests/test_native_triptych.py -q
+
+  native-rendering:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: uv venv .venv-render
+      - run: uv pip install --python .venv-render/bin/python -r scripts/requirements-render.txt pytest
+      - run: sudo apt-get update && sudo apt-get install -y xvfb libgl1-mesa-dri libegl1
+      - name: Native geometry, framebuffer, marker and publication regressions
+        run: xvfb-run -a .venv-render/bin/python -m pytest tests/test_native_detail.py tests/test_core_max_marker.py tests/test_detail_publication.py -q
