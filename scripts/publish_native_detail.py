@@ -109,6 +109,9 @@ def publish(rendered, site):
     # Leave room for the provenance record and future small text updates.
     if total > 990_000_000:
         raise ValueError("Publication would exceed the Pages size budget")
+    additional = sum(a.stat().st_size for a, _ in replacements)
+    if shutil.disk_usage(site).free - additional < 20 * 2**30:
+        raise ValueError("Publication would consume the 20 GiB local disk reserve")
     manifest.update(
         saved_frames=count,
         source_render_manifest_sha256=digest(manifest_path),

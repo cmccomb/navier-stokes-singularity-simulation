@@ -73,6 +73,7 @@ function enableDetails(run, views) {
             if (selections[kind].detail !== isDetail) showMovie(kind, isDetail ? detail : views, isDetail);
           };
         }
+        if (new URL(window.location.href).searchParams.get("view") === "3d") showMovie(kind, detail, true);
       }
     })
     .catch((error) => console.warn("3D detail unavailable; complete three-view movies remain available.", error));

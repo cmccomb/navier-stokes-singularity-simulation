@@ -16,7 +16,7 @@ const detail = fs.existsSync(detailPath) ? JSON.parse(fs.readFileSync(detailPath
   }]))
 };
 
-async function exercise(reduced, invalidRecord = false, invalidViews = false, invalidDetail = false) {
+async function exercise(reduced, invalidRecord = false, invalidViews = false, invalidDetail = false, preferDetail = false) {
   const nodes = new Map([...html.matchAll(/\bid="([^"]+)"/g)].map((m) => [m[1], {
     id: m[1], currentTime: 0, duration: 57.1,
     paused: true, plays: 0, hidden: m[1].endsWith("-switch"), attributes: {},
@@ -42,7 +42,7 @@ async function exercise(reduced, invalidRecord = false, invalidViews = false, in
     },
   };
   vm.runInNewContext(fs.readFileSync(path.join(site, "best.js"), "utf8"), {
-    document, URL, window: { location: new URL("http://localhost/"), matchMedia: () => ({ matches: reduced }) },
+    document, URL, window: { location: new URL(`http://localhost/${preferDetail ? "?view=3d" : ""}`), matchMedia: () => ({ matches: reduced }) },
     fetch: async (url) => ({ ok: true, json: async () => url.includes("detail-view") ? (invalidDetail ? { ...detail, source_record_sha256: "wrong" } : detail) : url.includes("three-view") ? (invalidViews ? { ...views, view_order: ["xz", "xy", "isometric"] } : views) : invalidRecord ? { ...run, validated: false } : run }),
     console: { error: (error) => errors.push(error), warn: (...message) => warnings.push(message) },
   });
@@ -61,7 +61,7 @@ async function exercise(reduced, invalidRecord = false, invalidViews = false, in
   assert.equal(errors.length, 0);
   for (const kind of ["flow", "force"]) {
     const video = nodes.get(`${kind}-video`);
-    const media = views.media[kind].files;
+    const media = (preferDetail && !invalidDetail ? detail : views).media[kind].files;
     const expected = (ext) => new URL(`${media[ext].path}?v=${media[ext].sha256.slice(0, 12)}`, "http://localhost/").href;
     assert.equal(video.src, expected("mp4"));
     assert.equal(video.poster, expected("png"));
@@ -83,6 +83,11 @@ async function exercise(reduced, invalidRecord = false, invalidViews = false, in
       continue;
     }
     assert.equal(nodes.get(`${kind}-switch`).hidden, false);
+    if (preferDetail) {
+      assert.equal(nodes.get(`${kind}-detail`).attributes["aria-pressed"], "true");
+      nodes.get(`${kind}-views`).onclick();
+      video.onloadedmetadata();
+    }
     video.pause();
     video.currentTime = 27.4;
     const plays = video.plays;
@@ -118,4 +123,6 @@ async function exercise(reduced, invalidRecord = false, invalidViews = false, in
 exercise(false).then(() => exercise(true)).then(() => exercise(false, true))
   .then(() => exercise(false, false, true))
   .then(() => exercise(false, false, false, true))
+  .then(() => exercise(false, false, false, false, true))
+  .then(() => exercise(true, false, false, false, true))
   .then(() => console.log("Media, detail toggles, stable clocks, rapid switching, fallback and reduced motion passed."));
