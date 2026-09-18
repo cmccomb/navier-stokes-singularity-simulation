@@ -73,6 +73,11 @@ def test_published_detail_record_and_all_gif_states():
     validate(manifest, best, views)
     assert manifest["saved_frames"] == 280
     assert manifest["core_half_width"] == 0.0625
+    assert manifest["overview_volume"]["display_resolution"] == 512
+    assert manifest["overview_volume"]["shade"] is False
+    assert manifest["overview_volume"]["flow_log_range"] == [0, 1]
+    assert manifest["overview_volume"]["force_log_range"] == [0, 5]
+    assert "No isosurfaces or temporal interpolation" in manifest["cutaway"]
     assert len(manifest["seed_points"]) == 32
     assert manifest["records"][0]["streamline_branches"] == 0
     assert manifest["records"][-1]["streamline_branches"] > 0

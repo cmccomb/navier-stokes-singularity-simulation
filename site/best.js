@@ -11,8 +11,8 @@ function asset(record) {
 
 const selections = {};
 const descriptions = {
-  flow: "Cutaway speed surfaces + native-core streamlines. Cyan rises; gold descends. Color shows direction, not speed. The white marker locates the native-core speed maximum. These are instantaneous streamlines, not particle tracks.",
-  force: "Cutaway force surfaces + native-core volume. Color and opacity use a fixed logarithmic mapping; opacity is not material density.",
+  flow: "Cutaway speed volume + native-core streamlines with faint speed-volume context. On the streamlines, cyan rises and gold descends: color shows direction, not speed. The white marker locates the native-core speed maximum. These are instantaneous streamlines, not particle tracks.",
+  force: "Cutaway force volume + native-core volume. Color and opacity use a fixed logarithmic mapping; opacity is not material density. The overview is display-resampled; the core retains native samples.",
 };
 
 function showMovie(kind, views, detail = false) {

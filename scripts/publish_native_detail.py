@@ -116,7 +116,12 @@ def publish(rendered, site):
         saved_frames=count,
         source_render_manifest_sha256=digest(manifest_path),
         playback={"gif_hold_ms": holds, "duration_seconds": sum(holds) / 1000},
-        reconstruction="Native finest-patch vectors and force magnitude; instantaneous streamlines and volume ray interpolation are display reconstructions, not added solver resolution.",
+        reconstruction=(
+            f"Overview scalar magnitudes use fixed {manifest['overview_volume']['display_resolution']}-cubed display resampling with finest-containing-level ownership. "
+            if "overview_volume" in manifest
+            else "Overview magnitude surfaces are display reconstructions. "
+        )
+        + "The core retains native samples. Instantaneous streamlines and volume ray interpolation are display reconstructions, not added solver resolution; original native fields are unchanged.",
     )
     for source, destination in replacements:
         shutil.copy2(source, destination)

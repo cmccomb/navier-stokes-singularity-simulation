@@ -219,7 +219,7 @@ def mark(args):
         "annotation_sha256": sha(Path(__file__)),
         "maxima_manifest_sha256": sha(args.maxima / "manifest.json"),
         "unmarked_manifest_sha256": sha(args.rendered / "manifest.json"),
-        "projection": "Orthographic overlay on core panel, shown even when behind a surface; no force marker.",
+        "projection": "Orthographic overlay on core panel, visible through rendered geometry; no force marker.",
     }
     original["media"] = {}
     write(args.output / "manifest.json", original)
