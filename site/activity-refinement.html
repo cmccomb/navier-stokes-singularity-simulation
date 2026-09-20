@@ -59,6 +59,7 @@
         <p>The outer-band experiment launched on Oliver from rest, targeting the same t = 0.995 endpoint and the same 280-state output clock as Kay. Maximum timestep 0.00025, forcing-phase ceiling 0.0375, profile, viscosity, derivative-window rule, and core spacing are unchanged. Four solver threads and two force threads limit scratch memory. The run retains all native velocity and forcing voxels and has an 11.5 GiB process-RSS stop threshold and a 20 GiB free-disk reserve, sampled every five seconds. Its launch snapshot is not a live progress counter.</p>
         <p>The native field budget is approximately 150.9 GiB. The preflight reserves a 256 GiB working budget plus the separate 20 GiB free reserve on Oliver; approximately 431.6 GiB was free before launch. Kay's original archive remains untouched. The new run is an experiment and does not replace the completed homepage result until its archive and spatial-sensitivity checks are reviewed.</p>
         <p><a href="data/activity-refinement.json">Design, validation, source-sensor, capacity, and launch record</a> · <a href="data/outer-refinement.bands">Pinned outer-band geometry</a></p>
+        <p>The <a href="mesh-sensitivity.html">September 20 mesh-sensitivity study</a> follows this experiment with matched-state diagnostics, directional source probes, and measured costs for the next fixed mesh.</p>
 
         <h2>Reproduce the design</h2>
         <pre><code>python -m scripts.audit_native_action \

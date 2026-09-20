@@ -6,6 +6,27 @@ from urllib.parse import urlsplit
 SITE = Path(__file__).parents[1] / "site"
 
 
+def test_mesh_diagnostics_keep_source_sensitivity_distinct_from_convergence():
+    docs = (SITE / "documentation.html").read_text()
+    page = (SITE / "mesh-sensitivity.html").read_text()
+    record = json.loads((SITE / "data/mesh-sensitivity.json").read_text())
+    assert 'href="mesh-sensitivity.html"' in docs
+    assert 'href="data/mesh-sensitivity.json"' in page
+    assert "not a solver-timestep convergence test" in page
+    assert not record["production_ready"] and not record["accepted_best_changed"]
+    sensors = [s for r in record["source_sensors"] for s in r["sensors"]]
+    assert len(sensors) >= 54
+    assert all(len(s["raw_sha256"]) == 4 for s in sensors)
+    candidates = record["candidate_ranking"]["candidates"]
+    assert len(candidates) == 27 and not any(c["production_ready"] for c in candidates)
+    assert next(c for c in candidates if c["name"] == "current")["stored_cells"] == 12055040
+    assert record["leading_candidate_geometry"]["mesh"]["stored_cells"] == 12840448
+    comparison = record["matched_native_comparison"]
+    if comparison["status"] == "complete":
+        assert comparison["report"]["complete"] and len(comparison["report"]["frames"]) == 2
+        assert all(len(f["native_audits"]) == 2 for f in comparison["report"]["frames"])
+
+
 class _References(HTMLParser):
     def __init__(self) -> None:
         super().__init__()

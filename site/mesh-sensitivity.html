@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Matched-state diagnostics, directional forcing probes, and measured AMReX costs for the next fixed mesh." />
+    <meta name="theme-color" content="#07111f" />
+    <title>Mesh sensitivity · Navier–Stokes Simulation</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#content">Skip to content</a>
+    <header class="site-header">
+      <a class="wordmark" href="index.html"><span class="mark" aria-hidden="true">∇</span><span>Navier–Stokes Simulation</span></a>
+      <nav aria-label="Project navigation"><a href="index.html">Results</a><a href="documentation.html" aria-current="page">Documentation</a><a class="nav-cta" href="https://github.com/cmccomb/navier-stokes-singularity-simulation">GitHub ↗</a></nav>
+    </header>
+    <main class="docs-shell" id="content">
+      <nav class="docs-nav" aria-label="Documentation pages"><a href="refinement.html">Backend validation</a><a href="activity-refinement.html">Activity-guided refinement</a><a href="mesh-sensitivity.html" aria-current="page">Mesh sensitivity</a><a href="rendering-3d.html">3D rendering</a></nav>
+      <article class="doc-page">
+        <p class="eyebrow">Guide 12 · September 20, 2026</p>
+        <h1>Put the next cells around the rings.</h1>
+        <p class="dek">The outer-band experiment supports a more targeted next mesh: extend fine coverage around the contracting annulus and its flared axial region. Adding another level only at the center misses most of the source sensitivity sampled here.</p>
+        <p>This is a design study during an unfinished run, not a new accepted result. Oliver continues on its original 12,055,040-cell mesh from rest to 0.995. Its settings and endpoint are unchanged, and Kay's completed run remains the homepage result.</p>
+
+        <h2>What the running experiment already tells us</h2>
+        <p>At saved time 0.875183, Oliver's reported RMS deviation from the prescribed target is 22.7% lower than Kay's; at 0.937088 it is 17.5% lower. At the latter time, peak speed differs by only 0.003%, while the worst pointwise deviation is slightly larger. The outer refinement helps this diagnostic without resolving the worst discrepancy. The surrogate forcing itself depends on mesh spacing, so these are combined source-and-solution sensitivity results, not percentages of recovered continuum accuracy.</p>
+        <p>The profile, forcing implementation, evolution overlay, maximum timestep, and saved clocks match. The adapter change adds fixed-band tagging. Oliver uses two force workers instead of Kay's four to limit scratch memory; both use four solver threads. The provenance record retains these differences.</p>
+        <section id="native-comparison" aria-labelledby="native-comparison-title">
+          <h2 id="native-comparison-title">A native field comparison, not a movie comparison</h2>
+          <p>Two matched states, at 0.875183 and 0.937088, have been exported without resampling. Full-field comparison is pending transfer and independent audit. The comparison will conservatively average newly refined cells onto Kay's active hierarchy, retain the shared finest-core samples, and exclude covered coarse cells. Velocity and force will be separated by level, newly refined regions, unchanged spacing, and a two-cell collar around the baseline cube interfaces. This averaging removes fine-only variation; local source probes test a different part of the problem.</p>
+        </section>
+
+        <h2>Spatial source sensitivity comes first</h2>
+        <p>We evaluated 54 four-cell-wide patches at t = 0.937, 0.985, and 0.995, using three radial similarity coordinates, three axial coordinates, and two azimuths. Each patch uses h, h/2, and h/4 source evaluations, with fine samples volume-averaged onto the same coarse cells. A fourth evaluation halves the force's time-derivative window. The later probes evaluate the prescribed source; they are not future evolved Oliver states.</p>
+        <p>The largest sampled force difference between h and h/2 is 50.9% of the h/4 reference RMS, followed by 20.3% between h/2 and h/4. Halving the derivative window changes force by at most 2.1 × 10<sup>−7</sup> in the same relative measure. These are local patch results, not whole-domain error bounds. The window check is not a solver-timestep convergence test.</p>
+        <table>
+          <thead><tr><th>Probe at t = 0.937, X = 0.62</th><th>Radial variation</th><th>Axial variation</th><th>Azimuthal variation</th></tr></thead>
+          <tbody>
+            <tr><td>Equatorial ring, η = 0</td><td>1.534</td><td>0.488</td><td>0.220</td></tr>
+            <tr><td>Flared region, η = 0.8256</td><td>1.542</td><td>1.446</td><td>0.022</td></tr>
+          </tbody>
+        </table>
+        <p>Values are the RMS directional derivative of the Cartesian force vector, multiplied by the current cell width and divided by local force RMS. They indicate where variation is sharp; they do not estimate the error reduction from anisotropic cells. Radial variation dominates the equatorial example, while axial variation becomes comparable farther up the flare. At the same radius and height, the coordinate-axis and 45° probes can differ by one refinement level because the existing fine regions are cubes.</p>
+
+        <h2>Measure real boxes before spending memory</h2>
+        <p>A mesh-only AMReX executable uses the production tagger and reproduces every box in Oliver's frozen mesh. It then builds 26 alternatives without allocating flow fields or advancing a timestep. Each build uses less than 29 MiB. Original outer bands and core cubes are retained. Candidate rings include physical buffers and ancestor coverage; AMReX still uses cubic Cartesian cells in a fully three-dimensional solver.</p>
+        <table>
+          <thead><tr><th>Layout</th><th>Measured stored cells</th><th>Estimated solver RSS</th></tr></thead>
+          <tbody>
+            <tr><td>Current outer-band mesh</td><td>12,055,040</td><td>8.97 GiB measured prefix peak</td></tr>
+            <tr><td>Targeted ring, local-ring-17</td><td>12,840,448 (+6.5%)</td><td>9.55 GiB estimate</td></tr>
+            <tr><td>Wider flared ring, local-ring-24</td><td>13,515,264 (+12.1%)</td><td>10.05 GiB estimate</td></tr>
+            <tr><td>Another central cube level</td><td>14,152,192 (+17.4%)</td><td>10.53 GiB estimate</td></tr>
+            <tr><td>Union of intermediate collars</td><td>17,062,400 (+41.5%)</td><td>12.69 GiB estimate; over screen</td></tr>
+            <tr><td>Union of inner collars</td><td>17,377,792 (+44.2%)</td><td>12.93 GiB estimate; over screen</td></tr>
+          </tbody>
+        </table>
+        <p>The memory estimates scale Oliver's observed peak by stored-cell count. They are screening estimates, not late-time capacity guarantees. Box count, scratch allocation, and evolving memory demand still require a bounded pilot under the 11.5 GiB RSS guard and 20 GiB free-disk reserve.</p>
+        <p>The leading low-cost ring is centered near r = 0.108, z = 0 and extends the existing 1/1024 spacing outward. It covers 10 of the 54 source patches at their next finer level. Its heuristic coverage score is 28.8% averaged over the three sampled times, versus 0.047% for another central cube. The score weights squared h-to-h/2 source differences by patch volume, normalizes each time separately, and requires coverage of the entire patch. Overlapping patches are not a domain integral, and the score is not a predicted solution-error reduction. In particular, this ring covers none of the weighted t = 0.937 sample set.</p>
+
+        <h2>What must happen before another long run</h2>
+        <p>First finish the native discrepancy map and probe its largest differences. Then test the selected geometry with manufactured solutions, interface checks, and a bounded late-time capacity pilot. A short restart can check capacity but cannot establish the accuracy of a different mesh's from-rest history. Temporal refinement must be checked independently. A new accepted trajectory would start from rest with a pinned mesh, forcing, clock, and complete native archive.</p>
+        <p>These measurements justify a targeted mesh candidate, not a claim of convergence or singularity. Broader time, azimuth, and negative-z sampling may change the ranking. Refining both r and z coverage does not require a curvilinear or axisymmetric solver.</p>
+        <p><a href="data/mesh-sensitivity.json">Source hashes, all probe metrics, all 27 mesh costs, and leading candidate geometry</a> · <a href="activity-refinement.html">Original derivation and launch record</a></p>
+
+        <h2>Reproduce the diagnostic workflow</h2>
+        <pre><code>python -m scripts.export_mesh_snapshot \
+  --run outputs/outer-run --exporter build/amrex-omp/ns_volume_export \
+  --steps 1847 2627 --output outputs/outer-snapshots
+python -m scripts.compare_mesh_snapshots \
+  --baseline outputs/kay-snapshots --candidate outputs/outer-snapshots \
+  --output outputs/native-comparison
+python -m scripts.plan_mesh_sensors \
+  --snapshot outputs/outer-snapshots/manifest.json \
+  --table outputs/outer-run/profile.tbl --output outputs/source-requests.json
+python -m scripts.mesh_source_sensors \
+  --executable build/amrex-omp/ns_force_probe \
+  --table outputs/outer-run/profile.tbl --requests outputs/source-requests.json \
+  --output outputs/source-sensors
+cmake --build build/amrex-omp --target ns_mesh_probe
+python -m scripts.rank_mesh_candidates \
+  --executable build/amrex-omp/ns_mesh_probe \
+  --snapshot outputs/outer-snapshots/manifest.json \
+  --bands site/data/outer-refinement.bands \
+  --sensors outputs/source-sensors/sensors.json --output outputs/mesh-ranking</code></pre>
+        <p>Use a configured AMReX build and fresh output directories. Select only completed native states with matching clocks. The snapshot exporter verifies original native hashes before and after reading; the comparator rechecks exported bytes, active volume, energy, peak speed, and all six components for finiteness. The cost probe checks its entire baseline box layout against the frozen snapshot.</p>
+      </article>
+    </main>
+    <footer><p>Independent open numerical work · not affiliated with OpenAI.</p></footer>
+  </body>
+</html>

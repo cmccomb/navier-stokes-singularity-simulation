@@ -234,6 +234,18 @@ def main():
         json.loads((p / "manifest.json").read_text())
         for p in (args.baseline, args.candidate)
     ]
+    source_records = []
+    for folder, report in zip((args.baseline, args.candidate), reports, strict=True):
+        path = folder / "run-snapshot.json"
+        if sha(path) != report["source_record_sha256"]:
+            raise ValueError("Source run record changed")
+        source_records.append(json.loads(path.read_text()))
+    for name in ("paper_fields.H", "paper_profile.H", "incflo_overlay.py"):
+        if (
+            source_records[0]["adapter_source_hashes"][name]
+            != source_records[1]["adapter_source_hashes"][name]
+        ):
+            raise ValueError(f"Model/evolution source differs: {name}")
     if (
         not all(r["complete"] for r in reports)
         or reports[0]["profile_sha256"] != reports[1]["profile_sha256"]
@@ -254,6 +266,8 @@ def main():
             sha(p / "manifest.json") for p in (args.baseline, args.candidate)
         ],
         "frames": [],
+        "comparison_script_sha256": sha(__file__),
+        "source_hashes": [r["adapter_source_hashes"] for r in source_records],
         "scope": "Full-domain native vector comparison after conservative restriction to baseline active cells. Not a convergence certificate. Fine-only structure is averaged out. Regions overlap; only each stated partition is additive. Interface collar refers to baseline cubes, not new band interfaces.",
     }
     for a, b in zip(reports[0]["frames"], reports[1]["frames"], strict=True):
@@ -263,6 +277,7 @@ def main():
             p / f["path"]
             for p, f in zip((args.baseline, args.candidate), (a, b), strict=True)
         ]
+        native_audits = []
         for p, f in zip(raw_paths, (a, b), strict=True):
             if sha(p) != f["sha256"] or p.stat().st_size != f["export"]["bytes"]:
                 raise ValueError("Native export hash/size differs")
@@ -273,6 +288,9 @@ def main():
                     diagnostic[key], f["diagnostic"][key], rtol=1e-10, atol=1e-12
                 ):
                     raise ValueError(f"Native audit mismatch: {key}")
+            native_audits.append(
+                {"sha256": f["sha256"], "all_six_components_finite": True, **diagnostic}
+            )
         result = compare(
             raw_paths[0],
             a["export"]["blocks"],
@@ -281,7 +299,12 @@ def main():
             reports[0]["parameters"]["widths"],
         )
         output["frames"].append(
-            {"step": a["step"], "time": a["export"]["time"], **result}
+            {
+                "step": a["step"],
+                "time": a["export"]["time"],
+                "native_audits": native_audits,
+                **result,
+            }
         )
         print(
             json.dumps(
