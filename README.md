@@ -19,43 +19,40 @@ toward the normalized singular time `t*=1`.
 > exact infinite pulse hierarchy or all-order correction cycle. Numerical instability, overflow, or a
 > grid-dependent peak is not evidence of blow-up.
 
-## Current best
+## Current completed simulation
 
 The [results site](https://cmccomb.com/navier-stokes-singularity-simulation/)
-features **Kay's completed AMReX run: 280 saved states from exact rest through t = 0.995**.
-Its 128³ base and four fixed refined levels give 2048³-equivalent spacing
-**only in the core**, not throughout the domain. The
-[completion record](site/data/best.json) preserves native checks and media
-provenance. Archive validation does not establish convergence or a singularity.
+shows **Oliver's completed outer-refinement run: all 280 audited states from
+exact rest through t = 0.995**. The velocity and forcing movies, numerical
+record, and interactive mesh use this same September 23 completion.
 
-| Completed run configuration | Value |
+| Run configuration | Value |
 |---|---:|
-| Grid / domain | `64^3` base, 5 fixed levels, full `[-1,1]^3` box |
-| Stored / active cells | `1,310,720` / `1,179,648` |
+| Grid / domain | `128^3` base, 5 fixed levels plus 27 outer bands, full `[-1,1]^3` box |
+| Stored / active cells | `12,055,040` / `10,810,304` |
 | Saved time interval | `0` to `0.995`, all 280 states |
 | Exact rest interval | `0` to `0.55` |
+| Endpoint peak speed | `7.415301682` model units |
+| Reported endpoint RMS deviation | `0.001613819` |
 | Profile | `appendix-b-axis-v2-localized`, finite three-pulse surrogate |
 | Maximum timestep / phase advance | `0.00025` / `0.0375` radians |
 | Force-difference half-window | `2e-7` |
 
-Arrow-free GIFs and MP4s use the established site styling and fixed midplanes.
-The homepage movies retain every saved state. [Run details and limitations](site/results.html#oliver-complete).
+The [completion record](site/data/best.json) binds each saved state to the
+current GIFs and MP4s. The fixed x–y and x–z planes and isometric surfaces use
+one saved-time clock, fixed scales, and no temporal interpolation. Mesh views
+show the actual active cell edges, including the irregular outer bands.
+2048³-equivalent spacing applies **only to the innermost core**.
 
-The [native-voxel explorer](https://huggingface.co/spaces/ccm/navier-stokes-singularity-simulation)
-adds x/y/z slice controls, velocity/forcing selection, and saved-time playback.
-Prototype subsets are explicitly labeled. The
-[dataset documentation](https://cmccomb.com/navier-stokes-singularity-simulation/voxels.html)
-covers the lossless float64 format, native-grid sampling, validation, and publication.
+The native float64 archive remains on Oliver; older published movies have
+been removed from the site. The [field documentation](site/voxels.html)
+describes the current archive and its readback checks.
 
-The earlier PhiFlow from-rest 32³ cubic-profile temporal pilot recovered a successive-difference
-ratio of 3.989, consistent with second-order time convergence at that coarse
-resolution. Spatial convergence is not established. This remains a best-guess
-finite-surrogate experiment, not a singularity demonstration.
-
-The [refined-backend documentation](https://cmccomb.com/navier-stokes-singularity-simulation/refinement.html)
-separates operator validation, completed flow histories, memory measurements
-and the remaining accuracy gates. The previous uniform-grid movies and 3D
-explorers remain in the [numerical record](site/results.html#legacy-media).
+Archive validation establishes completion and data integrity. It does not
+certify spatial convergence or singularity formation. The discrete forcing
+and diagnostic quadrature depend on the mesh.
+[Run details and limitations](site/results.html) ·
+[Backend validation](site/refinement.html).
 
 ## Earlier PhiFlow publication workflow
 
@@ -158,8 +155,6 @@ the website itself checks for published updates every minute. A run-specific
 launcher and its deadline belong with the controller's runtime records, not
 in the numerical archive or in a permanent service on the solver machine.
 
-The separate `288^3` late-window calculation remains the resolution maximum and
-is documented in the [full numerical record](https://cmccomb.com/navier-stokes-singularity-simulation/results.html).
 
 ## Quick start
 

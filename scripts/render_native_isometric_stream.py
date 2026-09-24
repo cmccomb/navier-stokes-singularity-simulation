@@ -24,6 +24,7 @@ def main():
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--remove-verified-geometry", action="store_true")
     parser.add_argument("--wait-seconds", type=float, default=7200)
+    parser.add_argument("--single-worker", action="store_true")
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=True)
     source = json.loads((args.prepared / "source-run.json").read_text())
@@ -42,10 +43,14 @@ def main():
             # is no longer awaiting producer-side cache verification.
             while True:
                 worker = "even" if index % 2 == 0 else "odd"
-                progress_path = args.prepared / f"progress-{worker}.json"
+                progress_path = args.prepared / (
+                    "progress.json" if args.single_worker else f"progress-{worker}.json"
+                )
                 try:
                     progress = json.loads(progress_path.read_text())
-                    ready = progress["prepared"] > index // 2
+                    ready = progress["prepared"] > (
+                        index if args.single_worker else index // 2
+                    )
                     item = json.loads(item_path.read_text()) if ready else None
                 except (FileNotFoundError, json.JSONDecodeError):
                     item = None

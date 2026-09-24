@@ -20,14 +20,14 @@ def test_best_is_complete_native_history_with_fixed_planes():
     assert not run["production_accuracy_certified"] and not run["vector_arrows"]
     assert (
         run["source_record_sha256"]
-        == "f831732d6cad4aaee4ae7f864da41fdbd406f0c329f8adcbc1b325c0ebb27f71"
+        == "afe8898110109ff25600c3cb58e3a9911b5baf6f6f8f7f14ff3dbbd826ded97c"
     )
     assert len(run["frames"]) == len(run["native_checks"]) == run["saved_frames"] == 280
     assert run["frame_times"] == [r["time"] for r in run["frames"]]
     assert run["frame_times"][0] == 0 and run["frame_times"][-1] == 0.995
     assert all(a < b for a, b in zip(run["frame_times"], run["frame_times"][1:]))
-    assert run["stored_cells"] == 10485760 and run["active_cells"] == 9437184
-    assert run["machine"] == "Kay" and run["parameters"]["base_n"] == 128
+    assert run["stored_cells"] == 12055040 and run["active_cells"] == 10810304
+    assert run["machine"] == "Oliver" and run["parameters"]["base_n"] == 128
     assert run["finest_equivalent_n"] == 2048
     assert run["diagnostics"]["step"] == 5510
     for frame, native in zip(run["frames"], run["native_checks"], strict=True):
@@ -38,7 +38,7 @@ def test_best_is_complete_native_history_with_fixed_planes():
         if frame["time"] <= 0.55:
             assert frame["peak_speed"] == 0
     assert run["render"]["slice_coordinates"] == {"xy": 0, "xz": 0}
-    assert run["diagnostics"]["peak_speed"] == pytest.approx(7.415298767108944)
+    assert run["diagnostics"]["peak_speed"] == pytest.approx(7.415301682371514)
 
 
 def test_best_movies_have_all_frames_matching_durations_and_fixed_scales():
@@ -93,7 +93,7 @@ def test_best_videos_preserve_the_gif_clock():
 def test_homepage_uses_only_fixed_midplane_media():
     html = (SITE / "index.html").read_text()
     script = (SITE / "best.js").read_text()
-    assert 'src="best.js?v=kay-detail-1"' in html and 'src="app.js"' not in html
+    assert 'src="best.js?v=outer-complete-2"' in html and 'src="app.js"' not in html
     assert '"data/best.json"' in script and "data/stream.json" not in script
     assert "At peak-speed height" not in html and "moving slice" not in script
     assert 'data-view="peak"' not in html and 'role="tab' not in html
@@ -102,7 +102,7 @@ def test_homepage_uses_only_fixed_midplane_media():
     assert html.count("Fixed planes: y = 0 and z = 0.") == 2
     assert "Active solver cells" in html and "2048³-equivalent core only" in html
     assert "media/stream-flow-3d.html" not in html
-    assert "media/stream-flow-3d.html" in (SITE / "results.html").read_text()
+    assert "media/stream-flow-3d.html" not in (SITE / "results.html").read_text()
 
 
 def test_best_page_controller_with_fixed_planes_and_reduced_motion():

@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="Complete-history 3D movies with volume cutaways, native-core streamlines, and a verified velocity-maximum marker." />
+    <meta name="description" content="Complete native-history movies with fixed central slices, isometric magnitude surfaces, and the actual refined mesh." />
     <meta name="theme-color" content="#07111f" />
     <title>3D rendering · Navier–Stokes Simulation</title>
     <link rel="icon" href="favicon.svg" type="image/svg+xml" />
@@ -18,94 +18,20 @@
     <main class="docs-shell" id="content">
       <nav class="docs-nav" aria-label="Documentation pages"><a href="method.html">Model &amp; method</a><a href="running.html">Run it</a><a href="voxels.html">Native voxels</a><a href="rendering-3d.html" aria-current="page">3D rendering</a></nav>
       <article class="doc-page">
-        <p class="eyebrow">Rendering guide · September 18, 2026</p>
-        <h1>See the flow in three dimensions.</h1>
-        <p class="dek">Kay's complete 280-state sequence is available in two presentations: fixed x–y and x–z slices beside an isometric overview, or a larger 3D cutaway beside a native-core close-up. Both start at exact rest and end at t = 0.995.</p>
-        <h2>Inside the flow: the 3D detail view</h2>
-        <p>Choose <strong>3D detail</strong> above either homepage movie. Switching presentations preserves the playback time and whether the movie was playing or paused. The two presentations contain the same 280 saved states on the same 57.1-second clock. The detail MP4 is 2400 × 1440; the GIF is 1200 × 720. Fullscreen MP4 playback preserves more color and fine structure than the GIF.</p>
-        <p>The left panel renders a <strong>volume cutaway</strong>, not magnitude surfaces. Composite ray casting accumulates color and opacity through the field; an exact crop removes the front quarter, x &gt; 0 and y &lt; 0. Color and opacity are fixed across time using log<sub>10</sub>(1 + magnitude), with color ranges of 0–9 for speed and 0–10<sup>5</sup> for force in model units. The reference cube remains ±0.5. The right panel magnifies the finest native patch, ±0.0625 in each coordinate. Its separately fixed scale is labeled; the two panels do not share a length scale.</p>
-        <p>The overview reconstructs native scalar magnitudes on a fixed <strong>512³ display lattice</strong> spanning the full domain, [−1, 1]³. At each display point, trilinear interpolation uses the finest containing native level. This float32 display resampling does not add solver resolution and does not preserve every fine-core sample in the overview. The close-up instead retains all 128³ native-core samples. The original float64 velocity and force fields remain untouched.</p>
-        <h3>Velocity: instantaneous streamlines</h3>
-        <p>The core panel integrates the saved velocity vector field from 32 fixed seeds, forward and backward. On these streamlines, cyan indicates upward velocity, gold downward velocity, and slate predominantly horizontal motion. The mapped quantity is u<sub>z</sub>/|u|, not speed. Tube radius is a display choice, not a physical radius or flux. A faint speed volume provides geometric context, using 18% of the overview's opacity mapping and a fixed core-specific opacity distance; it is not an isosurface.</p>
-        <p>The white <strong>core max |u|</strong> marker identifies the native cell with greatest speed inside the finest patch, with its value in model units. It is a projected locator, visible through the volume, not a tracked vortex center or necessarily the global maximum. Its location is recomputed independently for every saved state and may jump between nearly equal peaks. Exact ties use the first cell in native array order. At exact rest every cell is a maximum, so no marker is drawn. Force is left unmarked.</p>
-        <p>Each frame is an independent set of <strong>instantaneous streamlines</strong>, not particle trajectories. The integration uses RK45 with a maximum spatial step of half a native cell and stays within the finest patch. This spatial tracing step is separate from the solver's time step. Tests recover straight paths in uniform flow and circular paths in rigid rotation, including a halved-step check. Exact rest produces no streamlines; a colored line in weak flow reports direction, not large speed.</p>
-        <h3>Forcing: native-core volume</h3>
-        <p>The force panel renders |f| at the finest patch's 128³ native cell centers using the fixed mapping log<sub>10</sub>(1 + |f|). Color and opacity remain unchanged across time, with the color range extending to 10<sup>5</sup> model force units. Weak force can be nearly transparent. Opacity exposes spatial structure; it does not represent density, smoke, energy, or uncertainty. Ray interpolation is a display reconstruction, not a refinement of the solver.</p>
-        <p>Volume shading is disabled so lighting does not alter the scalar colors; fixed lighting still exposes streamline tube shape. Two-times supersampling improves display edges. No spatial smoothing filter is applied to the native fields. Ray interpolation can soften their display, but cannot correct grid-scale error. A better rendering is not a better-resolved solution. <a href="data/detail-view.json">Complete detail-rendering record</a>.</p>
-        <h2>The homepage's three views</h2>
-        <p>Each row reads left to right: x–y slice at z = 0, x–z slice at y = 0, then an isometric projection of magnitude surfaces. The first two panels sample native cells on fixed planes; they are not projections of the 3D surfaces. One encoded movie keeps all three panels on the same saved state when playing or scrubbing.</p>
-        <p>Velocity surfaces use |u| = 0.15, 1.5, and 4. Applied-force surfaces use |f| = 10, 100, and 1000. These are fixed display thresholds, not thresholds for instability. A blank 3D panel can mean the field is nonzero but below the lowest surface. The slice colorbar uses a shared, fixed scale within each quantity, linear near zero and logarithmic above the labeled transition. Velocity and force have different units and scales. Each isometric camera remains fixed and is checked against the complete history; the reference cube supplies its physical scale.</p>
-        <p>The grid row shows actual native cell edges, with covered coarse interiors excluded. Its isometric panel projects three central grid sections, not all edges of every voxel. Both center slices look alike because the fixed refinement geometry is symmetric. The grid does not evolve with time. The older refinement-region schematic remains available below it.</p>
-        <p>The combined MP4 is 2400 × 960; the GIF is 1600 × 640. Both retain all 280 saved states and the same 57.1-second playback clock. <a href="data/three-view.json">Three-view rendering record</a>.</p>
-        <h2>What the surfaces mean</h2>
-        <p>Each surface joins locations with the same velocity magnitude, |u|, in nondimensional model units. The overview uses fixed thresholds of 0.15, 1.5, and 4. The lowest surface is translucent blue, the middle is translucent cyan, and the highest is opaque pale cyan. Lighting communicates shape, not a second scalar quantity. These are speed surfaces, not vortex boundaries, particle trajectories, streamlines, or a liquid's free surface.</p>
-        <p>The homepage reference cube has half-width 0.5. The earlier Oliver core close-up shows only the 1.5 and 4 surfaces and uses a ±0.125 reference cube, explicitly hiding the outer 0.15 shell. These cubes provide scale; they are not simulation boundaries. The native periodic domain is [−1, 1]³.</p>
-        <h2>Stable cameras and complete time history</h2>
-        <p>The homepage's isometric cameras use orthographic projection and stay fixed throughout each movie. Kay uses physical parallel scales of 1.65 for flow and 1.10 for force, chosen before image generation. Every surface is checked against the fixed camera and caption bounds; clipping stops the release instead of changing the view. A reference cube supplies physical scale. The earlier Oliver camera set fitted its cameras across the complete history and includes a separately labeled core magnification. There are no velocity-vector arrows or camera orbits.</p>
-        <p>Every saved state from t = 0 to 0.995 is retained, including the exact-rest interval through 0.55. Playback shows five saved states per second, with a one-second initial hold and a half-second final hold: 57.1 seconds in total. The simulation times are nonuniform. The timestamp, not elapsed movie time, is the simulation clock. No intermediate fluid states are invented. A blank view after rest can mean that speed remains below its lowest displayed threshold.</p>
-        <h2>Rendering quality without a resolution claim</h2>
-        <p>Kay's renderer reads one lossless float64 native AMReX snapshot at a time, avoiding a second full voxel archive. It records every level's SHA-256 digest, checks active-cell peak speed and energy against the solver history, and independently reproduces both cached center slices exactly. The complete 280-frame native forcing audit is required before rendering. Oliver's separate <a href="voxels.html">Hugging Face dataset</a> is not used for Kay's movies.</p>
-        <p>For the three-view magnitude surfaces, scalar magnitudes are computed at native cell centers. A nonuniform tensor-product display grid retains the finest core spacing and has 384 points per axis for Kay, compared with 192 for Oliver. These are display-grid sizes, not uniform solver resolutions. Neither the native fields nor the surface geometry is decimated. This surface pipeline is separate from the detail view's fixed 512³ volume-display lattice and native-core close-up.</p>
-        <p>At each display point, the finest containing native level supplies the scalar value through trilinear interpolation, clamped at that level's outer cell centers. Contouring then reconstructs a surface between display points. This interpolation serves visualization only. It cannot add resolved physics, remove coarse-grid error, or establish convergence. No spatial filter, surface-position smoothing, or mesh decimation is applied.</p>
-        <p><a href="https://docs.pyvista.org/api/core/grids">VTK/PyVista's nonuniform grid support</a> preserves physical coordinate spacing. <a href="https://docs.pyvista.org/api/plotting/_autosummary/pyvista.plotter.enable_depth_peeling">Depth peeling</a> handles overlapping translucent surfaces, and fixed lights with smooth normal shading expose depth. Each isometric panel is rendered at 1600 × 1200 and reduced to 800 × 600 before composition. The combined MP4 is 2400 × 960; its color detail is better preserved than in the 1600 × 640, 256-color GIF. Download the MP4 for the clearest presentation.</p>
-        <h2>Reproduce Kay's homepage movies</h2>
-        <p>Use the completed native plotfiles, the pinned AMReX volume exporter, and the complete hash-verified center-slice cache. Preparation checks full native vectors; one raw snapshot occupies scratch space per worker. The bounded-cache route below renders completed surfaces as they become available and removes only those verified, regenerable meshes. It preserves the original plotfiles, frame receipts, hashes, and isometric images. Encoding checks every saved frame and hold duration.</p>
-        <pre><code>python -m scripts.prepare_native_movies slices \
-  --run /path/to/refined-n128-l5-rest-t0995 \
-  --exporter /path/to/ns_slice_export --output outputs/native-slices
-python -m scripts.prepare_native_movies prepare --worker=-even \
-  --run /path/to/refined-n128-l5-rest-t0995 \
-  --exporter /path/to/ns_volume_export \
-  --slices outputs/native-slices --output outputs/kay-geometry &amp;
-python -m scripts.prepare_native_movies prepare --worker=-odd \
-  --run /path/to/refined-n128-l5-rest-t0995 \
-  --exporter /path/to/ns_volume_export \
-  --slices outputs/native-slices --output outputs/kay-geometry &amp;
-python -m scripts.render_native_isometric_stream \
-  --prepared outputs/kay-geometry --output outputs/kay-isometric \
-  --remove-verified-geometry
-wait
-python -m scripts.prepare_native_movies assemble \
-  --prepared outputs/kay-geometry
-python -m scripts.prepare_native_movies render \
-  --prepared outputs/kay-geometry --slices outputs/native-slices \
-  --isometric-cache outputs/kay-isometric \
-  --output outputs/kay-movies</code></pre>
-        <h2>Reproduce the detail movies</h2>
-        <p>Use the same native plotfiles and completed preparation manifest. The detail renderer rechecks each exported level against the recorded native hash, then checks full-field peak speed and energy. The single worker below processes all saved states with one temporary native snapshot, a 20 GiB disk reserve, and a further 2 GiB scratch margin. Original plotfiles, checkpoints, and solver inputs remain read-only. Encoding rejects missing frames, reordered times, or changed image hashes.</p>
-        <pre><code>python -m scripts.render_native_detail render \
-  --run /path/to/refined-n128-l5-rest-t0995 \
-  --exporter /path/to/ns_volume_export \
-  --prepared outputs/kay-geometry --output outputs/detail
-python -m scripts.mark_native_core_max extract \
-  --run /path/to/refined-n128-l5-rest-t0995 \
-  --exporter /path/to/ns_volume_export --prepared outputs/kay-geometry \
-  --output outputs/core-maxima
-python -m scripts.mark_native_core_max mark \
-  --rendered outputs/detail --maxima outputs/core-maxima \
-  --output outputs/detail-marked
-python -m scripts.render_native_detail encode --output outputs/detail-marked
-python -m scripts.publish_native_detail --rendered outputs/detail-marked --site site</code></pre>
-        <p>The marker pass independently rereads and hashes each native core. It checks that the core maximum does not exceed the full-field maximum, binds the marker to the original rendered frame, and modifies only velocity annotations. Forcing images are copied unchanged.</p>
-        <p>Use one volume-rendering worker on a 16 GiB Mac: the complete Kay render peaked at approximately 9.4 GiB resident memory. Keep at least 20 GiB free, plus bounded scratch space. Do not reuse an output directory. For a prototype, add selected <code>--indices</code>. Partial selections cannot be encoded as a complete-history movie. Movie readback checks every saved state and hold duration; publication requires the same source and time history as the current best run.</p>
-        <h2>Earlier Oliver camera set</h2>
-        <p>The separate <a href="media/oliver-3d-isometric.mp4">isometric</a>, <a href="media/oliver-3d-side.mp4">side</a>, <a href="media/oliver-3d-top.mp4">top</a>, and <a href="media/oliver-3d-core.mp4">core</a> movies remain archived Oliver views. Their <a href="data/rendering-3d.json">original rendering record</a> is unchanged. They do not show Kay.</p>
-        <h2>Reproduce the earlier dataset-based movies</h2>
-        <p>Use a separate rendering environment and a completed native dataset export. FFmpeg and an offscreen-capable OpenGL context are required. The renderer refuses an incomplete dataset for movie production and requires a new output directory.</p>
-        <pre><code>uv venv .venv-render --python 3.12
-uv pip install --python .venv-render/bin/python -r scripts/requirements-render.txt
-.venv-render/bin/python -m scripts.render_native_3d \
-  --dataset outputs/native-voxels --output outputs/native-3d \
-  --views isometric side top core --width 1600</code></pre>
-        <p>For a quick rendering check, add <code>--stills 0 140 279</code>. This produces explicitly selected stills, not a full-history animation. The output manifest records source hashes, thresholds, opacity, camera position and scale, per-frame surface counts, and movie hashes. A geometric check rejects a camera that would clip the visible flow beneath captions or outside the image. GIF and MP4 readback checks verify frame counts and timing, including repeated identical rest states.</p>
-        <p>After preparing the complete velocity geometry above, reproduce the ordered homepage rows with:</p>
-        <pre><code>.venv-render/bin/python -m scripts.render_native_triptych \
-  --dataset outputs/native-voxels \
-  --velocity-geometry outputs/native-3d \
-  --output outputs/native-three-view
-.venv-render/bin/python -m scripts.render_grid_views \
-  --output outputs/native-grid-views.svg</code></pre>
-        <p>These movies visualize a finite manufactured-force surrogate. Rendering integrity is separate from numerical accuracy and does not provide evidence of a singularity. See the <a href="method.html">method</a> and <a href="accuracy.html">accuracy budget</a> for the simulation's scope.</p>
+        <p class="eyebrow">Current run · September 23, 2026</p>
+        <h1>One native history, three fixed views.</h1>
+        <p class="dek">Oliver’s complete 280-state trajectory appears as fixed x–y and x–z slices beside an isometric view, separately for velocity and applied force. Every view starts at exact rest and ends at t = 0.995.</p>
+        <h2>Trace every image to the saved fields</h2>
+        <p>The renderer reads the original float64 native AMReX blocks, including the irregular outer refinement bands. Covered coarse cells are excluded from independent volume, kinetic-energy, and peak-speed checks. The renderer checks these values against the solver diagnostics and verifies its center slices against an independent native slice exporter.</p>
+        <p>Every saved state carries source, native-block, geometry, and image hashes. The final movies require all 280 states, the exact saved-time sequence, fixed camera and color scales, and matching GIF/MP4 playback clocks. <a href="data/best.json">Completion record</a> · <a href="data/three-view.json">Rendering record</a></p>
+        <h2>Display sampling</h2>
+        <p>Each fixed slice uses 256² display samples from the finest containing native cell, with positive-side ownership at cell faces and no smoothing. The isometric view reconstructs scalar magnitudes linearly across same-level native boxes. Coarser reconstruction supplies uncovered stencil slots; the finest containing native cell determines ownership. Native cell centers are retained in the core. This is display interpolation, not additional solver resolution.</p>
+        <p>Velocity surfaces use thresholds 0.15, 1.5, and 4 in model units; force surfaces use 10, 100, and 1000. Surface geometry is neither smoothed nor decimated. The cameras are orthographic and fixed through each full movie. The reference cube has half-width 0.5; the periodic simulation domain is [−1, 1]³.</p>
+        <h2>Playback</h2>
+        <p>All 280 saved states appear with no interpolated times. Ordinary states hold for 0.2 seconds, the initial rest state for one second, and the endpoint for half a second. The total is 57.1 seconds. Simulation-time spacing is nonuniform, and the timestamp always identifies the original saved state.</p>
+        <h2>The mesh view</h2>
+        <p>The static grid displays active native cell edges in the three central sections, including the outer bands. Covered coarse interiors are excluded. The rotatable view and the two fixed projections use the same exported native box geometry. The close-up retains the actual unchanged inner refinement interface.</p>
+        <p><a href="results.html">Run details and numerical limits →</a></p>
       </article>
     </main>
     <footer><p>Independent open numerical work · not affiliated with OpenAI.</p></footer>

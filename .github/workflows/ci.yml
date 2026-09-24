@@ -47,4 +47,4 @@ jobs:
       - run: uv pip install --python .venv-render/bin/python -r scripts/requirements-render.txt pytest
       - run: sudo apt-get update && sudo apt-get install -y xvfb libgl1-mesa-dri libegl1
       - name: Native geometry, framebuffer, marker and publication regressions
-        run: xvfb-run -a .venv-render/bin/python -m pytest tests/test_native_detail.py tests/test_core_max_marker.py tests/test_detail_publication.py -q
+        run: xvfb-run -a .venv-render/bin/python -m pytest tests/test_native_detail.py tests/test_core_max_marker.py tests/test_detail_publication.py tests/test_ragged_native.py tests/test_prepare_native_movies.py -q

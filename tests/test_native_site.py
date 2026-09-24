@@ -24,11 +24,11 @@ def test_homepage_keeps_mesh_interaction_without_the_data_explorer():
     html = (SITE / "index.html").read_text()
     assert 'id="native-explorer"' not in html and 'id="native-frame"' not in html
     assert 'src="native-explorer.js"' not in html
-    assert 'src="mesh-explorer.html?embed=whole&amp;v=kay128"' in html
+    assert 'src="mesh-explorer.html?embed=whole&amp;v=outer128"' in html
     assert (
-        html.index('src="media/mesh-xy.svg?v=kay128"')
-        < html.index('src="media/mesh-isometric.svg?v=kay128"')
-        < html.index('src="mesh-explorer.html?embed=whole&amp;v=kay128"')
+        html.index('src="media/mesh-xy.svg?v=outer128"')
+        < html.index('src="media/mesh-isometric.svg?v=outer128"')
+        < html.index('src="mesh-explorer.html?embed=whole&amp;v=outer128"')
     )
     assert 'id="flow-video"' in html and 'id="force-video"' in html
     assert "All 280 saved states are included." in html

@@ -131,37 +131,13 @@
       caption.textContent = `${n} active cells across the innermost refinement boundary. Fine cells have half the spacing of their coarse neighbors.`;
     } else {
       if (mode === "core") extent = mesh.levels.at(-1).half * 1.5;
-      for (const [level, x0, y0, x1, y1] of mesh.planes) {
-        // Clip whole-domain sections to the focused box in model coordinates.
-        const lo = [
-          Math.max(-extent, Math.min(extent, x0)),
-          Math.max(-extent, Math.min(extent, y0)),
-        ];
-        const hi = [
-          Math.max(-extent, Math.min(extent, x1)),
-          Math.max(-extent, Math.min(extent, y1)),
-        ];
-        if (
-          (x0 === x1 && Math.abs(x0) > extent) ||
-          (y0 === y1 && Math.abs(y0) > extent)
-        )
-          continue;
-        if (lo[0] === hi[0] && lo[1] === hi[1]) continue;
-        for (let fixed = 0; fixed < 3; fixed++) {
-          const axes = [0, 1, 2].filter((a) => a !== fixed),
-            a = [0, 0, 0],
-            b = [0, 0, 0];
-          axes.forEach((axis, i) => {
-            a[axis] = lo[i];
-            b[axis] = hi[i];
-          });
-          segments.push({
-            a,
-            b,
-            color: mesh.levels[level].color,
-            weight: 0.65,
-          });
-        }
+      for (const [level, ...points] of mesh.planes3d) {
+        const a = points.slice(0, 3), b = points.slice(3);
+        if (a.some((v, axis) => v === b[axis] && Math.abs(v) > extent)) continue;
+        const clip = (v) => Math.max(-extent, Math.min(extent, v));
+        const lo = a.map(clip), hi = b.map(clip);
+        if (lo.every((v, axis) => v === hi[axis])) continue;
+        segments.push({ a: lo, b: hi, color: mesh.levels[level].color, weight: 0.65 });
       }
       for (const level of mesh.levels)
         if (level.half <= extent)
@@ -176,7 +152,7 @@
       caption.textContent =
         mode === "core"
           ? "Three central sections at the core. Every line follows an actual cell face; covered coarse cells are excluded."
-          : "Three central sections through the active cells. Outlines mark the five refinement regions.";
+          : "Three central sections through the active cells. Outer bands are included; cube outlines mark the central refinement regions.";
     }
     redraw();
   }

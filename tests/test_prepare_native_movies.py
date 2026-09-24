@@ -120,11 +120,13 @@ def test_storage_recheck_preserves_budget_and_does_not_claim_restart():
         0, required + check["reserve_bytes"] - check["free_bytes"]
     )
     assert check["planned_new_frames"] == 40 and not check["solver_started"]
-    assert "has not restarted" in (site / "results.html").read_text()
 
 
-def test_huggingface_release_remains_explicitly_oliver():
+def test_current_field_documentation_matches_current_run():
     site = Path(__file__).parents[1] / "site"
-    old = json.loads((site / "data/oliver-best.json").read_text())
-    assert old["machine"] == "Oliver" and old["parameters"]["base_n"] == 64
-    assert "not the newly featured Kay run" in (site / "voxels.html").read_text()
+    run = json.loads((site / "data/best.json").read_text())
+    page = (site / "voxels.html").read_text()
+    assert run["machine"] == "Oliver" and run["parameters"]["base_n"] == 128
+    assert f'{run["stored_cells"]:,}' in page
+    assert f'{run["active_cells"]:,}' in page
+    assert "huggingface.co/spaces" not in page

@@ -16,7 +16,7 @@ from scripts.render_native_mesh import (
 )
 
 
-def stage(source, slices, movies, site):
+def stage(source, slices, movies, site, *, machine="Kay", run_id="refined-n128-l5-rest-t0995", prepared=None):
     record = json.loads(source.read_text())
     cached = json.loads((slices / "manifest.json").read_text())
     views = json.loads((movies / "manifest.json").read_text())
@@ -25,6 +25,8 @@ def stage(source, slices, movies, site):
     if not (
         record["status"] == "completed"
         and record["validated"]
+        and cached["prefix_complete"]
+        and cached["source_record_sha256"] == sha(source)
         and views["validated"]
         and views["complete_history"]
         and views["source_record_sha256"] == sha(source)
@@ -62,8 +64,8 @@ def stage(source, slices, movies, site):
     best = {
         "schema_version": 1,
         "kind": "completed-native-best",
-        "machine": "Kay",
-        "id": "refined-n128-l5-rest-t0995",
+        "machine": machine,
+        "id": run_id,
         "status": "completed",
         "validated": True,
         "production_accuracy_certified": False,
@@ -105,6 +107,18 @@ def stage(source, slices, movies, site):
 
     write(site / "data/best.json", best)
     write(site / "data/three-view.json", views)
+    if record["parameters"].get("revolved_refinement"):
+        from scripts.render_ragged_mesh import mesh_record
+        from scripts.render_ragged_mesh import render_panel as ragged_panel
+
+        frame = json.loads(prepared.read_text())
+        if frame["source_record_sha256"] != sha(source):
+            raise ValueError("Prepared native mesh has the wrong source")
+        mesh = mesh_record(record, sha(source), frame["blocks"])
+        write(site / "data/native-mesh.json", mesh)
+        for view in ("xy", "isometric"):
+            (site / f"media/mesh-{view}.svg").write_text(ragged_panel(mesh, view))
+        return
     levels = hierarchy(best)
     lines = plane_lines(levels)
     cells, bounds = transition_cells(levels)
@@ -131,5 +145,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ("source", "slices", "movies", "site"):
         parser.add_argument("--" + name, type=Path, required=True)
+    parser.add_argument("--machine", default="Kay")
+    parser.add_argument("--run-id", default="refined-n128-l5-rest-t0995")
+    parser.add_argument("--prepared", type=Path)
     args = parser.parse_args()
-    stage(args.source, args.slices, args.movies, args.site)
+    stage(args.source, args.slices, args.movies, args.site,
+          machine=args.machine, run_id=args.run_id, prepared=args.prepared)

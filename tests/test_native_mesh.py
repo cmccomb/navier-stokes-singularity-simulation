@@ -13,7 +13,8 @@ ROOT = Path(__file__).resolve().parents[1]
 
 @pytest.fixture
 def levels():
-    return hierarchy(json.loads((ROOT / "site/data/best.json").read_text()))
+    record = json.loads((ROOT / "site/data/best.json").read_text())
+    return hierarchy({**record, "stored_cells": 10485760, "active_cells": 9437184})
 
 
 def test_plane_edges_are_on_cell_faces_and_exclude_covered_interiors(levels):
@@ -49,8 +50,25 @@ def test_transition_block_fills_space_once_with_native_cells(levels):
 
 def test_generated_mesh_matches_current_record(levels):
     data = json.loads((ROOT / "site/data/native-mesh.json").read_text())
+    run = json.loads((ROOT / "site/data/best.json").read_text())
+    assert data["schema_version"] == 2
+    assert data["source_record_sha256"] == run["source_record_sha256"]
     assert data["levels"] == levels
-    assert data["planes"] == plane_lines(levels)
     cells, bounds = transition_cells(levels)
     assert data["cells"] == cells and data["detail_bounds"] == bounds
-    assert data["active_cells"] == 9437184
+    assert data["active_cells"] == run["active_cells"] == 10810304
+    assert data["stored_cells"] == run["stored_cells"] == 12055040
+    assert data["composite_volume"] == 8
+    assert data["planes3d"] == [
+        edge for plane in data["planes_by_fixed_axis"].values() for edge in plane
+    ]
+    for fixed, edges in data["planes_by_fixed_axis"].items():
+        assert edges
+        for level, *coordinates in edges:
+            a, b = coordinates[:3], coordinates[3:]
+            assert a[int(fixed)] == b[int(fixed)] == 0
+            assert sum(x != y for x, y in zip(a, b, strict=True)) == 1
+            for value in coordinates:
+                index = (value + 1) / levels[level]["dx"]
+                assert index == pytest.approx(round(index))
+                assert -1 <= value <= 1

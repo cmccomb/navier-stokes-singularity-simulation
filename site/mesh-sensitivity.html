@@ -21,18 +21,10 @@
         <p class="eyebrow">Guide 12 · September 20, 2026</p>
         <h1>Put the next cells around the rings.</h1>
         <p class="dek">The outer-band experiment supports a more targeted next mesh: extend fine coverage around the contracting annulus and its flared axial region. Adding another level only at the center misses most of the source sensitivity sampled here.</p>
-        <p>This is a design study during an unfinished run, not a new accepted result. Oliver continues on its original 12,055,040-cell mesh from rest to 0.995. Its settings and endpoint are unchanged, and Kay's completed run remains the homepage result.</p>
-
-        <h2>What the running experiment already tells us</h2>
-        <p>At saved time 0.875183, Oliver's reported RMS deviation from the prescribed target is 22.7% lower than Kay's; at 0.937088 it is 17.5% lower. At the latter time, peak speed differs by only 0.003%, while the worst pointwise deviation is slightly larger. The outer refinement helps this diagnostic without resolving the worst discrepancy. The surrogate forcing itself depends on mesh spacing, so these are combined source-and-solution sensitivity results, not percentages of recovered continuum accuracy.</p>
-        <p>The profile, forcing implementation, evolution overlay, maximum timestep, and saved clocks match. The adapter change adds fixed-band tagging. Oliver uses two force workers instead of Kay's four to limit scratch memory; both use four solver threads. The provenance record retains these differences.</p>
-        <section id="native-comparison" aria-labelledby="native-comparison-title">
-          <h2 id="native-comparison-title">A native field comparison, not a movie comparison</h2>
-          <p>Two matched states, at 0.875183 and 0.937088, have been exported without resampling. Full-field comparison is pending transfer and independent audit. The comparison will conservatively average newly refined cells onto Kay's active hierarchy, retain the shared finest-core samples, and exclude covered coarse cells. Velocity and force will be separated by level, newly refined regions, unchanged spacing, and a two-cell collar around the baseline cube interfaces. This averaging removes fine-only variation; local source probes test a different part of the problem.</p>
-        </section>
+        <p>This September 20 mesh-design study used Oliver’s outer-band geometry. The run has since completed through t = 0.995 with all 280 native states validated. <a href="results.html">Current numerical record →</a></p>
 
         <h2>Spatial source sensitivity comes first</h2>
-        <p>We evaluated 54 four-cell-wide patches at t = 0.937, 0.985, and 0.995, using three radial similarity coordinates, three axial coordinates, and two azimuths. Each patch uses h, h/2, and h/4 source evaluations, with fine samples volume-averaged onto the same coarse cells. A fourth evaluation halves the force's time-derivative window. The later probes evaluate the prescribed source; they are not future evolved Oliver states.</p>
+        <p>We evaluated 54 four-cell-wide patches at t = 0.937, 0.985, and 0.995, using three radial similarity coordinates, three axial coordinates, and two azimuths. Each patch uses h, h/2, and h/4 source evaluations, with fine samples volume-averaged onto the same coarse cells. A fourth evaluation halves the force's time-derivative window. These probes evaluate the prescribed source independently of the evolved trajectory.</p>
         <p>The largest sampled force difference between h and h/2 is 50.9% of the h/4 reference RMS, followed by 20.3% between h/2 and h/4. Halving the derivative window changes force by at most 2.1 × 10<sup>−7</sup> in the same relative measure. These are local patch results, not whole-domain error bounds. The window check is not a solver-timestep convergence test.</p>
         <table>
           <thead><tr><th>Probe at t = 0.937, X = 0.62</th><th>Radial variation</th><th>Axial variation</th><th>Azimuthal variation</th></tr></thead>
@@ -48,7 +40,7 @@
         <table>
           <thead><tr><th>Layout</th><th>Measured stored cells</th><th>Estimated solver RSS</th></tr></thead>
           <tbody>
-            <tr><td>Current outer-band mesh</td><td>12,055,040</td><td>8.97 GiB measured prefix peak</td></tr>
+            <tr><td>Current outer-band mesh</td><td>12,055,040</td><td>8.97 GiB measured peak</td></tr>
             <tr><td>Targeted ring, local-ring-17</td><td>12,840,448 (+6.5%)</td><td>9.55 GiB estimate</td></tr>
             <tr><td>Wider flared ring, local-ring-24</td><td>13,515,264 (+12.1%)</td><td>10.05 GiB estimate</td></tr>
             <tr><td>Another central cube level</td><td>14,152,192 (+17.4%)</td><td>10.53 GiB estimate</td></tr>

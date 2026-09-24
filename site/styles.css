@@ -215,6 +215,10 @@ footer p { margin-bottom: 0; }
 .measure h2 { margin: 0; font-size: 1.25rem; font-weight: 600; }
 .measure-note, .grid-note { color: var(--muted); font-size: 0.875rem; }
 .measure-note { margin: 0.3rem 0 0; }
+.latest-result { margin-bottom: 1.5rem; }
+.latest-result > .eyebrow { margin-top: 0; }
+.latest-result h2 { font-size: clamp(1.4rem, 3vw, 1.9rem); }
+.latest-result > p { max-width: 76ch; }
 
 .docs-hero {
   max-width: 52rem;

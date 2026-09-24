@@ -10,8 +10,8 @@
     <meta name="theme-color" content="#07111f" />
     <title>From smooth flow to a singularity · Navier–Stokes Simulation</title>
     <link rel="icon" href="favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="styles.css?v=detail-3d-1" />
-    <script type="module" src="best.js?v=kay-detail-1"></script>
+    <link rel="stylesheet" href="styles.css?v=outer-complete-2" />
+    <script type="module" src="best.js?v=outer-complete-2"></script>
   </head>
   <body>
     <a class="skip-link" href="#result">Skip to the simulation</a>
@@ -101,19 +101,22 @@
 
       </section>
 
-      <section class="big-numbers" id="result" aria-label="Simulation in numbers">
-        <div><p class="number-label">Active solver cells</p><p class="number-value" id="cell-count">9,437,184</p><p class="number-note" id="cell-grid">128³ base · 5 fixed levels · 2048³-equivalent core only</p></div>
+      <section class="measure latest-result" id="result" aria-labelledby="latest-title">
+        <p class="eyebrow">Completed September 23, 2026</p>
+        <h2 id="latest-title">The current simulation</h2>
+        <p>Oliver’s outer-refinement run starts at exact rest and reaches t = 0.995 in 5,510 steps. All 280 saved velocity and forcing states passed the completion audit.</p>
+        <p class="measure-note">A finite manufactured-force simulation. Core convergence and singularity formation remain unproven. <a href="results.html">Run details →</a></p>
+      </section>
+
+      <section class="big-numbers" aria-label="Simulation in numbers">
+        <div><p class="number-label">Active solver cells</p><p class="number-value" id="cell-count">10,810,304</p><p class="number-note" id="cell-grid">128³ base · outer bands · 2048³-equivalent core only</p></div>
         <div><p class="number-label">Saved frames from rest</p><p class="number-value" id="frame-count">280</p><p class="number-note">Complete · t = 0 to 0.995</p></div>
         <div><p class="number-label">Endpoint peak speed</p><p class="number-value" id="peak-speed">7.415</p><p class="number-note" id="speed-time">Model units · full-field diagnostic at t = 0.995</p></div>
       </section>
 
       <section class="measure featured-measure" aria-labelledby="flow-title">
         <h2 id="flow-title">How the fluid moves</h2>
-        <p class="measure-note">Our best completed run: Kay, from exact rest through t = 0.995. All 280 saved states are included. Choose the x–y / x–z / isometric row or the cutaway with a native-core close-up.</p>
-        <div class="view-switch" id="flow-switch" role="group" aria-label="Velocity presentation" hidden>
-          <button type="button" id="flow-views" aria-pressed="true" aria-controls="flow-video">Slices + 3D</button>
-          <button type="button" id="flow-detail" aria-pressed="false" aria-controls="flow-video">3D detail</button>
-        </div>
+        <p class="measure-note">Oliver’s completed run, from exact rest through t = 0.995. All 280 saved states are included. Fixed x–y and x–z slices sit beside an isometric view of the same native field.</p>
         <p class="measure-note" id="flow-view-note" aria-live="polite">Fixed planes: y = 0 and z = 0. No vector arrows.</p>
         <p class="media-pending" id="flow-pending">Loading the completed velocity movie.</p>
         <figure class="stream-movie three-view" id="flow-figure" hidden>
@@ -121,18 +124,14 @@
           <p class="plot-scroll-hint" id="flow-scroll-hint">Scroll sideways: x–y → x–z → isometric</p>
           <figcaption>
             <span>Velocity · <span data-clip-range>saved times</span></span>
-            <span class="media-links"><a id="flow-gif" href="media/kay-flow-views.gif" download>GIF ↓</a><a id="flow-mp4" href="media/kay-flow-views.mp4" download>MP4 ↓</a></span>
+            <span class="media-links"><a id="flow-gif" href="media/oliver-flow-views.gif?v=outer128" download>GIF ↓</a><a id="flow-mp4" href="media/oliver-flow-views.mp4?v=outer128" download>MP4 ↓</a></span>
           </figcaption>
         </figure>
-        <p class="measure-note">Switch views at the same saved time. The 3D detail view cuts through the speed volume and magnifies circulation in the native core. Cameras and scales stay fixed; no intermediate states are invented. Use fullscreen or download the MP4 for the clearest view. <a href="rendering-3d.html">Rendering details →</a></p>
+        <p class="measure-note">Cameras, slice planes, and color scales stay fixed across all saved states. The 3D surfaces reconstruct native magnitudes for display; no intermediate times are invented. Use fullscreen or download the MP4 for the clearest view. <a href="rendering-3d.html">Rendering details →</a></p>
       </section>
       <section class="measure" aria-labelledby="force-title">
         <h2 id="force-title">The force driving it</h2>
-        <p class="measure-note">The applied force at the same saved times. Choose the x–y / x–z / isometric row or the cutaway and native-core volume. Force uses its own fixed scales.</p>
-        <div class="view-switch" id="force-switch" role="group" aria-label="Force presentation" hidden>
-          <button type="button" id="force-views" aria-pressed="true" aria-controls="force-video">Slices + 3D</button>
-          <button type="button" id="force-detail" aria-pressed="false" aria-controls="force-video">3D detail</button>
-        </div>
+        <p class="measure-note">The applied force at the same saved times and fixed planes as the velocity movie. Force uses its own fixed color scale and surface thresholds.</p>
         <p class="measure-note" id="force-view-note" aria-live="polite">Fixed planes: y = 0 and z = 0. No vector arrows.</p>
         <p class="media-pending" id="force-pending">Loading the completed forcing movie.</p>
         <figure class="stream-movie three-view" id="force-figure" hidden>
@@ -140,26 +139,26 @@
           <p class="plot-scroll-hint" id="force-scroll-hint">Scroll sideways: x–y → x–z → isometric</p>
           <figcaption>
             <span>Force magnitude · <span data-clip-range>saved times</span></span>
-            <span class="media-links"><a id="force-gif" href="media/kay-force-views.gif" download>GIF ↓</a><a id="force-mp4" href="media/kay-force-views.mp4" download>MP4 ↓</a></span>
+            <span class="media-links"><a id="force-gif" href="media/oliver-force-views.gif?v=outer128" download>GIF ↓</a><a id="force-mp4" href="media/oliver-force-views.mp4?v=outer128" download>MP4 ↓</a></span>
           </figcaption>
         </figure>
       </section>
       <section class="measure" aria-labelledby="mesh-title">
         <h2 id="mesh-title">The mesh beneath the motion</h2>
-        <p class="measure-note">A 128³ base covers the full periodic box. Four fixed nested cubes refine the core, reaching 2048³-equivalent spacing only inside the innermost cube. The hierarchy stores 10,485,760 cells; 9,437,184 remain active after covered coarse cells are excluded.</p>
+        <p class="measure-note">A 128³ base covers the full periodic box. Four fixed nested cubes refine the core, and 27 outer bands add resolution around the wider flow. The innermost cube reaches 2048³-equivalent spacing. The hierarchy stores 12,055,040 cells; 10,810,304 remain active after covered coarse cells are excluded.</p>
         <div class="plot-viewport mesh-row-viewport" tabindex="0" role="region" aria-label="Mesh row: x-y, isometric, rotatable whole mesh; scroll horizontally on narrow screens">
           <div class="mesh-row">
             <figure>
               <h3>x–y slice · z = 0</h3>
-              <img src="media/mesh-xy.svg?v=kay128" width="800" height="800" loading="lazy" alt="Active native cell edges in the central x-y slice; covered coarse interiors excluded." />
+              <img src="media/mesh-xy.svg?v=outer128" width="800" height="800" loading="lazy" alt="Active native cell edges in the central x-y slice; covered coarse interiors excluded." />
             </figure>
             <figure>
               <h3>Isometric</h3>
-              <img src="media/mesh-isometric.svg?v=kay128" width="800" height="800" loading="lazy" alt="Isometric view of three central sections through the active native cells." />
+              <img src="media/mesh-isometric.svg?v=outer128" width="800" height="800" loading="lazy" alt="Isometric view of three central sections through the active native cells." />
             </figure>
             <figure>
               <h3>Whole mesh · rotate</h3>
-              <iframe src="mesh-explorer.html?embed=whole&amp;v=kay128" title="Rotatable whole native mesh" loading="lazy" sandbox="allow-scripts allow-same-origin"></iframe>
+              <iframe src="mesh-explorer.html?embed=whole&amp;v=outer128" title="Rotatable whole native mesh" loading="lazy" sandbox="allow-scripts allow-same-origin"></iframe>
             </figure>
           </div>
         </div>
@@ -171,15 +170,8 @@
           <span style="--level: #9bddd9">L3 · Δ = 0.001953125</span>
           <span style="--level: #ffe8a3">L4 · Δ = 0.0009765625</span>
         </div>
-        <p class="measure-note">Central sections show actual active cell edges; outlines mark the refinement regions. Covered coarse interiors are excluded.</p>
-        <details class="grid-schematic"><summary>Refinement-region schematic</summary>
-          <figure class="stream-movie mesh-diagram">
-            <div class="plot-viewport" tabindex="0" role="region" aria-label="Refinement regions; scroll horizontally on narrow screens"><img src="media/kay-mesh.svg" width="720" height="432" loading="lazy" alt="Five fixed refinement regions centered in the full box: half-widths 1, 0.5, 0.25, 0.125 and 0.0625. Core spacing is 0.0009765625 model length units. Region boundaries, not individual cells, are drawn." /></div>
-            <p class="plot-scroll-hint">Scroll sideways to see the refinement levels →</p>
-            <figcaption><span>Fixed refinement regions · not individual cells</span><a href="media/kay-mesh.svg" download>SVG ↓</a></figcaption>
-          </figure>
-        </details>
-        <p class="archive-link"><a href="results.html">Earlier runs and numerical record →</a></p>
+        <p class="measure-note">Central sections show actual active cell edges, including the irregular outer refinement. Outlines mark the central cubes. Covered coarse interiors are excluded.</p>
+        <p class="archive-link"><a href="results.html">Numerical record →</a></p>
       </section>
     </main>
 

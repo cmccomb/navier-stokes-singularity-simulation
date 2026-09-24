@@ -133,6 +133,7 @@ def export_slices(args):
             manifest["frames"].append(
                 {**frame, "slice_sha256": sha(raw), "compressed_sha256": sha(packed)}
             )
+            print(f"Exported slice {len(manifest['frames'])}/{len(record['native_frames'])}", flush=True)
     if sha(args.run / "run.json") != manifest["source_record_sha256"]:
         raise ValueError("Source record changed")
     manifest["prefix_complete"] = True
@@ -182,6 +183,19 @@ def prepare(args):
     environment = dict(os.environ, OMP_NUM_THREADS="1", OMP_THREAD_LIMIT="1")
     import pyvista as pv
 
+    ragged = bool(record["parameters"].get("revolved_refinement"))
+    block_geometry, block_masks = None, None
+    if ragged:
+        from scripts import ragged_native
+        from scripts.compare_mesh_snapshots import validate_blocks
+
+        manifest["sampling"] = (
+            "Native scalar magnitudes on irregular AMR boxes; trilinear display "
+            "reconstruction across same-level box boundaries, coarse reconstruction "
+            "in uncovered stencil slots, and finest containing native-cell ownership. "
+            "Native core centers retained; no surface smoothing, decimation, or time interpolation."
+        )
+
     with tempfile.TemporaryDirectory(prefix="native-movie-", dir=output) as scratch:
         raw = Path(scratch) / "frame.bin"
         for index in indices:
@@ -213,6 +227,7 @@ def prepare(args):
                         str(args.exporter),
                         f"plot={source / frame['path']}",
                         f"output={raw}",
+                        *(["layout=blocks"] if ragged else []),
                     ],
                     env=environment,
                     check=True,
@@ -233,26 +248,30 @@ def prepare(args):
                     or rows[0]["order"] != "xyz-component"
                 ):
                     raise ValueError("Native export schema/clock differs")
-                levels = rows[0]["levels"]
+                layout = rows[0]["blocks" if ragged else "levels"]
+                raw_values = np.memmap(raw, dtype="<f8", mode="r")
                 fields = [
-                    np.memmap(
-                        raw,
-                        dtype="<f8",
-                        mode="r",
-                        offset=level["offset_bytes"],
-                        shape=tuple(level["shape"]),
-                    )
-                    for level in levels
+                    raw_values[
+                        level["offset_bytes"] // 8:
+                        level["offset_bytes"] // 8 + int(np.prod(level["shape"]))
+                    ].reshape(tuple(level["shape"]))
+                    for level in layout
                 ]
-                diagnostics = check_fields(
-                    fields,
-                    levels,
-                    frame,
-                    frame["time"]
-                    <= record["profile_manifest"]["parameters"][
-                        "paper_time_cutoff_start"
-                    ],
-                )
+                rest = frame["time"] <= record["profile_manifest"]["parameters"]["paper_time_cutoff_start"]
+                if ragged:
+                    if block_geometry is None:
+                        validate_blocks(layout, raw.stat().st_size)
+                        block_geometry = layout
+                        block_masks = ragged_native.diagnostic_masks(layout)
+                    elif layout != block_geometry:
+                        raise ValueError("Fixed native block geometry changed")
+                    levels = ragged_native.bounding_levels(layout)
+                    diagnostics = ragged_native.diagnostics(fields, layout, block_masks, rest)
+                    if abs(diagnostics["volume"] - 8) > 1e-12 or abs(diagnostics["peak_speed"] - frame["peak_speed"]) > 1e-12:
+                        raise ValueError("Native block diagnostics disagree")
+                else:
+                    levels = layout
+                    diagnostics = check_fields(fields, levels, frame, rest)
                 expected_energy = record["history"][frame["step"]]["energy"]
                 if not np.isclose(
                     diagnostics["energy"], expected_energy, rtol=1e-11, atol=1e-300
@@ -260,7 +279,7 @@ def prepare(args):
                     raise ValueError("Energy differs from solver history")
                 planes = read_planes(cache, cached["frames"][index])
                 for a, p in zip(planes, ("xy", "xz"), strict=True):
-                    if not np.array_equal(a, center_plane(fields, levels, p)):
+                    if not np.array_equal(a, center_plane(fields, layout, p)):
                         raise ValueError("Independent native plane exporters disagree")
                 axes = composite_axes(levels)
                 item = {
@@ -271,7 +290,7 @@ def prepare(args):
                     "exporter_sha256": exporter_hash,
                     "levels": levels,
                     "display_shape": [len(a) for a in axes],
-                    "level_sha256": [
+                    "block_sha256" if ragged else "level_sha256": [
                         hashlib.sha256(f.tobytes()).hexdigest() for f in fields
                     ],
                     "diagnostics": diagnostics,
@@ -282,11 +301,16 @@ def prepare(args):
                         for k in (0, 3)
                     ],
                 }
+                if ragged:
+                    item["blocks"] = layout
                 for q, quantity, thresholds in (
                     ("flow", "velocity", THRESHOLDS),
                     ("force", "force", FORCE_THRESHOLDS),
                 ):
-                    scalar = sample_speed(fields, levels, axes, quantity)
+                    scalar = (
+                        ragged_native.sample_speed(fields, layout, levels, axes, quantity)
+                        if ragged else sample_speed(fields, levels, axes, quantity)
+                    )
                     meshes = contours(axes, scalar, thresholds)
                     del scalar
                     fit_camera_scales(meshes, manifest["scales"][q])
@@ -303,7 +327,7 @@ def prepare(args):
                             hashes.append(None)
                     item["geometry"][q] = hashes
                     item["triangles"][q] = [m.n_cells for m in meshes]
-                del fields
+                del fields, raw_values
                 raw.unlink()
                 write(item_path, item)
             manifest["records"].append(item)
@@ -502,7 +526,7 @@ def render(args):
             if scene is not None:
                 scene.close()
         report["media"][q] = encode_frames(
-            folder, args.output / f"kay-{q}-views", times, gif_size=(1600, 640)
+            folder, args.output / f"{manifest['machine'].lower()}-{q}-views", times, gif_size=(1600, 640)
         )
     write(args.output / "manifest.json", report)
 

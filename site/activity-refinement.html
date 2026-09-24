@@ -18,14 +18,12 @@
     <main class="docs-shell" id="content">
       <nav class="docs-nav" aria-label="Documentation pages"><a href="method.html">Model &amp; method</a><a href="refinement.html">Backend validation</a><a href="activity-refinement.html" aria-current="page">Activity-guided refinement</a><a href="rendering-3d.html">3D rendering</a></nav>
       <article class="doc-page">
-        <p class="eyebrow">Guide 11 · September 17, 2026</p>
+        <p class="eyebrow">Guide 11 · Design September 17 · Completion September 23, 2026</p>
         <h1>Refine where the flow has been active.</h1>
         <p class="dek">The completed trajectory provides a measured footprint for the next mesh. It is not enough to refine only the final core: the velocity and forcing occupy a much wider region earlier in the evolution.</p>
+        <div class="callout">Oliver’s outer-band run completed through t = 0.995 and passed all 280 native archive checks. <a href="results.html">Current numerical record →</a></div>
         <p>All 280 saved native states from Kay's completed run are included. The audit checks the original float64 velocity and force hashes, excludes covered coarse cells, recovers the full domain volume, and reproduces kinetic energy. It then measures velocity, force, and their spatial variation in radial–axial bins. The maximum around each ring retains localized azimuthal features; a ring average could hide them. This is a design projection of a fully three-dimensional field, not an axisymmetric simulation.</p>
-        <figure style="margin: 2rem 0">
-          <a href="media/action-footprint.png"><img src="media/action-footprint.png" width="2550" height="1050" style="width: 100%; height: auto" alt="Three radial–axial speed maps show contraction from t=0.672 to 0.995. The fourth panel combines forcing activity over all 280 states, with gold outlines marking buffered outer refinement bands." /></a>
-          <figcaption>Speed uses the same logarithmic scale across the three selected times. The fourth panel takes the maximum of force divided by each frame's own peak. Empty bins are unsampled, not zero. Open the image for full resolution.</figcaption>
-        </figure>
+
 
         <h2>A flared region, not an assumed paraboloid</h2>
         <p>The implemented similarity map gives an independent geometric check. Write τ = 1 − t, D = ½ − h, and use the model's radial and axial scales R and H:</p>
@@ -36,30 +34,19 @@
         <p>The new tagger adds fixed radial–axial bands revolved around the z-axis to the existing nested cubes. AMReX turns these tags into Cartesian boxes with cubic cells. Azimuthal variation, all three velocity components, the full periodic domain, and the finest central spacing are retained. The bands are fixed before launch; no adaptive regridding or coordinate stretching is introduced.</p>
         <p>A bin is selected when either velocity or force exceeds a chosen fraction of that frame's peak and its local change estimate, Δx‖∇v‖, exceeds another fraction of the same peak. The selected bins are united over time, expanded by at least two parent-cell widths, and supplied with ancestor coverage. Gradients use second-order level-local differences with one-sided patch-edge stencils. These are placement indicators, not residuals, truncation errors, or certified tolerances.</p>
 
-        <h2>The memory tradeoff</h2>
-        <table>
-          <thead><tr><th>Layout</th><th>Stored cells</th><th>Meaning</th></tr></thead>
-          <tbody>
-            <tr><td>Completed Kay mesh</td><td>10.49 million</td><td>Measured baseline allocation</td></tr>
-            <tr><td>All-level activity union, lower thresholds</td><td>83.80 million</td><td>Geometric estimate before box overhead</td></tr>
-            <tr><td>All-level activity union, higher thresholds</td><td>42.03 million</td><td>Geometric estimate before box overhead</td></tr>
-            <tr><td>Selected outer-band experiment</td><td>11.13 million</td><td>Geometric estimate</td></tr>
-            <tr><td>Selected experiment after AMReX boxing</td><td>12.06 million</td><td>Measured full-size allocation</td></tr>
-          </tbody>
-        </table>
-        <p>The all-level unions do not fit safely on a 16 GiB Mac. The first controlled experiment instead extends only the outer refined level, selecting amplitude at least 0.75 of the frame peak and per-cell variation at least 0.5 of that peak. It adds 27 buffered bands while preserving every core cube. The selected regions receive Δx = 1/128 rather than the base spacing 1/64; the central spacing remains 1/1024. Box padding makes the measured increase about 15%, larger than the 6% geometric estimate. This is a targeted sensitivity test, not complete coverage of every active structure.</p>
+        <h2>The completed mesh</h2>
+        <p>The hierarchy stores 12,055,040 cells, of which 10,810,304 remain active after covered coarse cells are excluded. It uses 27 buffered bands at the outer refined level, with amplitude threshold 0.75 of each frame’s peak and per-cell variation threshold 0.5. Every core cube is retained. The selected outer regions have Δx = 1/128; the base spacing is 1/64 and the central spacing is 1/1024. This is a fixed placement rule, not an error tolerance.</p>
 
         <h2>Checks before the long trajectory</h2>
         <p>The continuous manufactured flow u = t(sin πy, sin πz, sin πx) exercises the new ragged hierarchy independently of the paper surrogate. The first 16³-to-32³ comparison failed: L² error increased from 9.67 × 10<sup>−6</sup> to 2.15 × 10<sup>−5</sup>. The coarse meshes realize different box coverage, so that pair does not establish convergence. The failure is retained. A subsequent 32³-to-64³ pair reduces error to 6.80 × 10<sup>−6</sup>, a ratio of 3.16; changing the box decomposition changes that error by 2.28 × 10<sup>−12</sup>. This passing pair is useful evidence, not a complete asymptotic study.</p>
-        <p>Every pilot also reads back all six native components. A block-wise float64 export preserves irregular level coverage without filling holes, interpolation, or downsampling; independent active-cell volume, peak speed, and energy checks agree with the solver. Restart reproduces each final velocity field with zero measured difference. Existing rectangular-level exports remain available for the completed Kay movies.</p>
+        <p>Every pilot also reads back all six native components. A block-wise float64 export preserves irregular level coverage without filling holes, interpolation, or downsampling; independent active-cell volume, peak speed, and energy checks agree with the solver. Restart reproduces each final velocity field with zero measured difference.</p>
         <p>Separate local source sensors at t = 0.67, 0.775, and 0.9 compare aligned Δx, Δx/2, and Δx/4 patches. In the outer-level subset, the aggregated force differences decrease on the second refinement but remain appreciable. These overlapping sensors are neither global error norms nor proof that all selected bands are adequate. The mesh-dependent surrogate force changes when spacing changes, so the experiment measures combined source and solution sensitivity.</p>
         <p>Oliver's full-size activation preflight completed from exact rest through 0.551 in 15 steps, retained all three requested native states, and passed force readback. Peak RSS was 4,994.94 MiB, about 4.88 GiB. The force is still extremely small at that endpoint; this checks allocation and archive handling, not late-time accuracy or a late-time memory bound.</p>
 
-        <h2>The next run</h2>
-        <p>The outer-band experiment launched on Oliver from rest, targeting the same t = 0.995 endpoint and the same 280-state output clock as Kay. Maximum timestep 0.00025, forcing-phase ceiling 0.0375, profile, viscosity, derivative-window rule, and core spacing are unchanged. Four solver threads and two force threads limit scratch memory. The run retains all native velocity and forcing voxels and has an 11.5 GiB process-RSS stop threshold and a 20 GiB free-disk reserve, sampled every five seconds. Its launch snapshot is not a live progress counter.</p>
-        <p>The native field budget is approximately 150.9 GiB. The preflight reserves a 256 GiB working budget plus the separate 20 GiB free reserve on Oliver; approximately 431.6 GiB was free before launch. Kay's original archive remains untouched. The new run is an experiment and does not replace the completed homepage result until its archive and spatial-sensitivity checks are reviewed.</p>
-        <p><a href="data/activity-refinement.json">Design, validation, source-sensor, capacity, and launch record</a> · <a href="data/outer-refinement.bands">Pinned outer-band geometry</a></p>
-        <p>The <a href="mesh-sensitivity.html">September 20 mesh-sensitivity study</a> follows this experiment with matched-state diagnostics, directional source probes, and measured costs for the next fixed mesh.</p>
+        <h2 id="completed-result">The completed outer-band run</h2>
+        <p>Oliver reached t = 0.995 from exact rest in 5,510 steps. Its completion audit finished on September 23 at 14:15 UTC. All 280 scheduled native velocity and forcing states passed readback, with zero measured force discrepancy, and the full history passed its clock and endpoint checks. Peak RAM was 8.97 GiB, below the 11.5 GiB process-RSS guard.</p>
+        <p>The completed run reaches t = 0.995 in 5,510 steps. Endpoint peak speed is 7.415301682, reported RMS deviation is 0.001613819, and maximum component deviation is 0.280880827. All 280 native states passed the force readback and full-domain volume checks. The <a href="data/best.json">completion record</a> identifies the source and the complete movie history.</p>
+        <p>The run used a maximum timestep of 0.00025, forcing-phase ceiling of 0.0375, four solver threads, and two force threads. Integration took 131.20 hours with peak process RSS 8.97 GiB. The native field payload is approximately 150.9 GiB. Archive validation does not establish core convergence or singularity formation.</p>
 
         <h2>Reproduce the design</h2>
         <pre><code>python -m scripts.audit_native_action \

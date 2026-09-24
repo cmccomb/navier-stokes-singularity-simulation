@@ -20,42 +20,18 @@
         <a href="method.html">Model &amp; method</a><a href="running.html">Run it</a><a href="results.html">Numerical record</a><a href="refinement.html">Refined-mesh pilot</a><a href="voxels.html" aria-current="page">Native voxels</a>
       </nav>
       <article class="doc-page">
-        <p class="eyebrow">Guide 09 · September 13, 2026</p>
+        <p class="eyebrow">Guide 09 · September 23, 2026</p>
         <h1>The fields behind the movie.</h1>
-        <p class="dek">The native voxel dataset preserves velocity and forcing on the solver's fixed nested grids. An interactive slice explorer makes those fields inspectable without downloading the whole history.</p>
-        <h2>Explore three perpendicular planes</h2>
-        <p>Move x to select a YZ plane, y for XZ, and z for XY. Choose velocity or forcing, then select a saved state or press Play. The displayed time is the actual output time. Saved times are not uniformly spaced, and playback waits for data instead of skipping or interpolating states.</p>
-        <p>The <a href="https://huggingface.co/spaces/ccm/navier-stokes-singularity-simulation">Hugging Face explorer</a> currently serves Oliver's earlier 64³-base run, not the newly featured Kay run. Both histories contain 280 states from exact rest to 0.995, so frame count alone does not identify the run. Check the release's run ID and base grid. Kay's full-resolution native velocity and forcing fields remain on the archive machine; they have not yet been published to Hugging Face.</p>
-        <p>Cold loads can take several seconds, especially for an uncached frame or a sleeping Space. Small native slabs are cached; memory does not grow with the whole time series. Manual controls share one ordered render queue, separate from up to four playback sessions, so older control requests cannot finish after newer ones. Plotting is serialized for thread safety. The <a href="index.html#result">GIFs and videos</a> remain available independently of the app.</p>
-        <p>When the selected archive fits an 18 GiB raw-data budget and leaves 5 GiB free, the Space also warms a lossless disk cache in the background. The app stays usable through remote slice reads until the complete pinned snapshot is ready. This cache lives on the server's ephemeral disk, not in the browser, and larger future runs fall back to remote reads.</p>
-        <h2>Native resolution, not an enlarged image</h2>
-        <p>The published Oliver dataset contains five 64³ patches per saved state: 1,310,720 stored cells and 1,179,648 active cells, with 1024³-equivalent spacing only in the innermost core. Kay's native archive instead contains five 128³ patches: 10,485,760 stored cells and 9,437,184 active cells, with 2048³-equivalent core spacing. Covered coarse cells are excluded from composite diagnostics in both runs.</p>
-        <p>The viewer uses a fixed 256 × 256 display grid for each plane, selecting the finest native cell containing each display location. Display sampling does not change the solver's resolution. No smoothing, vector arrows, or automatic peak-height tracking is applied. At cell boundaries the positive-side cell is selected, except at the domain's upper edge, where the last cell is used.</p>
-        <p>Playback prepares three saved frames before starting, then buffers upcoming frames while the browser displays the current one. A bounded image cache and retained plot axes make repeat playback faster. Cold reads can still pause playback while data arrives; no saved state is skipped or invented.</p>
-        <h2>Dataset structure</h2>
-        <p>The <a href="https://huggingface.co/datasets/ccm/navier-stokes-singularity-simulation">public dataset</a> stores immutable releases under <code>releases/&lt;manifest-hash-prefix&gt;/</code>. Each has <code>manifest.json</code>, the source record <code>source-best.json</code>, and <code>fields.zarr</code>. Pin the dataset commit and release prefix for reproducibility.</p>
-        <p>Zarr arrays <code>level_0</code> through <code>level_4</code> have axes <code>(t, x, y, z, component)</code>. Components are <code>u_x, u_y, u_z, f_x, f_y, f_z</code> in nondimensional model units. Origins describe cell boundaries; add half a cell spacing to obtain a cell center. All values remain float64, with lossless Zstd/bitshuffle compression. Covered coarse cells are retained but must be excluded from composite integrals.</p>
-        <p>The full raw field payload is 16.40625 GiB. Small 8³ chunks support plane reads, while per-level, per-time shards keep the file count manageable. This is a field dataset, not a restart archive: pressure, ghost cells, and checkpoint state are not included.</p>
-        <h2>Reproduce the export</h2>
-        <pre><code>uv venv .venv-hf --python 3.12
-uv pip install --python .venv-hf/bin/python -r spaces/native_explorer/requirements.txt
-cmake -S backends/amrex -B build/amrex
-cmake --build build/amrex --target ns_volume_export -j 2
-.venv-hf/bin/python -m scripts.export_native_dataset \
-  --source /path/to/frozen/native/archive --best site/data/best.json \
-  --exporter build/amrex/ns_volume_export --output outputs/native-voxels
-NS_DATASET_LOCAL=outputs/native-voxels .venv-hf/bin/python spaces/native_explorer/app.py</code></pre>
-        <p>The output directory must be new; a 20 GiB free-space guard protects local storage. An explicit <code>--indices 0 85 279</code> produces a clearly labeled prototype. The exporter does not mutate the native source or change any simulation settings.</p>
-        <h2>Validate before publishing</h2>
-        <p>Every exported level round-trips exactly against its source values. Per-frame checks cover finite values, exact rest, timestamps, composite peak speed, and full-domain volume; the endpoint also checks kinetic energy. SHA-256 digests retain per-level provenance. Independent native slice comparisons and synthetic nested-grid tests check all axes and refinement boundaries.</p>
-        <pre><code>.venv-hf/bin/python -m scripts.publish_native_dataset \
-  --folder outputs/native-voxels --repo ccm/navier-stokes-singularity-simulation
-# Record the returned immutable reference in spaces/native_explorer/dataset.json.
-.venv-hf/bin/python -m scripts.deploy_native_space \
-  --repo ccm/navier-stokes-singularity-simulation</code></pre>
-        <p>Publication rechecks the stored digests, uploads only an allowlist, and compares public remote slices with local values before advertising a release. The app requires no viewing credentials. The basic CPU Space has no hourly hardware charge under the existing account plan; deployment does not request a paid hardware upgrade. <a href="https://huggingface.co/docs/hub/en/spaces-overview">Hosting details ↗</a></p>
-        <p>The optional <code>scripts.finish_native_release</code> command combines the transfer, export, publication, deployment, and final reference update in one bounded job, not a recurring watcher. It records its phase and failure state, limits the default run to six hours, and keeps native sources intact. It updates only the Space dataset reference and the site's release record on GitHub main after the hosted full-history endpoint passes. Concurrent changes to those records or the app source stop promotion for review.</p>
-        <p>These checks establish archive and visualization integrity, not spatial convergence or blowup. The finite manufactured-force surrogate remains distinct from the analytical construction. Read the <a href="method.html">method</a> and <a href="accuracy.html">accuracy budget</a> before interpreting its peaks.</p>
+        <p class="dek">Oliver’s completed native archive preserves all three velocity and all three forcing components in float64 at each of the 280 saved states.</p>
+        <h2>The current archive</h2>
+        <p>The fixed AMReX hierarchy covers [−1,1]³ with a 128³ base, four nested core refinements, and 27 outer refinement bands. Each state stores 12,055,040 cells; 10,810,304 remain active after covered coarse cells are excluded. The finest central spacing is 1/1024, equivalent to 2048³ only within the innermost cube.</p>
+        <p>The six-component raw payload is 551.84 MiB per state and approximately 150.89 GiB for the full history, before headers and checkpoints. The archive remains on Oliver. The site publishes its complete <a href="index.html#result">velocity and forcing movies</a>, <a href="data/best.json">completion record</a>, and <a href="mesh-explorer.html">native mesh</a>.</p>
+        <h2>Native cells and display samples</h2>
+        <p>The x–y and x–z movie planes use a fixed 256 × 256 display grid and select the finest native cell containing each location. At cell boundaries the positive-side cell is selected. The display grid does not change the solver’s resolution. No peak-following slice, vector arrows, or temporal interpolation is used.</p>
+        <p>The isometric surfaces reconstruct native scalar magnitudes with fixed thresholds. Irregular fine boxes own only the locations they cover; uncovered regions retain coarse ownership. Same-level box boundaries are joined for reconstruction, and the native core centers are preserved. <a href="rendering-3d.html">Rendering method →</a></p>
+        <h2>Read back before publication</h2>
+        <p>All saved states passed the solver’s archive audit, including exact timestamps, finite values, force reevaluation with zero measured difference, and composite volume 8. Movie preparation independently reads all six components, checks exact rest, reproduces peak speed and kinetic energy, and verifies that two independent exporters produce identical central slices.</p>
+        <p>The native block, slice, surface, and image hashes retain the provenance of the published movies. These checks establish archive and visualization integrity; spatial convergence and singularity formation remain unproven.</p>
       </article>
     </main>
     <footer><p>Independent open numerical work · not affiliated with OpenAI.</p></footer>

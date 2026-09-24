@@ -291,14 +291,14 @@
     "xz",
     "isometric"
   ],
-  "source_record_sha256": "f831732d6cad4aaee4ae7f864da41fdbd406f0c329f8adcbc1b325c0ebb27f71",
-  "prepared_manifest_sha256": "628c309f1b3441cf6a7f7681186355b762d2aaa8e74b4a3eedb82080b07e3efb",
-  "renderer_sha256": "189af05b97c4a9667e9f3dca883790eb8599c247a06db67a14773df4bbd504a6",
-  "surface_sampling": "Native scalar magnitudes, trilinear finest-level reconstruction on all composite native centers; no surface smoothing, decimation, or temporal interpolation",
+  "source_record_sha256": "afe8898110109ff25600c3cb58e3a9911b5baf6f6f8f7f14ff3dbbd826ded97c",
+  "prepared_manifest_sha256": "92dd9d645f5f5b01faf0c3a5896b21c9d098ecb3a60cbcc3e1b436314125162e",
+  "renderer_sha256": "9cc2b0f3bb759eecd887582862d579f456323bc80be6929569974db7860ca74c",
+  "surface_sampling": "Native scalar magnitudes on irregular AMR boxes; trilinear display reconstruction across same-level box boundaries, coarse reconstruction in uncovered stencil slots, and finest containing native-cell ownership. Native core centers retained; no surface smoothing, decimation, or time interpolation.",
   "display_shape": [
-    384,
-    384,
-    384
+    424,
+    424,
+    400
   ],
   "slice_coordinates": {
     "xy": 0,
@@ -317,7 +317,7 @@
     ]
   },
   "slice_color_max": {
-    "flow": 7.368014096271463,
+    "flow": 7.3680171148305105,
     "force": 13773.338217096023
   },
   "isometric_parallel_scale": {
@@ -332,19 +332,19 @@
       "height": 960,
       "files": {
         "gif": {
-          "name": "kay-flow-views.gif",
-          "sha256": "f9c27b3f930ca0d6a78fa47651e85ec827d6854505ee672ceaede51a87360291",
-          "path": "media/kay-flow-views.gif"
+          "name": "oliver-flow-views.gif",
+          "sha256": "7076737063cd66acc052e9222022c2a4f407378455cf3ca7c71d73cd4ccf79cb",
+          "path": "media/oliver-flow-views.gif"
         },
         "mp4": {
-          "name": "kay-flow-views.mp4",
-          "sha256": "da856f9fff779048be9155e37b2c7c138c8516389e82f2e12436eb0a2c8f6c8e",
-          "path": "media/kay-flow-views.mp4"
+          "name": "oliver-flow-views.mp4",
+          "sha256": "08e1cd6ad829dadb4067db4cd62f64f141dfd1fd2503929488e3e9c95b7ca315",
+          "path": "media/oliver-flow-views.mp4"
         },
         "png": {
-          "name": "kay-flow-views.png",
-          "sha256": "746779f3ca89d8b9d2e05bc35372f4973746d68eacbb8cc4bc694ff4107a02f1",
-          "path": "media/kay-flow-views.png"
+          "name": "oliver-flow-views.png",
+          "sha256": "214689ef5fe5a86d281b7e5e365f958e8b25e40fa0cced488ee9ee65c7bb48ae",
+          "path": "media/oliver-flow-views.png"
         }
       }
     },
@@ -355,23 +355,23 @@
       "height": 960,
       "files": {
         "gif": {
-          "name": "kay-force-views.gif",
-          "sha256": "7226e87e189e2c6702fa22cb2917434ecdafa919beb0e3c9af414683fe80cc12",
-          "path": "media/kay-force-views.gif"
+          "name": "oliver-force-views.gif",
+          "sha256": "b1d1c3c6e72889f9986add38ddec0430da7a88219374d7ea902aa2c272e6377a",
+          "path": "media/oliver-force-views.gif"
         },
         "mp4": {
-          "name": "kay-force-views.mp4",
-          "sha256": "b1eb6600bec76eb835d5637ab48a9fa2b7385bfe85e6541330b8d92b75c95195",
-          "path": "media/kay-force-views.mp4"
+          "name": "oliver-force-views.mp4",
+          "sha256": "4857541da4d4ec169cf6dd3c7b8cf933c565d662235037bad6620f71d936b507",
+          "path": "media/oliver-force-views.mp4"
         },
         "png": {
-          "name": "kay-force-views.png",
-          "sha256": "e9b5af29aba496d7000417fb0c5fa1be1412ee0bfd3bb9e5bb9aac7995c96623",
-          "path": "media/kay-force-views.png"
+          "name": "oliver-force-views.png",
+          "sha256": "0cdea2121b515a98c044dae1db751ee5d318622da3089eefd74cee16789d3ec5",
+          "path": "media/oliver-force-views.png"
         }
       }
     }
   },
-  "isometric_manifest_sha256": "7aa1db14e816d176a56f3c55d21ddeeada4820924be21c7fa729926c6fe9973d",
+  "isometric_manifest_sha256": "da6576787b7fc82c113fc4353eddf90c8e893f8889441207e3976d5c8591f2a6",
   "camera_policy": "Fixed physical scales selected before image generation; every native surface checked for clipping; no per-frame zoom"
 }

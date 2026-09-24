@@ -25,99 +25,35 @@
       <article class="doc-page">
         <p class="eyebrow">Guide 04</p>
         <h1>Numerical record</h1>
-        <p class="dek">The strongest completed trajectories, what they establish, and the claims they do not support.</p>
+        <p class="dek">The current completed trajectory, its verification, and its numerical limits.</p>
 
-        <h2 id="kay-complete">Current best completed run: Kay</h2>
-        <p>Kay completed the AMReX / incflo trajectory from exact rest through <span class="math">t = 0.995</span>, with all 280 scheduled native states and zero archived-force readback discrepancy. The native audit finished on September 16, 2026 (UTC). The homepage's flow, forcing, and mesh views now describe this same run. “Best” identifies the higher-resolution completed run selected for presentation, not a convergence or singularity certificate.</p>
+        <h2 id="outer-complete">Oliver · completed outer-refinement run</h2>
+        <p>The AMReX / incflo trajectory starts at exact rest and reaches <span class="math">t = 0.995</span>. Its completion audit finished on September 23, 2026 at 14:15 UTC. All 280 planned native states passed readback, with zero archived-force discrepancy. The full 5,510-step history passed its clock and endpoint checks.</p>
         <table>
-          <thead><tr><th>Completed native run</th><th>Value</th></tr></thead>
+          <thead><tr><th scope="col">Run configuration and endpoint</th><th scope="col">Value</th></tr></thead>
           <tbody>
-            <tr><td>Base grid / fixed levels</td><td>128³ / 5</td></tr>
-            <tr><td>Stored / active cells</td><td>10,485,760 / 9,437,184</td></tr>
-            <tr><td>Finest spacing</td><td>2 / 2048, only inside the ±0.0625 core cube</td></tr>
-            <tr><td>Saved states / final step</td><td>280 / 5,510</td></tr>
-            <tr><td>Maximum timestep / forcing-phase ceiling</td><td>0.00025 / 0.0375</td></tr>
-            <tr><td>Endpoint peak speed</td><td>7.415298767 model units</td></tr>
-            <tr><td>Endpoint kinetic energy</td><td>0.038289232 model units</td></tr>
-            <tr><td>Archived-force readback discrepancy</td><td>0 across all 280 native states</td></tr>
-            <tr><td>Elapsed run and completion audit</td><td>78.58 hours</td></tr>
+            <tr><th scope="row">Base grid / fixed levels</th><td>128³ / 5, with 27 outer refinement bands</td></tr>
+            <tr><th scope="row">Stored / active cells</th><td>12,055,040 / 10,810,304</td></tr>
+            <tr><th scope="row">Finest spacing</th><td>1 / 1024, inside the ±0.0625 core cube</td></tr>
+            <tr><th scope="row">Saved states / final step</th><td>280 / 5,510</td></tr>
+            <tr><th scope="row">Maximum timestep / forcing-phase ceiling</th><td>0.00025 / 0.0375</td></tr>
+            <tr><th scope="row">Endpoint peak speed</th><td>7.415301682 model units</td></tr>
+            <tr><th scope="row">Endpoint kinetic energy</th><td>0.038288832 model units</td></tr>
+            <tr><th scope="row">RMS velocity deviation from target</th><td>0.001613819</td></tr>
+            <tr><th scope="row">Maximum component deviation from target</th><td>0.280880827</td></tr>
+            <tr><th scope="row">Native force readback discrepancy</th><td>0 across all 280 states</td></tr>
+            <tr><th scope="row">Peak process memory</th><td>8.97 GiB, below the 11.5 GiB guard</td></tr>
+            <tr><th scope="row">Integration wall time</th><td>131.20 hours, before the final archive audit</td></tr>
           </tbody>
         </table>
-        <p>The <a href="data/best.json">completion record</a> and <a href="data/three-view.json">movie record</a> bind the full native history to the featured assets. Kay has half the cell spacing and eight times the active cells of Oliver in the same refinement regions. That is a resolution increase, not an eightfold accuracy claim.</p>
-        <h3 id="continuation-status">Extension storage recheck</h3>
-        <p>The first extension attempt stopped at its storage preflight without advancing the solver. The latest recheck, on September 17 at 12:51 UTC after native movie preparation, does not pass: 47.21 GiB free versus 30.93 GiB budgeted for new outputs and checks plus a retained 20 GiB reserve. At least 3.72 GiB more free space is needed under the unchanged budget. An earlier check at 12:08 UTC passed with 53.23 GiB free; the later measurement supersedes it. These are dated capacity measurements, not guarantees. <a href="data/continuation-storage-check.json">Exact byte counts and both readings →</a></p>
-        <p>The proposed continuation to 0.9975 would add 40 saved states. It has not restarted; restart recovery, replay, and the smaller-timestep comparison still need to pass. The homepage stops at the validated 0.995 endpoint. See <a href="refinement.html#continuation">continuation gates</a>.</p>
-
-        <h2 id="oliver-complete">Earlier completed reference: Oliver</h2>
-        <p>Oliver's completed trajectory covers the same output schedule and localized three-pulse profile on a coarser mesh. It remains a separate reference and the source of the published Hugging Face voxel release; it is no longer the homepage movie.</p>
-        <table>
-          <thead><tr><th>Completed native run</th><th>Value</th></tr></thead>
-          <tbody>
-            <tr><td>Base grid / fixed levels</td><td>64³ / 5</td></tr>
-            <tr><td>Stored / active cells</td><td>1,310,720 / 1,179,648</td></tr>
-            <tr><td>Finest spacing</td><td>2 / 1024, only inside the ±0.0625 core cube</td></tr>
-            <tr><td>Saved states / final step</td><td>280 / 5,510</td></tr>
-            <tr><td>Maximum timestep / forcing-phase ceiling</td><td>0.00025 / 0.0375</td></tr>
-            <tr><td>Endpoint peak speed</td><td>7.415989607 model units</td></tr>
-            <tr><td>Endpoint kinetic energy</td><td>0.036935156 model units</td></tr>
-            <tr><td>Archived-force readback discrepancy</td><td>0 across all 280 native states</td></tr>
-            <tr><td>Elapsed run and completion audit</td><td>9.02 hours</td></tr>
-          </tbody>
-        </table>
-        <p>The archived <a href="data/oliver-best.json">Oliver completion and media record</a> contains source hashes, the complete output schedule, native checks, slice heights and media checksums. Its <a href="media/oliver-flow-views.gif">flow GIF</a> and <a href="media/oliver-force-views.gif">forcing GIF</a> remain available. Raw snapshots preserve all three velocity and all three force components in double precision; both runs' web slices sample 256² pixels using the finest containing native cell.</p>
-        <h3>Reading the fixed slices</h3>
-        <p>The homepage movies show a vertical x–z plane at <span class="math">y = 0</span> and a horizontal x–y plane at <span class="math">z = 0</span>. Both planes remain fixed throughout the run, and the force movie uses the same planes as the velocity movie.</p>
-        <p>Colors use the site's symmetric-log magnitude scale, with fixed limits shared across both planes and all saved times within each quantity. Every saved state is shown at five frames per second, apart from the initial and final holds; no time interpolation, smoothing or arrow overlays are used.</p>
-        <div class="callout warning">Completion and archive integrity are verified for both runs. Spatial convergence, continuum error and singularity formation are not. The finite manufactured force is not the paper's infinite all-order cancellation construction. Kay and Oliver remain separate trajectories; their frames are never mixed.</div>
-
-        <h2 id="legacy-media">Earlier uniform-grid media</h2>
-        <p>The previous PhiFlow movies and browser-volume explorers remain archived separately: <a href="media/stream-flow.gif">velocity GIF</a>, <a href="media/stream-force.gif">forcing GIF</a>, <a href="media/stream-flow-3d.html">velocity 3D</a>, <a href="media/stream-force-3d.html">force 3D</a>, and <a href="media/mesh-3d.html">uniform mesh explorer</a>. They do not show the current refined run. Their original <a href="data/stream.json">publication record</a> is unchanged.</p>
-
-        <h2>Historical 224³ complete run</h2>
-        <p>An earlier continuous <span class="math">224³</span> trajectory starts from exact rest at <span class="math">t = 0</span> and reaches <span class="math">t = 0.992</span>. Velocity and force vanish through 0.55, smoothly activate through 0.775, and all 63 requested frames complete.</p>
-        <table>
-          <thead><tr><th>Endpoint at t = 0.992</th><th>Value</th></tr></thead>
-          <tbody>
-            <tr><td>Peak speed, solver / target</td><td>3.30140 / 3.24247</td></tr>
-            <tr><td>Relative tracking error</td><td>1.1057%</td></tr>
-            <tr><td>Divergence L∞</td><td>7.11 × 10<sup>−14</sup></td></tr>
-            <tr><td>Peak vorticity</td><td>294.52</td></tr>
-            <tr><td>Total / core kinetic energy</td><td>0.007728 / 0.000188</td></tr>
-            <tr><td>Radial / axial scale coverage</td><td>5.21 / 5.41 cells</td></tr>
-            <tr><td>Top-third spectral energy</td><td>0.5464%</td></tr>
-            <tr><td>Manufactured-force L2 norm</td><td>36.76</td></tr>
-          </tbody>
-        </table>
-        <div class="callout warning">This historical run predates the Appendix-B axis-profile revision and the finite three-level pulse correction. It is no longer the homepage result. The uniform-grid checks below belong to that earlier solver family, not to the current AMReX run.</div>
-
-        <h2>Highest spatial frontier</h2>
-        <p>A <span class="math">288³</span> late-window run reaches <span class="math">t = 0.995</span> with 0.7438% tracking error, divergence <span class="math">1.03 × 10<sup>−13</sup></span>, 5.29 radial cells per scale, 0.4631% top-third spectral energy, and peak vorticity 492.51. Because it initializes from the manufactured target at <span class="math">t = 0.94</span>, it is a concentrated-regime resolution test—not a formation history from rest.</p>
-
-        <h2>Grid refinement</h2>
-        <table>
-          <thead><tr><th>Grid</th><th>Radial cells</th><th>Tracking error</th><th>Top-third energy</th><th>Peak vorticity</th><th>Gate</th></tr></thead>
-          <tbody>
-            <tr><td>128³</td><td>3.33</td><td>3.760%</td><td>3.042%</td><td>122.90</td><td>Fail</td></tr>
-            <tr><td>160³</td><td>4.16</td><td>2.122%</td><td>1.379%</td><td>166.43</td><td>Marginal</td></tr>
-            <tr><td>192³</td><td>4.99</td><td>1.431%</td><td>0.714%</td><td>217.78</td><td>Pass</td></tr>
-          </tbody>
-        </table>
-        <p>Across these equal-window runs, endpoint tracking error decreases with observed order 2.39 and top-third spectral energy with order 3.57. The geometry and Fourier audits agree at <span class="math">192³</span>.</p>
-
-        <h2>Temporal and projection checks</h2>
-        <p>Five timestep refinements recover order 1.013 for projected Euler and 2.176 for projected midpoint RK2. On a small trajectory, the periodic FFT projection differs from PhiFlow’s sparse conjugate-gradient path by <span class="math">4.93 × 10<sup>−8</sup></span> in relative L2 while reducing centered-grid divergence to machine precision.</p>
-
-        <h2>Negative findings that matter</h2>
-        <ul>
-          <li>The manufactured-force norm and its derivatives still grow toward <span class="math">t = 1</span>; the finite surrogate has not reproduced the analytical residual cancellation.</li>
-          <li>Force-release controls relax instead of maintaining concentration.</li>
-          <li>The theoretical core aspect ratio is only about 1.04 at the canonical endpoint, so lack of a visually needle-like jet is expected.</li>
-          <li>Cross-Mac spatial decomposition loses to communication: the fleet is better used for independent trajectories and parameter controls.</li>
-          <li>A numerical blow-up, NaN, or CFL collapse is not evidence of a singular solution.</li>
-        </ul>
-
-        <h2>Next comparison</h2>
-        <p>Kay's 128³-base/five-level run uses the same fixed regions, localized profile and output schedule as Oliver. It reaches 2048³-equivalent spacing in the innermost cube. The next spatial comparison must use matched saved times and volume restriction in their overlap. <a href="refinement.html#next-refined-run">Launch and runtime records →</a></p>
+        <p>The <a href="data/best.json">completion record</a> and <a href="data/three-view.json">movie record</a> bind every displayed state to this run. The flow, force, and mesh views all use Oliver’s outer-refinement geometry. The two movies share one saved-time clock.</p>
+        <h2>What the checks establish</h2>
+        <p>The complete from-rest history, output clock, native archive, and implemented discrete-force readback are verified. RMS and maximum component deviations compare the computed velocity against the prescribed target on active native cells. They do not measure error against an independently known continuum solution.</p>
+        <p>The finite manufactured force depends on grid spacing. The finest core spacing is 1/1024, and core convergence remains unproven. This finite run stops before t = 1 and cannot establish singularity formation or the paper’s infinite all-order cancellation construction.</p>
+        <h2>Reading the movies</h2>
+        <p>The horizontal x–y slice stays at z = 0 and the vertical x–z slice stays at y = 0. Each plane samples the finest containing native cell at 256² display points without spatial smoothing. The isometric panel uses trilinear reconstruction of native magnitudes for visualization, retaining native center spacing in the core.</p>
+        <p>All 280 saved states appear in order. Ordinary states hold for 0.2 seconds, the initial rest state for one second, and the endpoint for half a second. GIFs and MP4s use the same holds. Saved simulation times become closer together toward the endpoint, so the playback clock is not proportional to simulation time.</p>
+        <p><a href="rendering-3d.html">Rendering and verification details →</a></p>
 
         <nav class="page-links" aria-label="Adjacent documentation"><a href="running.html">← Run it</a><a href="reproduction.html">Reproduction target →</a></nav>
       </article>
