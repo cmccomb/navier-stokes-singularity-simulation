@@ -84,6 +84,12 @@ but the 64³ trajectory is not yet complete or fully audited.
 The [prospective outer-band checkpoint protocol](site/data/outer-band-protocol-20260927.json)
 locks thirteen subsequent scheduled states and the spatial screen before
 those states are produced.
+Its first five [audited comparisons](site/data/outer-band-prospective-prefix-20260927.json)
+show two velocity misses followed by three consecutive passes at
+`t=0.615808–0.629071` under the 2% velocity / 5% forcing working screen.
+This is a provisional spatial candidate at sampled times. The 64³ full-run
+audit, refined fixed-force timestep control, and diagnostic gates remain
+outstanding; eight later locked checkpoints are pending.
 
 An [audited native diagnostic trace](site/results.html#precursor-diagnostics)
 at the same six times shows increasing peak speed and sampled vorticity and a

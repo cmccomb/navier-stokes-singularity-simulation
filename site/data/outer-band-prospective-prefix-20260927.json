@@ -1,0 +1,351 @@
+{
+  "schema_version": 1,
+  "kind": "outer-band-prospective-spatial-screen",
+  "checkpoints": [
+    {
+      "frame_index": 29,
+      "time": 0.6020692874341146,
+      "screen": "fail",
+      "comparison_sha256": "be41399fae6193975a111fdb2b1aa372f47620168dc5915f64ef5c1cba5be60c",
+      "comparison": {
+        "schema_version": 1,
+        "kind": "mixed-geometry-native-sensitivity",
+        "source_snapshot_sha256": [
+          "10ad228b7c1d1ff3366591d0fcac3cd37d84ff821d846f1e6f3561062c0a0642",
+          "18d7e0b45e9d63221cc5cdc04fc1cbc14d42657a2d80a622ef00ee53d11c4ac6"
+        ],
+        "source_run_sha256": [
+          "7fd21d99a78350cd462914a3475944db61227ec8337a82a1f025354d0facf11e",
+          "afe8898110109ff25600c3cb58e3a9911b5baf6f6f8f7f14ff3dbbd826ded97c"
+        ],
+        "source_binary_sha256": "92a0c36aff5cbef1cc9ed45c19da5e0a7610c68c361c4a9b1b1264203b356ecd",
+        "source_profile_sha256": "fb613aa587c4bd42d63af26ac783e71f02b0380f570813a027b752a82f20f994",
+        "mesh_pair_base_n": [
+          64,
+          128
+        ],
+        "source_run_state": [
+          {
+            "status": "running",
+            "validated": false
+          },
+          {
+            "status": "completed",
+            "validated": true
+          }
+        ],
+        "comparator_sha256": "648282838dc6c83bcd8d542abf162d416b99771d84e7f26694e653a4388cbc26",
+        "scope": "Conservatively compare native AMR fields when refinement footprints differ.\n\nEvery active fine cell contributes its physical volume to its containing active\ncoarse cell. A coarse cell can therefore contain a mixture of fine AMR levels.\nThe comparison rejects gaps, overlaps, and source cells coarser than the target.\nThis is a resolution/mesh-layout sensitivity test, not a continuum error bound.\nOnly the selected native snapshots are audited; a running source's full trajectory remains unvalidated.",
+        "frames": [
+          {
+            "time": 0.6020692874341146,
+            "coarse_step": 257,
+            "fine_step": 257,
+            "composite_volume": 8.0,
+            "velocity": {
+              "difference_squared_integral": 4.619295743369923e-07,
+              "reference_squared_integral": 0.0010944910403504504,
+              "active_max_component_difference": 0.0014569600066532094,
+              "rms_difference": 0.00024029397993317279,
+              "relative_l2_difference": 0.020543847318237395
+            },
+            "force": {
+              "difference_squared_integral": 0.0074154750805211075,
+              "reference_squared_integral": 8.33181293923016,
+              "active_max_component_difference": 0.21874114923667654,
+              "rms_difference": 0.03044559713760166,
+              "relative_l2_difference": 0.02983319277735188
+            }
+          }
+        ],
+        "validated": true
+      }
+    },
+    {
+      "frame_index": 30,
+      "time": 0.6089987316985057,
+      "screen": "fail",
+      "comparison_sha256": "792f3faf764646c6570610edec164f0654f2899ae6f4b7566fd240e65dc319c5",
+      "comparison": {
+        "schema_version": 1,
+        "kind": "mixed-geometry-native-sensitivity",
+        "source_snapshot_sha256": [
+          "77eab837cb4817c66994ea1a2b9343950ccd93e3fa7a091063f7fe29235e41a8",
+          "c91481836c3a765558dadb78ac7225826d6aabef95261b3f92170f0bb87fb581"
+        ],
+        "source_run_sha256": [
+          "7fd21d99a78350cd462914a3475944db61227ec8337a82a1f025354d0facf11e",
+          "afe8898110109ff25600c3cb58e3a9911b5baf6f6f8f7f14ff3dbbd826ded97c"
+        ],
+        "source_binary_sha256": "92a0c36aff5cbef1cc9ed45c19da5e0a7610c68c361c4a9b1b1264203b356ecd",
+        "source_profile_sha256": "fb613aa587c4bd42d63af26ac783e71f02b0380f570813a027b752a82f20f994",
+        "mesh_pair_base_n": [
+          64,
+          128
+        ],
+        "source_run_state": [
+          {
+            "status": "running",
+            "validated": false
+          },
+          {
+            "status": "completed",
+            "validated": true
+          }
+        ],
+        "comparator_sha256": "648282838dc6c83bcd8d542abf162d416b99771d84e7f26694e653a4388cbc26",
+        "scope": "Conservatively compare native AMR fields when refinement footprints differ.\n\nEvery active fine cell contributes its physical volume to its containing active\ncoarse cell. A coarse cell can therefore contain a mixture of fine AMR levels.\nThe comparison rejects gaps, overlaps, and source cells coarser than the target.\nThis is a resolution/mesh-layout sensitivity test, not a continuum error bound.\nOnly the selected native snapshots are audited; a running source's full trajectory remains unvalidated.",
+        "frames": [
+          {
+            "time": 0.6089987316985057,
+            "coarse_step": 304,
+            "fine_step": 304,
+            "composite_volume": 8.0,
+            "velocity": {
+              "difference_squared_integral": 1.2700713534187295e-06,
+              "reference_squared_integral": 0.0031022809975784584,
+              "active_max_component_difference": 0.002413869299093341,
+              "rms_difference": 0.00039844562888472146,
+              "relative_l2_difference": 0.02023361555271489
+            },
+            "force": {
+              "difference_squared_integral": 0.015166421547626513,
+              "reference_squared_integral": 14.377223318518354,
+              "active_max_component_difference": 0.3690061058335323,
+              "rms_difference": 0.04354081640774911,
+              "relative_l2_difference": 0.032479104920348195
+            }
+          }
+        ],
+        "validated": true
+      }
+    },
+    {
+      "frame_index": 31,
+      "time": 0.6158075087303938,
+      "screen": "pass",
+      "comparison_sha256": "1426619b74fb0e0e2034d489c607d0d77eb987f81cffc8ab563e5ede14526a93",
+      "comparison": {
+        "schema_version": 1,
+        "kind": "mixed-geometry-native-sensitivity",
+        "source_snapshot_sha256": [
+          "3f93dbd4f421d33282480e9c610fe7717b776fde5226cc4b9ccf7e230c8f268c",
+          "a32f875665bbf424433f543bcc24c03588b9e2165ad9ce8bdbb124a23e575d58"
+        ],
+        "source_run_sha256": [
+          "7fd21d99a78350cd462914a3475944db61227ec8337a82a1f025354d0facf11e",
+          "afe8898110109ff25600c3cb58e3a9911b5baf6f6f8f7f14ff3dbbd826ded97c"
+        ],
+        "source_binary_sha256": "92a0c36aff5cbef1cc9ed45c19da5e0a7610c68c361c4a9b1b1264203b356ecd",
+        "source_profile_sha256": "fb613aa587c4bd42d63af26ac783e71f02b0380f570813a027b752a82f20f994",
+        "mesh_pair_base_n": [
+          64,
+          128
+        ],
+        "source_run_state": [
+          {
+            "status": "running",
+            "validated": false
+          },
+          {
+            "status": "completed",
+            "validated": true
+          }
+        ],
+        "comparator_sha256": "648282838dc6c83bcd8d542abf162d416b99771d84e7f26694e653a4388cbc26",
+        "scope": "Conservatively compare native AMR fields when refinement footprints differ.\n\nEvery active fine cell contributes its physical volume to its containing active\ncoarse cell. A coarse cell can therefore contain a mixture of fine AMR levels.\nThe comparison rejects gaps, overlaps, and source cells coarser than the target.\nThis is a resolution/mesh-layout sensitivity test, not a continuum error bound.\nOnly the selected native snapshots are audited; a running source's full trajectory remains unvalidated.",
+        "frames": [
+          {
+            "time": 0.6158075087303938,
+            "coarse_step": 335,
+            "fine_step": 335,
+            "composite_volume": 8.0,
+            "velocity": {
+              "difference_squared_integral": 2.752737067778741e-06,
+              "reference_squared_integral": 0.006933367326422388,
+              "active_max_component_difference": 0.0035703558557160092,
+              "rms_difference": 0.000586593669819529,
+              "relative_l2_difference": 0.019925547375418563
+            },
+            "force": {
+              "difference_squared_integral": 0.026179833371822645,
+              "reference_squared_integral": 20.75075876597705,
+              "active_max_component_difference": 0.531761539034241,
+              "rms_difference": 0.05720558689042383,
+              "relative_l2_difference": 0.03551946765580099
+            }
+          }
+        ],
+        "validated": true
+      }
+    },
+    {
+      "frame_index": 32,
+      "time": 0.6224977197922241,
+      "screen": "pass",
+      "comparison_sha256": "89198f0ba5f3630179cb1773d1937d87221bbefc1dd2dc8f6557088294b3a403",
+      "comparison": {
+        "schema_version": 1,
+        "kind": "mixed-geometry-native-sensitivity",
+        "source_snapshot_sha256": [
+          "98e75da73a28452a4f0b76c2e47563ec8ff774c43c647eaea965f750067117fa",
+          "9638684a860544f210700bb6f8da6826604bf2573d6071a7a2d9b49cf61edd3c"
+        ],
+        "source_run_sha256": [
+          "7fd21d99a78350cd462914a3475944db61227ec8337a82a1f025354d0facf11e",
+          "afe8898110109ff25600c3cb58e3a9911b5baf6f6f8f7f14ff3dbbd826ded97c"
+        ],
+        "source_binary_sha256": "92a0c36aff5cbef1cc9ed45c19da5e0a7610c68c361c4a9b1b1264203b356ecd",
+        "source_profile_sha256": "fb613aa587c4bd42d63af26ac783e71f02b0380f570813a027b752a82f20f994",
+        "mesh_pair_base_n": [
+          64,
+          128
+        ],
+        "source_run_state": [
+          {
+            "status": "running",
+            "validated": false
+          },
+          {
+            "status": "completed",
+            "validated": true
+          }
+        ],
+        "comparator_sha256": "648282838dc6c83bcd8d542abf162d416b99771d84e7f26694e653a4388cbc26",
+        "scope": "Conservatively compare native AMR fields when refinement footprints differ.\n\nEvery active fine cell contributes its physical volume to its containing active\ncoarse cell. A coarse cell can therefore contain a mixture of fine AMR levels.\nThe comparison rejects gaps, overlaps, and source cells coarser than the target.\nThis is a resolution/mesh-layout sensitivity test, not a continuum error bound.\nOnly the selected native snapshots are audited; a running source's full trajectory remains unvalidated.",
+        "frames": [
+          {
+            "time": 0.6224977197922241,
+            "coarse_step": 362,
+            "fine_step": 362,
+            "composite_volume": 8.0,
+            "velocity": {
+              "difference_squared_integral": 5.029387272292395e-06,
+              "reference_squared_integral": 0.01310582807168783,
+              "active_max_component_difference": 0.004884609372660734,
+              "rms_difference": 0.0007928892791787195,
+              "relative_l2_difference": 0.01958958817224408
+            },
+            "force": {
+              "difference_squared_integral": 0.039902979887895415,
+              "reference_squared_integral": 26.599997071249717,
+              "active_max_component_difference": 0.7451997980459049,
+              "rms_difference": 0.07062487158209158,
+              "relative_l2_difference": 0.038731281814938345
+            }
+          }
+        ],
+        "validated": true
+      }
+    },
+    {
+      "frame_index": 33,
+      "time": 0.6290714295556976,
+      "screen": "pass",
+      "comparison_sha256": "114e37a65d1cf5f9152817b841c14e90c0e16b2cd109687f7786168f9eb4be6c",
+      "comparison": {
+        "schema_version": 1,
+        "kind": "mixed-geometry-native-sensitivity",
+        "source_snapshot_sha256": [
+          "d25027974bad5126c0a925ca13daaf0f917e32702a3e665f0ff2ae189fa0b927",
+          "22e29171bca80aa89e94d539b17947da7f63b5ad955e6128d3ea389a715537ea"
+        ],
+        "source_run_sha256": [
+          "7fd21d99a78350cd462914a3475944db61227ec8337a82a1f025354d0facf11e",
+          "afe8898110109ff25600c3cb58e3a9911b5baf6f6f8f7f14ff3dbbd826ded97c"
+        ],
+        "source_binary_sha256": "92a0c36aff5cbef1cc9ed45c19da5e0a7610c68c361c4a9b1b1264203b356ecd",
+        "source_profile_sha256": "fb613aa587c4bd42d63af26ac783e71f02b0380f570813a027b752a82f20f994",
+        "mesh_pair_base_n": [
+          64,
+          128
+        ],
+        "source_run_state": [
+          {
+            "status": "running",
+            "validated": false
+          },
+          {
+            "status": "completed",
+            "validated": true
+          }
+        ],
+        "comparator_sha256": "648282838dc6c83bcd8d542abf162d416b99771d84e7f26694e653a4388cbc26",
+        "scope": "Conservatively compare native AMR fields when refinement footprints differ.\n\nEvery active fine cell contributes its physical volume to its containing active\ncoarse cell. A coarse cell can therefore contain a mixture of fine AMR levels.\nThe comparison rejects gaps, overlaps, and source cells coarser than the target.\nThis is a resolution/mesh-layout sensitivity test, not a continuum error bound.\nOnly the selected native snapshots are audited; a running source's full trajectory remains unvalidated.",
+        "frames": [
+          {
+            "time": 0.6290714295556976,
+            "coarse_step": 389,
+            "fine_step": 389,
+            "composite_volume": 8.0,
+            "velocity": {
+              "difference_squared_integral": 8.075357509596925e-06,
+              "reference_squared_integral": 0.021930620435251468,
+              "active_max_component_difference": 0.006280996207820279,
+              "rms_difference": 0.0010046988049657547,
+              "relative_l2_difference": 0.01918913596144667
+            },
+            "force": {
+              "difference_squared_integral": 0.05577000257733662,
+              "reference_squared_integral": 31.496251112729876,
+              "active_max_component_difference": 0.927704357091803,
+              "rms_difference": 0.08349401369060586,
+              "relative_l2_difference": 0.042079531910650246
+            }
+          }
+        ],
+        "validated": true
+      }
+    },
+    {
+      "frame_index": 36,
+      "time": 0.648113662215126,
+      "screen": "pending"
+    },
+    {
+      "frame_index": 39,
+      "time": 0.6661783303148294,
+      "screen": "pending"
+    },
+    {
+      "frame_index": 45,
+      "time": 0.699573136094869,
+      "screen": "pending"
+    },
+    {
+      "frame_index": 85,
+      "time": 0.8512123014757145,
+      "screen": "pending"
+    },
+    {
+      "frame_index": 147,
+      "time": 0.9499330850269806,
+      "screen": "pending"
+    },
+    {
+      "frame_index": 199,
+      "time": 0.9799170469879853,
+      "screen": "pending"
+    },
+    {
+      "frame_index": 239,
+      "time": 0.9900538310076937,
+      "screen": "pending"
+    },
+    {
+      "frame_index": 279,
+      "time": 0.995,
+      "screen": "pending"
+    }
+  ],
+  "all_checkpoints_assessed": false,
+  "candidate_sequences": [
+    {
+      "first_frame_index": 31,
+      "last_frame_index": 33,
+      "count": 3
+    }
+  ],
+  "scope": "Only the locked spatial screen is assessed. A candidate sequence still requires completed-run archive, refined fixed-force timestep, and diagnostic gates; it is not a continuum error bound.",
+  "protocol_sha256": "1a41ad71251a9f4f68f8f2148b6ad633e02715a834b06928963f33daedfb6d36"
+}

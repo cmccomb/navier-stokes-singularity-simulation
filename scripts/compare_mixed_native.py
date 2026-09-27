@@ -159,6 +159,9 @@ def main() -> None:
         "kind": "mixed-geometry-native-sensitivity",
         "source_snapshot_sha256": [sha(p / "manifest.json") for p in paths],
         "source_run_sha256": [a["source_record_sha256"], b["source_record_sha256"]],
+        "source_binary_sha256": ar["binary_sha256"],
+        "source_profile_sha256": a["profile_sha256"],
+        "mesh_pair_base_n": [a["parameters"]["base_n"], b["parameters"]["base_n"]],
         "source_run_state": [
             {"status": run["status"], "validated": run["validated"]}
             for run in (ar, br)
