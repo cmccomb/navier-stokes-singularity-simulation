@@ -300,7 +300,61 @@
     {
       "frame_index": 36,
       "time": 0.648113662215126,
-      "screen": "pending"
+      "screen": "fail",
+      "comparison_sha256": "8b0046ee8499a89da9c66e28fe919bd2f63d991be5cec396e4340823b10d8c72",
+      "comparison": {
+        "schema_version": 1,
+        "kind": "mixed-geometry-native-sensitivity",
+        "source_snapshot_sha256": [
+          "78a689a843bd2eb66b6bbcb58fa52d93a5a1e8b3a097b93c515b63abe23799f8",
+          "896f90d917794c21473714b10f40b1c4544a8291735d98022751de9fc0121a79"
+        ],
+        "source_run_sha256": [
+          "7fd21d99a78350cd462914a3475944db61227ec8337a82a1f025354d0facf11e",
+          "afe8898110109ff25600c3cb58e3a9911b5baf6f6f8f7f14ff3dbbd826ded97c"
+        ],
+        "source_binary_sha256": "92a0c36aff5cbef1cc9ed45c19da5e0a7610c68c361c4a9b1b1264203b356ecd",
+        "source_profile_sha256": "fb613aa587c4bd42d63af26ac783e71f02b0380f570813a027b752a82f20f994",
+        "mesh_pair_base_n": [
+          64,
+          128
+        ],
+        "source_run_state": [
+          {
+            "status": "running",
+            "validated": false
+          },
+          {
+            "status": "completed",
+            "validated": true
+          }
+        ],
+        "comparator_sha256": "648282838dc6c83bcd8d542abf162d416b99771d84e7f26694e653a4388cbc26",
+        "scope": "Conservatively compare native AMR fields when refinement footprints differ.\n\nEvery active fine cell contributes its physical volume to its containing active\ncoarse cell. A coarse cell can therefore contain a mixture of fine AMR levels.\nThe comparison rejects gaps, overlaps, and source cells coarser than the target.\nThis is a resolution/mesh-layout sensitivity test, not a continuum error bound.\nOnly the selected native snapshots are audited; a running source's full trajectory remains unvalidated.",
+        "frames": [
+          {
+            "time": 0.648113662215126,
+            "coarse_step": 473,
+            "fine_step": 473,
+            "composite_volume": 8.0,
+            "velocity": {
+              "difference_squared_integral": 2.10712502140247e-05,
+              "reference_squared_integral": 0.0645605595224159,
+              "active_max_component_difference": 0.010924992942475913,
+              "rms_difference": 0.0016229313838708917,
+              "relative_l2_difference": 0.018065979343059972
+            },
+            "force": {
+              "difference_squared_integral": 0.12588787462774176,
+              "reference_squared_integral": 40.741497098283595,
+              "active_max_component_difference": 1.4653485870895953,
+              "rms_difference": 0.12544315177987087,
+              "relative_l2_difference": 0.05558702852055192
+            }
+          }
+        ],
+        "validated": true
+      }
     },
     {
       "frame_index": 39,

@@ -223,6 +223,13 @@ against solver rows, then reports a half-peak support volume, finest-level
 half-peak volume, interior vorticity and divergence, force norm, and target
 deviation at specified saved times. Derivatives require all six neighbors to
 be active on the same level; interface and domain-edge cells are excluded.
+
+`scripts.vorticity_balance` checks five immutable native snapshots around a
+center time using the pressure-free curl of the momentum balance. A two-cell
+active neighborhood inside one block is required. It reports both five- and
+three-frame time differences so sparse-output sensitivity is visible. The
+result is an independent sampled-field diagnostic, not incflo's full discrete
+momentum residual or a continuum error estimate.
 The divergence is a sampled incompressibility diagnostic, not a full momentum
 residual. The [64³](../../site/data/precursor-n64-fixed.json) and
 [128³](../../site/data/precursor-n128-fixed.json) records contain the six-time

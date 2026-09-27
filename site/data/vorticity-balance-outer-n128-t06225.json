@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "kind": "sampled-native-vorticity-balance",
+  "source_snapshot_sha256": [
+    "c91481836c3a765558dadb78ac7225826d6aabef95261b3f92170f0bb87fb581",
+    "a32f875665bbf424433f543bcc24c03588b9e2165ad9ce8bdbb124a23e575d58",
+    "9638684a860544f210700bb6f8da6826604bf2573d6071a7a2d9b49cf61edd3c",
+    "22e29171bca80aa89e94d539b17947da7f63b5ad955e6128d3ea389a715537ea",
+    "5a1ebab20b840ca28b91c631e5b255d02334869a26dfb9ecc2ed6232432da735"
+  ],
+  "source_run_state": [
+    {
+      "status": "completed",
+      "validated": true
+    },
+    {
+      "status": "completed",
+      "validated": true
+    },
+    {
+      "status": "completed",
+      "validated": true
+    },
+    {
+      "status": "completed",
+      "validated": true
+    },
+    {
+      "status": "completed",
+      "validated": true
+    }
+  ],
+  "source_binary_sha256": "92a0c36aff5cbef1cc9ed45c19da5e0a7610c68c361c4a9b1b1264203b356ecd",
+  "source_profile_sha256": "fb613aa587c4bd42d63af26ac783e71f02b0380f570813a027b752a82f20f994",
+  "analyzer_sha256": "e08cc2fce862f8134521d69cec8f195ebe87a9ea8c88347cfa2aaf0b9596eeb4",
+  "times": [
+    0.6089987316985057,
+    0.6158075087303938,
+    0.6224977197922241,
+    0.6290714295556976,
+    0.635530666738951
+  ],
+  "center_time": 0.6224977197922241,
+  "viscosity": 0.01,
+  "core_half_width": 0.0625,
+  "regions": {
+    "all_interior": {
+      "cells": 6953935,
+      "volume": 4.954006195068359,
+      "rms": {
+        "residual_five": 1.1434529072493258,
+        "residual_three": 1.3561614115807665,
+        "time_stencil_difference": 0.4413797512100709,
+        "time_curl_five": 23.22709797607508,
+        "advection_curl": 0.34401508009911147,
+        "viscous_curl": 15.386349439762409,
+        "force_curl": 32.860243055001234
+      },
+      "relative_residual_five": 0.015921601762093528
+    },
+    "finest_core_interior": {
+      "cells": 1404928,
+      "volume": 0.001308441162109375,
+      "rms": {
+        "residual_five": 0.006130935379871243,
+        "residual_three": 0.045125530572335544,
+        "time_stencil_difference": 0.04341314564809335,
+        "time_curl_five": 12.648753372786864,
+        "advection_curl": 0.2506524159257325,
+        "viscous_curl": 4.7135269240377875,
+        "force_curl": 14.464337871079474
+      },
+      "relative_residual_five": 0.00019113020741115815
+    }
+  },
+  "scope": "Sample a pressure-free vorticity balance from five native AMR snapshots.\n\nThe sampled cells and their two-cell same-block neighborhoods must all be\nactive. The diagnostic excludes patch edges, AMR interfaces, and boundaries.\nIt is a finite-difference check of saved fields, not the solver's discrete\nmomentum residual or a continuum error estimate.",
+  "validated": true
+}

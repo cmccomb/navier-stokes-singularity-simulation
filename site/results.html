@@ -79,9 +79,10 @@
             <tr><td>0.615808</td><td>1.993%</td><td>3.552%</td><td>Pass</td></tr>
             <tr><td>0.622498</td><td>1.959%</td><td>3.873%</td><td>Pass</td></tr>
             <tr><td>0.629071</td><td>1.919%</td><td>4.208%</td><td>Pass</td></tr>
+            <tr><td>0.648114</td><td>1.807%</td><td>5.559%</td><td>Miss</td></tr>
           </tbody>
         </table>
-        <p>The three consecutive passes identify 0.615808–0.629071 as a provisional spatial candidate at these sampled times. The 64³ source run must finish and pass its full archive audit; a comparable refined fixed-force timestep comparison and peak, core, vorticity, energy, and residual checks must still pass. Eight later locked checkpoints remain unmeasured. The grid-dependent manufactured force makes this a finite-mesh sensitivity screen, not a continuum error bound or evidence of singularity formation.</p>
+        <p>The three consecutive passes identify 0.615808–0.629071 as a provisional spatial candidate at these sampled times. The next locked checkpoint, 0.648114, fails the forcing threshold; seven later locked checkpoints remain unmeasured. The 64³ source run must finish and pass its full archive audit; a comparable refined fixed-force timestep comparison and diagnostic checks must still pass. The grid-dependent manufactured force makes this a finite-mesh sensitivity screen, not a continuum error bound or evidence of singularity formation.</p>
         <p>A separate <a href="data/temporal-fixed-force-late-control.json">16³-base/two-level timestep control</a> reaches 0.995 with the same discrete force in both runs. Its six matched velocity differences are at most 0.21% relative composite L², with 0.083% at the endpoint. This confirms the comparison method on a coarse mesh; it does not clear the timestep gate for this five-level pair.</p>
 
         <h2 id="precursor-diagnostics">Growth, localization, and residual checks</h2>
@@ -98,6 +99,17 @@
           </tbody>
         </table>
         <p>At 0.995 the 128³ run has kinetic energy 0.038289 model units. Its sampled divergence RMS is 0.2241 over 7.471 of the domain’s 8 volume units; the 64³ value is 0.3356 over 6.955. Centered derivatives use only cells with six active neighbors on the same level, excluding AMR interfaces and outer boundaries. This divergence is an incompressibility diagnostic, not a full momentum residual. The endpoint vorticity maximum rises 16.2% under refinement. The finest-level half-peak radius also rises slightly between 0.990054 and 0.995, so contraction of that core measure is not established, even though the broader high-speed support shrinks. These traces remain finite-resolution evidence, not a singularity forecast.</p>
+        <h3>Pressure-free balance on the candidate prefix</h3>
+        <p>Five archived outer-band states around each candidate checkpoint give a sampled curl-momentum diagnostic, ∇×[∂<sub>t</sub>u + (u·∇)u − νΔu − f]. Pressure drops out under the curl. The <a href="data/vorticity-balance-outer-n64-t06158.json">64³</a> and <a href="data/vorticity-balance-outer-n128-t06158.json">128³</a> records at 0.615808, the <a href="data/vorticity-balance-outer-n64-t06225.json">64³</a> and <a href="data/vorticity-balance-outer-n128-t06225.json">128³</a> records at 0.622498, and the <a href="data/vorticity-balance-outer-n64-t06291.json">64³</a> and <a href="data/vorticity-balance-outer-n128-t06291.json">128³</a> records at 0.629071 retain source hashes, sampled volumes, and term norms. Each derivative uses active cells with a two-cell neighborhood inside one native block.</p>
+        <table>
+          <thead><tr><th scope="col">Center time</th><th scope="col">Finest-core balance RMS<br>64³ / 128³</th><th scope="col">Three- vs five-frame time term RMS<br>64³ / 128³</th></tr></thead>
+          <tbody>
+            <tr><td>0.615808</td><td>0.00371 / 0.00676</td><td>0.04202 / 0.04210</td></tr>
+            <tr><td>0.622498</td><td>0.00486 / 0.00613</td><td>0.04330 / 0.04341</td></tr>
+            <tr><td>0.629071</td><td>0.00799 / 0.00623</td><td>0.03795 / 0.03805</td></tr>
+          </tbody>
+        </table>
+        <p>Each mesh retains 0.001308 model-volume units inside the prescribed finest core after removing patch and refinement edges; the exact sampled cells differ. At every listed time the change from a three-frame to a five-frame time derivative exceeds the measured balance RMS. The larger global interior regions also differ in sampled volume across meshes. These results expose insufficient temporal output density for a residual-convergence claim; they are not the solver’s full discrete momentum residual or an error bound. A denser-output continuation and independent refined timestep check are needed.</p>
         <h2>Reading the movies</h2>
         <p>The horizontal x–y slice stays at z = 0 and the vertical x–z slice stays at y = 0. Each plane samples the finest containing native cell at 256² display points without spatial smoothing. The isometric panel uses trilinear reconstruction of native magnitudes for visualization, retaining native center spacing in the core.</p>
         <p>All 280 saved states appear in order. Ordinary states hold for 0.2 seconds, the initial rest state for one second, and the endpoint for half a second. GIFs and MP4s use the same holds. Saved simulation times become closer together toward the endpoint, so the playback clock is not proportional to simulation time.</p>
