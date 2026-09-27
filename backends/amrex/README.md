@@ -217,6 +217,26 @@ the averaging against an analytic initial Taylor field, not an evolved result.
 At `t=0.625`, the first reference/finer-time pair differs by 0.0414% relative
 composite L². This is not a late-time bound or a measured convergence order.
 
+`scripts.paper_precursor_diagnostics` reads completed fixed-cube native runs
+through the audited volume exporter. It cross-checks energy and peak speed
+against solver rows, then reports a half-peak support volume, finest-level
+half-peak volume, interior vorticity and divergence, force norm, and target
+deviation at specified saved times. Derivatives require all six neighbors to
+be active on the same level; interface and domain-edge cells are excluded.
+The divergence is a sampled incompressibility diagnostic, not a full momentum
+residual. The [64³](../../site/data/precursor-n64-fixed.json) and
+[128³](../../site/data/precursor-n128-fixed.json) records contain the six-time
+results and exact definitions.
+
+`scripts.compare_mixed_native` consumes `scripts.export_mesh_snapshot`
+manifests when adaptive refinement footprints differ. It volume-averages every
+active fine cell into its containing active coarse cell, allowing mixed fine
+levels in one coarse cell; every required coarse cell must have exactly one
+cell volume of coverage. This permits a comparison of the outer-band 64³ and
+128³ runs even though the older archive checker rejects their nonidentical
+level footprints. A validated 0.55 rest-frame preflight passes the coverage
+check; an active-field comparison awaits the full 64³ trajectory.
+
 The longer pinned probes exposed roundoff-scale duplicate output events.
 The next-launch clipper uses the same 1e-12 acceptance tolerance as upstream
 `writeNow`, and never enlarges an existing CFL-limited step. A 0.00025-ceiling

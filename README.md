@@ -54,17 +54,16 @@ and diagnostic quadrature depend on the mesh.
 [Run details and limitations](site/results.html) ·
 [Backend validation](site/refinement.html).
 
-The earlier fixed-cube pair provides a controlled spatial-sensitivity check:
-Oliver's 64³-base and Kay's 128³-base runs both completed from rest through
-`t=0.995` with the same binary, force profile, refinement regions and output
-clock. Restricting six matched finer fields to the coarse grid gives a relative
-velocity L² difference rising from **2.29% at `t≈0.700` to 4.54% at `t=0.995`**.
-The corresponding forcing-field difference rises from **12.33% to 18.19%**;
-the endpoint active-cell maximum velocity-component difference is **0.521
-model units**. See the
-[native-field comparison](site/data/paired-refinement-20260927.json). Nearly
-identical peak speeds do not establish convergence, and the manufactured force
-itself changes with grid spacing.
+The fixed-cube 32³/64³/128³ runs provide a controlled spatial-sensitivity
+sequence. All three completed from rest through `t=0.995` with the same binary,
+force profile, physical refinement cubes, and output clock. At the endpoint,
+the relative velocity L² gaps decrease from **10.29%** for 32³→64³ to
+**4.54%** for 64³→128³; forcing-field gaps decrease from **26.87%** to
+**18.19%**. The finest-pair active-cell maximum velocity-component difference
+is **0.521 model units**. See the [32³→64³](site/data/three-grid-n32-n64-20260927.json)
+and [64³→128³](site/data/paired-refinement-20260927.json) native comparisons.
+Nearly identical peak speeds do not establish field convergence, and the
+manufactured force itself changes with grid spacing.
 
 An [audited native diagnostic trace](site/results.html#precursor-diagnostics)
 at the same six times shows increasing peak speed and sampled vorticity and a
@@ -91,9 +90,10 @@ integration steps. At six matched checkpoints its velocity difference stayed
 below 0.21% relative composite L², reaching 0.083% at the endpoint; saved
 endpoint forcing fields were identical. This verifies the late-time comparison
 method on a coarse mesh, not the timestep accuracy of the 64³/128³ runs.
-A 32³-base control on Mali and a 96³-base
-intermediate run on Kay were launched on September 27, 2026 after validated
-same-binary preflights. They are not yet part of the completed comparison.
+The 32³-base control on Mali completed and joined the matched comparison. A
+96³-base intermediate run on Kay and a 64³-base outer-band companion on Oliver
+were launched after validated preflights. Their full trajectories are not yet
+completed or part of the published refinement sequence.
 
 ## Earlier PhiFlow publication workflow
 

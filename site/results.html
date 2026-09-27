@@ -52,20 +52,20 @@
         <p>The finite manufactured force depends on grid spacing. The finest core spacing is 1/1024, and core convergence remains unproven. This finite run stops before t = 1 and cannot establish singularity formation or the paper’s infinite all-order cancellation construction.</p>
 
         <h2 id="paired-refinement">Matched fixed-cube refinement</h2>
-        <p>This comparison uses the earlier Oliver 64³-base and Kay 128³-base five-level trajectories, each with the same four nested physical cubes. It does not compare the current featured outer-band mesh. Both trajectories completed all 280 states from rest through 0.995 and passed their native archive audits. Their solver binary, force profile, integration limits and saved-time schedule match. Kay's field is volume-restricted onto Oliver's grid at six exactly matched times; the <a href="data/paired-refinement-20260927.json">machine-readable record</a> includes run hashes and checker outputs.</p>
+        <p>This comparison uses Mali’s 32³-base, Oliver’s 64³-base, and Kay’s 128³-base five-level trajectories, each with the same four nested physical cubes. It does not compare the current featured outer-band mesh. All three completed 280 native states from rest through 0.995 and passed their archive audits. Their solver binary, force profile, integration limits, and saved-time schedule match. Each finer field is volume-restricted onto the preceding grid at six exactly matched times. The <a href="data/three-grid-n32-n64-20260927.json">32³→64³</a> and <a href="data/paired-refinement-20260927.json">64³→128³</a> records include run hashes and checker outputs.</p>
         <table>
-          <thead><tr><th scope="col">Saved time</th><th scope="col">Velocity L² difference</th><th scope="col">Forcing L² difference</th></tr></thead>
+          <thead><tr><th scope="col">Saved time</th><th scope="col">Velocity 32³→64³</th><th scope="col">Velocity 64³→128³</th><th scope="col">Forcing 32³→64³</th><th scope="col">Forcing 64³→128³</th></tr></thead>
           <tbody>
-            <tr><td>0.699573</td><td>2.29%</td><td>12.33%</td></tr>
-            <tr><td>0.851212</td><td>3.26%</td><td>17.34%</td></tr>
-            <tr><td>0.949933</td><td>3.48%</td><td>17.29%</td></tr>
-            <tr><td>0.979917</td><td>3.91%</td><td>17.97%</td></tr>
-            <tr><td>0.990054</td><td>4.28%</td><td>17.78%</td></tr>
-            <tr><td>0.995000</td><td>4.54%</td><td>18.19%</td></tr>
+            <tr><td>0.699573</td><td>5.95%</td><td>2.29%</td><td>14.04%</td><td>12.33%</td></tr>
+            <tr><td>0.851212</td><td>7.87%</td><td>3.26%</td><td>23.60%</td><td>17.34%</td></tr>
+            <tr><td>0.949933</td><td>8.45%</td><td>3.48%</td><td>24.10%</td><td>17.29%</td></tr>
+            <tr><td>0.979917</td><td>9.07%</td><td>3.91%</td><td>25.93%</td><td>17.97%</td></tr>
+            <tr><td>0.990054</td><td>9.78%</td><td>4.28%</td><td>21.46%</td><td>17.78%</td></tr>
+            <tr><td>0.995000</td><td>10.29%</td><td>4.54%</td><td>26.87%</td><td>18.19%</td></tr>
           </tbody>
         </table>
-        <p>Each percentage divides the active composite-domain L² difference by the corresponding restricted finer-field L² norm. The endpoint active-cell maximum velocity-component difference is 0.521 model units. The two endpoint peak speeds are nearly identical, yet their full velocity and forcing fields differ materially. The manufactured force uses grid-dependent derivatives, so this two-resolution result measures sensitivity rather than a convergence order for one fixed continuum forcing. Timestep refinement and further matched meshes are needed before identifying a resolved interval.</p>
-        <p>The working visualization gate is at most 2% velocity and 5% forcing relative L² difference at predefined matched checkpoints, followed by a fixed-force timestep check below one-quarter of the spatial gap. At 0.995 this pair exceeds both spatial targets. These practical thresholds do not certify a continuum error or singularity; they determine when a precursor movie can be presented as resolution-qualified.</p>
+        <p>Each percentage divides the active composite-domain L² difference by the corresponding restricted finer-field L² norm. Both gaps decrease from 32³→64³ to 64³→128³ at every shown time, but the endpoint 64³→128³ active-cell maximum velocity-component difference is still 0.521 model units. Nearly identical peak speeds do not establish field convergence. The manufactured force uses grid-dependent derivatives, so these three resolutions measure sensitivity rather than an observed convergence order for one fixed continuum forcing. Timestep refinement and further matched meshes are needed before identifying a resolved interval.</p>
+        <p>The working visualization gate is at most 2% velocity and 5% forcing relative L² difference at predefined matched checkpoints, followed by a fixed-force timestep check below one-quarter of the spatial gap. At 0.995 the finest pair exceeds both spatial targets. These practical thresholds do not certify a continuum error or singularity; they determine when a precursor movie can be presented as resolution-qualified.</p>
         <p>A separate <a href="data/temporal-fixed-force-late-control.json">16³-base/two-level timestep control</a> reaches 0.995 with the same discrete force in both runs. Its six matched velocity differences are at most 0.21% relative composite L², with 0.083% at the endpoint. This confirms the comparison method on a coarse mesh; it does not clear the timestep gate for this five-level pair.</p>
 
         <h2 id="precursor-diagnostics">Growth, localization, and residual checks</h2>
