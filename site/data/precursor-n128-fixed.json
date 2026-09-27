@@ -1,0 +1,637 @@
+{
+  "schema_version": 1,
+  "kind": "finite-precursor-native-diagnostics",
+  "source_record_sha256": "f831732d6cad4aaee4ae7f864da41fdbd406f0c329f8adcbc1b325c0ebb27f71",
+  "source_binary_sha256": "d389eabe02b2187e11567275b6b3b39acf15dde0498ed272411326946195ebfc",
+  "source_profile_sha256": "fb613aa587c4bd42d63af26ac783e71f02b0380f570813a027b752a82f20f994",
+  "exporter_sha256": "fe9a5d421e28acccd591dcf2508774c0c963ea66541ce7b5794c4ebd417bbf4c",
+  "checker_sha256": "a4a6ed138f238404f77472ae53846e10c68672b81b2f5fdec181f6c07fca93c8",
+  "analyzer_sha256": "68f909d51211aa9e91fad5ca167d1268e78e0de65d6861f177466504b583f0b4",
+  "definitions": {
+    "half_peak_support_equivalent_radius": "Radius of a sphere with the total active volume where speed is at least half the global peak; it is not a connected-component radius.",
+    "core_half_peak_equivalent_radius": "Same volume-equivalent radius using the finest level only, reported only when the global peak lies on that level; it is not an analytic core radius.",
+    "vorticity_and_divergence": "Centered level-local derivatives only where the cell and all six neighbors are active on one AMR level; interfaces and outer boundary cells are excluded.",
+    "divergence": "Sampled incompressibility diagnostic, not the full discrete momentum residual or a continuum error bound."
+  },
+  "frames": [
+    {
+      "time": 0.699573136094869,
+      "step": 722,
+      "source_frame": "plt00722",
+      "native_sha256": "eee7daf291b6344dcb635f1a0072c1ff564058e5429232933af0a094e058a733",
+      "target_l2_error": 0.000812050267334253,
+      "target_linf_error": 0.0108589953076185,
+      "peak_speed": 0.7537488157282161,
+      "peak_level": 1,
+      "kinetic_energy": 0.14086229749388868,
+      "force_l2": 2.4412741872517585,
+      "half_peak_support_volume": 0.6765404045581818,
+      "half_peak_support_equivalent_radius": 0.5445883875548287,
+      "core_half_peak_volume": 0.0,
+      "core_half_peak_equivalent_radius": null,
+      "derivative_interior_volume": 7.470986299216747,
+      "peak_vorticity": 16.277832643731042,
+      "vorticity_rms": 2.4869626143385095,
+      "divergence_rms": 0.03974839362139784,
+      "divergence_linf": 0.7439438677601666,
+      "levels": [
+        {
+          "level": 0,
+          "active_cells": 1835008,
+          "spacing": [
+            0.015625,
+            0.015625,
+            0.015625
+          ],
+          "derivatives": {
+            "cells": 1713656,
+            "peak_vorticity": 16.277832643731042,
+            "vorticity_squared_sum": 9435901.318616956,
+            "divergence_linf": 0.7439438677601666,
+            "divergence_squared_sum": 2874.0997999927454
+          }
+        },
+        {
+          "level": 1,
+          "active_cells": 1835008,
+          "spacing": [
+            0.0078125,
+            0.0078125,
+            0.0078125
+          ],
+          "derivatives": {
+            "cells": 1713656,
+            "peak_vorticity": 13.196833768496942,
+            "vorticity_squared_sum": 18429428.281513773,
+            "divergence_linf": 0.5994977202770668,
+            "divergence_squared_sum": 1760.4163876364148
+          }
+        },
+        {
+          "level": 2,
+          "active_cells": 1835008,
+          "spacing": [
+            0.00390625,
+            0.00390625,
+            0.00390625
+          ],
+          "derivatives": {
+            "cells": 1713656,
+            "peak_vorticity": 6.054947470420403,
+            "vorticity_squared_sum": 22836944.086409114,
+            "divergence_linf": 0.07052629719952033,
+            "divergence_squared_sum": 7.020308957052208
+          }
+        },
+        {
+          "level": 3,
+          "active_cells": 1835008,
+          "spacing": [
+            0.001953125,
+            0.001953125,
+            0.001953125
+          ],
+          "derivatives": {
+            "cells": 1713656,
+            "peak_vorticity": 4.4255976234485015,
+            "vorticity_squared_sum": 7857281.6325923465,
+            "divergence_linf": 0.005402072395642499,
+            "divergence_squared_sum": 0.02286633758562921
+          }
+        },
+        {
+          "level": 4,
+          "active_cells": 2097152,
+          "spacing": [
+            0.0009765625,
+            0.0009765625,
+            0.0009765625
+          ],
+          "derivatives": {
+            "cells": 2000376,
+            "peak_vorticity": 2.2426092274765965,
+            "vorticity_squared_sum": 5638404.029242903,
+            "divergence_linf": 0.0006176774006263486,
+            "divergence_squared_sum": 0.0017278350020458358
+          }
+        }
+      ]
+    },
+    {
+      "time": 0.851212301475714,
+      "step": 1647,
+      "source_frame": "plt01647",
+      "native_sha256": "da5e28284e14cb4b0e8b50a84c070dea56c9c8ce2da88bb528632c98c5993bc8",
+      "target_l2_error": 0.0019673696250161847,
+      "target_linf_error": 0.0241399209030934,
+      "peak_speed": 1.323043308645912,
+      "peak_level": 2,
+      "kinetic_energy": 0.15307113913864376,
+      "force_l2": 3.4628233963066415,
+      "half_peak_support_volume": 0.22333966009318829,
+      "half_peak_support_equivalent_radius": 0.3763793147059977,
+      "core_half_peak_volume": 0.0002754535526037216,
+      "core_half_peak_equivalent_radius": null,
+      "derivative_interior_volume": 7.470986299216747,
+      "peak_vorticity": 31.31864704469289,
+      "vorticity_rms": 3.569308040965218,
+      "divergence_rms": 0.09426927698368504,
+      "divergence_linf": 1.566874681597815,
+      "levels": [
+        {
+          "level": 0,
+          "active_cells": 1835008,
+          "spacing": [
+            0.015625,
+            0.015625,
+            0.015625
+          ],
+          "derivatives": {
+            "cells": 1713656,
+            "peak_vorticity": 21.283574354329904,
+            "vorticity_squared_sum": 6009212.490993036,
+            "divergence_linf": 1.566874681597815,
+            "divergence_squared_sum": 12979.065190379657
+          }
+        },
+        {
+          "level": 1,
+          "active_cells": 1835008,
+          "spacing": [
+            0.0078125,
+            0.0078125,
+            0.0078125
+          ],
+          "derivatives": {
+            "cells": 1713656,
+            "peak_vorticity": 31.31864704469289,
+            "vorticity_squared_sum": 134311348.5110135,
+            "divergence_linf": 1.4303331912937818,
+            "divergence_squared_sum": 35172.07009964523
+          }
+        },
+        {
+          "level": 2,
+          "active_cells": 1835008,
+          "spacing": [
+            0.00390625,
+            0.00390625,
+            0.00390625
+          ],
+          "derivatives": {
+            "cells": 1713656,
+            "peak_vorticity": 26.832608547641303,
+            "vorticity_squared_sum": 124585105.24404454,
+            "divergence_linf": 0.6202868492831697,
+            "divergence_squared_sum": 1842.5342853587042
+          }
+        },
+        {
+          "level": 3,
+          "active_cells": 1835008,
+          "spacing": [
+            0.001953125,
+            0.001953125,
+            0.001953125
+          ],
+          "derivatives": {
+            "cells": 1713656,
+            "peak_vorticity": 14.703565047542275,
+            "vorticity_squared_sum": 101065162.14329103,
+            "divergence_linf": 0.030674891459508302,
+            "divergence_squared_sum": 1.3888819326083066
+          }
+        },
+        {
+          "level": 4,
+          "active_cells": 2097152,
+          "spacing": [
+            0.0009765625,
+            0.0009765625,
+            0.0009765625
+          ],
+          "derivatives": {
+            "cells": 2000376,
+            "peak_vorticity": 6.943315439503978,
+            "vorticity_squared_sum": 35704627.520180926,
+            "divergence_linf": 0.003410939766119725,
+            "divergence_squared_sum": 0.02254973180802766
+          }
+        }
+      ]
+    },
+    {
+      "time": 0.9499330850269804,
+      "step": 2887,
+      "source_frame": "plt02887",
+      "native_sha256": "a4ba0be2c90ed976f541394df36adca490371250893905d4009cb5f276e028b7",
+      "target_l2_error": 0.0018658951945841062,
+      "target_linf_error": 0.03870173444234863,
+      "peak_speed": 2.300192771041222,
+      "peak_level": 3,
+      "kinetic_energy": 0.09375819792745085,
+      "force_l2": 8.45276959051923,
+      "half_peak_support_volume": 0.046151455491781235,
+      "half_peak_support_equivalent_radius": 0.2225182304372678,
+      "core_half_peak_volume": 0.000918995589017868,
+      "core_half_peak_equivalent_radius": null,
+      "derivative_interior_volume": 7.470986299216747,
+      "peak_vorticity": 106.35314665261039,
+      "vorticity_rms": 5.007424399073987,
+      "divergence_rms": 0.12959900334564958,
+      "divergence_linf": 6.690196677013303,
+      "levels": [
+        {
+          "level": 0,
+          "active_cells": 1835008,
+          "spacing": [
+            0.015625,
+            0.015625,
+            0.015625
+          ],
+          "derivatives": {
+            "cells": 1713656,
+            "peak_vorticity": 5.096406431729238,
+            "vorticity_squared_sum": 63671.96121693194,
+            "divergence_linf": 0.6854319303168062,
+            "divergence_squared_sum": 356.42358329764534
+          }
+        },
+        {
+          "level": 1,
+          "active_cells": 1835008,
+          "spacing": [
+            0.0078125,
+            0.0078125,
+            0.0078125
+          ],
+          "derivatives": {
+            "cells": 1713656,
+            "peak_vorticity": 76.71519550245105,
+            "vorticity_squared_sum": 155409021.61396423,
+            "divergence_linf": 4.697373095394816,
+            "divergence_squared_sum": 225450.5811055095
+          }
+        },
+        {
+          "level": 2,
+          "active_cells": 1835008,
+          "spacing": [
+            0.00390625,
+            0.00390625,
+            0.00390625
+          ],
+          "derivatives": {
+            "cells": 1713656,
+            "peak_vorticity": 106.35314665261039,
+            "vorticity_squared_sum": 1724190980.2669678,
+            "divergence_linf": 6.690196677013303,
+            "divergence_squared_sum": 277521.34641820606
+          }
+        },
+        {
+          "level": 3,
+          "active_cells": 1835008,
+          "spacing": [
+            0.001953125,
+            0.001953125,
+            0.001953125
+          ],
+          "derivatives": {
+            "cells": 1713656,
+            "peak_vorticity": 95.30822241553614,
+            "vorticity_squared_sum": 1283542998.7116158,
+            "divergence_linf": 2.0044088564082436,
+            "divergence_squared_sum": 10405.089342719395
+          }
+        },
+        {
+          "level": 4,
+          "active_cells": 2097152,
+          "spacing": [
+            0.0009765625,
+            0.0009765625,
+            0.0009765625
+          ],
+          "derivatives": {
+            "cells": 2000376,
+            "peak_vorticity": 40.62232689043152,
+            "vorticity_squared_sum": 696996080.6926682,
+            "divergence_linf": 0.030003601352234455,
+            "divergence_squared_sum": 3.801251663820109
+          }
+        }
+      ]
+    },
+    {
+      "time": 0.9799170469879851,
+      "step": 3927,
+      "source_frame": "plt03927",
+      "native_sha256": "ebce92573f3a0f04e80039e31722e49dc55d8c0184a99eb7b4781c2dc6d427fc",
+      "target_l2_error": 0.0018610931812153744,
+      "target_linf_error": 0.11376276281682404,
+      "peak_speed": 3.658861023716579,
+      "peak_level": 3,
+      "kinetic_energy": 0.06384947557611502,
+      "force_l2": 17.667135564397725,
+      "half_peak_support_volume": 0.012728984467685223,
+      "half_peak_support_equivalent_radius": 0.144844402219327,
+      "core_half_peak_volume": 0.0007242513820528984,
+      "core_half_peak_equivalent_radius": null,
+      "derivative_interior_volume": 7.470986299216747,
+      "peak_vorticity": 307.9561388559606,
+      "vorticity_rms": 6.738637525186678,
+      "divergence_rms": 0.15524242062582858,
+      "divergence_linf": 12.997324210667884,
+      "levels": [
+        {
+          "level": 0,
+          "active_cells": 1835008,
+          "spacing": [
+            0.015625,
+            0.015625,
+            0.015625
+          ],
+          "derivatives": {
+            "cells": 1713656,
+            "peak_vorticity": 3.7022076771941483,
+            "vorticity_squared_sum": 53109.84911242078,
+            "divergence_linf": 0.049577650520625405,
+            "divergence_squared_sum": 4.284311229478467
+          }
+        },
+        {
+          "level": 1,
+          "active_cells": 1835008,
+          "spacing": [
+            0.0078125,
+            0.0078125,
+            0.0078125
+          ],
+          "derivatives": {
+            "cells": 1713656,
+            "peak_vorticity": 79.25701858541922,
+            "vorticity_squared_sum": 19382934.980364162,
+            "divergence_linf": 7.654478876626918,
+            "divergence_squared_sum": 77724.64747406353
+          }
+        },
+        {
+          "level": 2,
+          "active_cells": 1835008,
+          "spacing": [
+            0.00390625,
+            0.00390625,
+            0.00390625
+          ],
+          "derivatives": {
+            "cells": 1713656,
+            "peak_vorticity": 260.09039205667824,
+            "vorticity_squared_sum": 3874515188.5011706,
+            "divergence_linf": 12.997324210667884,
+            "divergence_squared_sum": 2263460.014587078
+          }
+        },
+        {
+          "level": 3,
+          "active_cells": 1835008,
+          "spacing": [
+            0.001953125,
+            0.001953125,
+            0.001953125
+          ],
+          "derivatives": {
+            "cells": 1713656,
+            "peak_vorticity": 307.9561388559606,
+            "vorticity_squared_sum": 12243649248.38684,
+            "divergence_linf": 11.850601144869282,
+            "divergence_squared_sum": 1081813.7716740333
+          }
+        },
+        {
+          "level": 4,
+          "active_cells": 2097152,
+          "spacing": [
+            0.0009765625,
+            0.0009765625,
+            0.0009765625
+          ],
+          "derivatives": {
+            "cells": 2000376,
+            "peak_vorticity": 112.40461802948276,
+            "vorticity_squared_sum": 8209055924.45936,
+            "divergence_linf": 1.127157129302752,
+            "divergence_squared_sum": 1200.7140814424806
+          }
+        }
+      ]
+    },
+    {
+      "time": 0.990053831007693,
+      "step": 4727,
+      "source_frame": "plt04727",
+      "native_sha256": "813153686c95f2768b02e0e73420c4370e7aa49b1283bfda0eb6779c29ffac8d",
+      "target_l2_error": 0.0017757101470177359,
+      "target_linf_error": 0.094259409120875,
+      "peak_speed": 5.228023885997457,
+      "peak_level": 4,
+      "kinetic_energy": 0.04869099819542168,
+      "force_l2": 31.76715937143825,
+      "half_peak_support_volume": 0.004662804305553436,
+      "half_peak_support_equivalent_radius": 0.10363812005751674,
+      "core_half_peak_volume": 0.0005762800574302673,
+      "core_half_peak_equivalent_radius": 0.05162360477041438,
+      "derivative_interior_volume": 7.470986299216747,
+      "peak_vorticity": 675.2901836049588,
+      "vorticity_rms": 8.470478234743052,
+      "divergence_rms": 0.19968786986326686,
+      "divergence_linf": 31.026036905464977,
+      "levels": [
+        {
+          "level": 0,
+          "active_cells": 1835008,
+          "spacing": [
+            0.015625,
+            0.015625,
+            0.015625
+          ],
+          "derivatives": {
+            "cells": 1713656,
+            "peak_vorticity": 3.7503265876256386,
+            "vorticity_squared_sum": 53142.457905280855,
+            "divergence_linf": 0.04380600042305355,
+            "divergence_squared_sum": 4.1109741586843915
+          }
+        },
+        {
+          "level": 1,
+          "active_cells": 1835008,
+          "spacing": [
+            0.0078125,
+            0.0078125,
+            0.0078125
+          ],
+          "derivatives": {
+            "cells": 1713656,
+            "peak_vorticity": 35.683438320828145,
+            "vorticity_squared_sum": 10101199.418458913,
+            "divergence_linf": 1.3708235065054755,
+            "divergence_squared_sum": 1284.6630092493972
+          }
+        },
+        {
+          "level": 2,
+          "active_cells": 1835008,
+          "spacing": [
+            0.00390625,
+            0.00390625,
+            0.00390625
+          ],
+          "derivatives": {
+            "cells": 1713656,
+            "peak_vorticity": 379.4487948675665,
+            "vorticity_squared_sum": 2303690639.5587645,
+            "divergence_linf": 22.863989790237852,
+            "divergence_squared_sum": 3674189.6635260326
+          }
+        },
+        {
+          "level": 3,
+          "active_cells": 1835008,
+          "spacing": [
+            0.001953125,
+            0.001953125,
+            0.001953125
+          ],
+          "derivatives": {
+            "cells": 1713656,
+            "peak_vorticity": 661.7300616912876,
+            "vorticity_squared_sum": 47147910693.79576,
+            "divergence_linf": 31.026036905464977,
+            "divergence_squared_sum": 10431965.612081815
+          }
+        },
+        {
+          "level": 4,
+          "active_cells": 2097152,
+          "spacing": [
+            0.0009765625,
+            0.0009765625,
+            0.0009765625
+          ],
+          "derivatives": {
+            "cells": 2000376,
+            "peak_vorticity": 675.2901836049588,
+            "vorticity_squared_sum": 45555093451.0513,
+            "divergence_linf": 7.742829593305196,
+            "divergence_squared_sum": 597198.4002019234
+          }
+        }
+      ]
+    },
+    {
+      "time": 0.995,
+      "step": 5510,
+      "source_frame": "plt05510",
+      "native_sha256": "7464cf04db732ff6ccd5e076419950a581c1db8fd2c8878b20349c6525491c6d",
+      "target_l2_error": 0.0017580176354222877,
+      "target_linf_error": 0.28090791077345045,
+      "peak_speed": 7.415298767108944,
+      "peak_level": 4,
+      "kinetic_energy": 0.03828923218063788,
+      "force_l2": 56.38993163651905,
+      "half_peak_support_volume": 0.0017346832901239395,
+      "half_peak_support_equivalent_radius": 0.07453790725751912,
+      "core_half_peak_volume": 0.0006407592445611954,
+      "core_half_peak_equivalent_radius": 0.05348131663746079,
+      "derivative_interior_volume": 7.470986299216747,
+      "peak_vorticity": 1528.1368482338507,
+      "vorticity_rms": 10.81756371413577,
+      "divergence_rms": 0.22414109007176844,
+      "divergence_linf": 52.818126288356154,
+      "levels": [
+        {
+          "level": 0,
+          "active_cells": 1835008,
+          "spacing": [
+            0.015625,
+            0.015625,
+            0.015625
+          ],
+          "derivatives": {
+            "cells": 1713656,
+            "peak_vorticity": 3.825075136163399,
+            "vorticity_squared_sum": 53161.26652730492,
+            "divergence_linf": 0.04382972988662964,
+            "divergence_squared_sum": 4.047455607462934
+          }
+        },
+        {
+          "level": 1,
+          "active_cells": 1835008,
+          "spacing": [
+            0.0078125,
+            0.0078125,
+            0.0078125
+          ],
+          "derivatives": {
+            "cells": 1713656,
+            "peak_vorticity": 35.04634042859003,
+            "vorticity_squared_sum": 10153613.679922424,
+            "divergence_linf": 0.4291440989534122,
+            "divergence_squared_sum": 689.6883989300957
+          }
+        },
+        {
+          "level": 2,
+          "active_cells": 1835008,
+          "spacing": [
+            0.00390625,
+            0.00390625,
+            0.00390625
+          ],
+          "derivatives": {
+            "cells": 1713656,
+            "peak_vorticity": 327.5776093974746,
+            "vorticity_squared_sum": 691666626.1746645,
+            "divergence_linf": 29.767597794328395,
+            "divergence_squared_sum": 1229800.427400751
+          }
+        },
+        {
+          "level": 3,
+          "active_cells": 1835008,
+          "spacing": [
+            0.001953125,
+            0.001953125,
+            0.001953125
+          ],
+          "derivatives": {
+            "cells": 1713656,
+            "peak_vorticity": 1235.4585550187496,
+            "vorticity_squared_sum": 72472664215.39369,
+            "divergence_linf": 52.818126288356154,
+            "divergence_squared_sum": 37192639.08197844
+          }
+        },
+        {
+          "level": 4,
+          "active_cells": 2097152,
+          "spacing": [
+            0.0009765625,
+            0.0009765625,
+            0.0009765625
+          ],
+          "derivatives": {
+            "cells": 2000376,
+            "peak_vorticity": 1528.1368482338507,
+            "vorticity_squared_sum": 309257055777.9099,
+            "divergence_linf": 52.066844096730534,
+            "divergence_squared_sum": 26396551.620822087
+          }
+        }
+      ]
+    }
+  ],
+  "validated": true
+}

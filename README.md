@@ -66,6 +66,16 @@ model units**. See the
 identical peak speeds do not establish convergence, and the manufactured force
 itself changes with grid spacing.
 
+An [audited native diagnostic trace](site/results.html#precursor-diagnostics)
+at the same six times shows increasing peak speed and sampled vorticity and a
+shrinking half-peak support volume. At `t=0.995`, the vorticity maximum changes
+by 16.2% between 64³ and 128³, and the local finest-level half-peak radius
+does not contract from the preceding checkpoint. Centered divergence sampled
+away from AMR interfaces is reported separately from the target deviation;
+neither is a full momentum residual. The machine-readable [64³](site/data/precursor-n64-fixed.json)
+and [128³](site/data/precursor-n128-fixed.json) records retain all six
+checkpoint measurements, hashes, and exact diagnostic definitions.
+
 The working completion goal is a **resolution-qualified precursor movie**:
 identify the latest interval where matched full-field, source and timestep
 refinements show decreasing differences; report peak growth, core contraction,
