@@ -54,6 +54,24 @@ and diagnostic quadrature depend on the mesh.
 [Run details and limitations](site/results.html) ·
 [Backend validation](site/refinement.html).
 
+The earlier fixed-cube pair provides a controlled spatial-sensitivity check:
+Oliver's 64³-base and Kay's 128³-base runs both completed from rest through
+`t=0.995` with the same binary, force profile, refinement regions and output
+clock. Restricting six matched finer fields to the coarse grid gives a relative
+velocity L² difference rising from **2.29% at `t≈0.700` to 4.54% at `t=0.995`**;
+the endpoint maximum component difference is **0.521 model units**. See the
+[native-field comparison](site/data/paired-refinement-20260927.json). Nearly
+identical peak speeds do not establish convergence, and the manufactured force
+itself changes with grid spacing.
+
+The working completion goal is a **resolution-qualified precursor movie**:
+identify the latest interval where matched full-field, source and timestep
+refinements show decreasing differences; report peak growth, core contraction,
+vorticity, energy and numerical residuals there; and label any extension toward
+`t*=1` as a model extrapolation. A 32³-base control on Mali and a 96³-base
+intermediate run on Kay were launched on September 27, 2026 after validated
+same-binary preflights. They are not yet part of the completed comparison.
+
 ## Earlier PhiFlow publication workflow
 
 With noninteractive GitHub authentication configured, the publisher detects
