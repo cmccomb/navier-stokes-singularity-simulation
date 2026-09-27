@@ -79,7 +79,7 @@ def load_branch(paths: list[Path]) -> tuple[list[dict], list[dict], dict]:
 def measure_pair(baseline_paths: list[Path], half_paths: list[Path]) -> dict:
     baseline, bruns, bprobe = load_branch(baseline_paths)
     half, hruns, hprobe = load_branch(half_paths)
-    compatible(bprobe, hprobe)
+    control_audit = compatible(bprobe, hprobe, bruns[0])
     times = [manifest["frames"][0]["export"]["time"] for manifest in baseline]
     half_times = [manifest["frames"][0]["export"]["time"] for manifest in half]
     if any(abs(a - b) > 1e-12 for a, b in zip(times, half_times, strict=True)):
@@ -105,9 +105,29 @@ def measure_pair(baseline_paths: list[Path], half_paths: list[Path]) -> dict:
         for path, manifest in zip(half_paths, half, strict=True)
     ]
     sums: dict[str, dict] = {}
+    force_field = {
+        "difference_squared_integral": 0.0,
+        "reference_squared_integral": 0.0,
+        "volume": 0.0,
+        "max_component_difference": 0.0,
+    }
     for block in blocks:
         h = float(block["spacing"][0])
-        mask = eroded_active(active_mask(block, blocks))
+        active = active_mask(block, blocks)
+        force_a = values(raw_a[2], block)[..., 3:][active]
+        force_b = values(raw_b[2], block)[..., 3:][active]
+        delta = force_a - force_b
+        dv = h**3
+        force_field["difference_squared_integral"] += float(np.square(delta).sum()) * dv
+        force_field["reference_squared_integral"] += (
+            float(np.square(force_a).sum()) * dv
+        )
+        force_field["volume"] += int(active.sum()) * dv
+        if delta.size:
+            force_field["max_component_difference"] = max(
+                force_field["max_component_difference"], float(np.abs(delta).max())
+            )
+        mask = eroded_active(active)
         if not mask.any():
             continue
         fields_a = [values(path, block) for path in raw_a]
@@ -166,11 +186,26 @@ def measure_pair(baseline_paths: list[Path], half_paths: list[Path]) -> dict:
             if denominator
             else None
         )
-        force = row["rms"]["force_curl"]
-        if force["difference"] > 1e-10 + 1e-8 * force["baseline"]:
-            raise ValueError("fixed force differs between time branches")
     if not sums.get("all_interior") or not sums.get("finest_core_interior"):
         raise ValueError("no common interior samples")
+    if not math.isclose(force_field["volume"], 8, rel_tol=0, abs_tol=1e-12):
+        raise ValueError("fixed force fields lack full active coverage")
+    force_field["reference_rms"] = math.sqrt(
+        force_field["reference_squared_integral"] / force_field["volume"]
+    )
+    force_field["difference_rms"] = math.sqrt(
+        force_field["difference_squared_integral"] / force_field["volume"]
+    )
+    force_field["relative_l2_difference"] = (
+        math.sqrt(
+            force_field["difference_squared_integral"]
+            / force_field["reference_squared_integral"]
+        )
+        if force_field["reference_squared_integral"]
+        else None
+    )
+    if force_field["difference_rms"] > 1e-10 + 1e-8 * force_field["reference_rms"]:
+        raise ValueError("fixed force fields differ materially between time branches")
     return {
         "schema_version": 1,
         "kind": "local-dense-vorticity-balance-time-sensitivity",
@@ -186,6 +221,8 @@ def measure_pair(baseline_paths: list[Path], half_paths: list[Path]) -> dict:
         ],
         "source_binary_sha256": bruns[0]["binary_sha256"],
         "source_profile_sha256": baseline[0]["profile_sha256"],
+        "time_controls": control_audit,
+        "force_field_identity": force_field,
         "analyzer_sha256": sha(Path(__file__)),
         "regions": sums,
         "scope": __doc__.strip(),

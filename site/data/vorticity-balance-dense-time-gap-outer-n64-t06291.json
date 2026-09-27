@@ -1,0 +1,128 @@
+{
+  "schema_version": 1,
+  "kind": "local-dense-vorticity-balance-time-sensitivity",
+  "times": [
+    0.6280714295556976,
+    0.6285714295556977,
+    0.6290714295556976,
+    0.6295714295556976,
+    0.6300714295556976
+  ],
+  "center_time": 0.6290714295556976,
+  "source_snapshot_sha256": [
+    [
+      "d9b54574078c439a95c4b016c89081902c9c46d74ac19ba016fa2e10171e00ca",
+      "97387996918d719f658f32a998d0f692931d8686dedf72056cc5b1255d90e56c",
+      "62436ded955862aebaaf4df52238e0f4b2078390b8db46820960f7a0bdce8902",
+      "3de6b2cf58a651a8d89ebc4c6693f8ad17701ca62a51d7fc56c80ed57d3d8bee",
+      "1b9b26132c0033280f3055e3c3251b377db13e59e1efec303444a6b763422d2f"
+    ],
+    [
+      "0e7e7453d671d47b20931420d1e4d4b80facb64fe923f3a4f3de6e1b5ab930d9",
+      "c4335589746f5f9e76be87381975de542e15ff7d065e39f5dd3c24e3b99c5be2",
+      "246ccaf0d6a83e4bcf84bcfb487c1bcb99888e6ad6dfe88bc29059b5a36aba7b",
+      "8bcb1f85a3ebc98b3ceb274eec76058fde1c3059eabc36a47392022d910928b6",
+      "c29ce3c3f738461606727e22f8dc0bc328c020efcb589dc6ccd05690e9bf4c59"
+    ]
+  ],
+  "source_probe_sha256": [
+    "558898464ead8590f18d5cb73dd2573a62c1b2000b1656f5a594e84821a991bf",
+    "60dda6b262ef364d4b2f202c53616100cb0899e0e43923f08b2467e548fead45"
+  ],
+  "source_binary_sha256": "92a0c36aff5cbef1cc9ed45c19da5e0a7610c68c361c4a9b1b1264203b356ecd",
+  "source_profile_sha256": "fb613aa587c4bd42d63af26ac783e71f02b0380f570813a027b752a82f20f994",
+  "time_controls": {
+    "baseline": {
+      "time_factor": 1,
+      "max_dt": 0.00025,
+      "integration_phase_step": 0.0375,
+      "force_definition_unchanged": true,
+      "inferred_from_pinned_legacy_runner": true
+    },
+    "half": {
+      "time_factor": 0.5,
+      "max_dt": 0.000125,
+      "integration_phase_step": 0.01875,
+      "force_definition_unchanged": true,
+      "inferred_from_pinned_legacy_runner": false
+    }
+  },
+  "force_field_identity": {
+    "difference_squared_integral": 0.0,
+    "reference_squared_integral": 30.94243099210205,
+    "volume": 8.0,
+    "max_component_difference": 0.0,
+    "reference_rms": 1.966673301291487,
+    "difference_rms": 0.0,
+    "relative_l2_difference": 0.0
+  },
+  "analyzer_sha256": "78d1c6b0d25ca580b9dd82b49ba2d14138897318b7c948cae9a3e88ee1213ce6",
+  "regions": {
+    "all_interior": {
+      "cells": 809566,
+      "volume": 3.85916805267334,
+      "rms": {
+        "residual_five": {
+          "baseline": 1.4229755918020162,
+          "half": 1.2238778054191335,
+          "difference": 0.24268790431151183
+        },
+        "time_curl_five": {
+          "baseline": 23.14380873729402,
+          "half": 23.143036624933316,
+          "difference": 0.2048059137433361
+        },
+        "advection_curl": {
+          "baseline": 0.38608957879711925,
+          "half": 0.3860870492022048,
+          "difference": 0.0003664191931393965
+        },
+        "viscous_curl": {
+          "baseline": 9.977757635191576,
+          "half": 9.980471950250612,
+          "difference": 0.04290611475176059
+        },
+        "force_curl": {
+          "baseline": 29.51064664750736,
+          "half": 29.51064664750736,
+          "difference": 0.0
+        }
+      },
+      "relative_residual_difference_to_term_sum": 0.003851070154278819
+    },
+    "finest_core_interior": {
+      "cells": 175616,
+      "volume": 0.001308441162109375,
+      "rms": {
+        "residual_five": {
+          "baseline": 0.013592786090462853,
+          "half": 0.008195867994327059,
+          "difference": 0.010467935273719323
+        },
+        "time_curl_five": {
+          "baseline": 14.029103162211078,
+          "half": 14.029116131691561,
+          "difference": 0.00103984232328976
+        },
+        "advection_curl": {
+          "baseline": 0.44264828250498695,
+          "half": 0.4426490178850597,
+          "difference": 4.254431649054248e-05
+        },
+        "viscous_curl": {
+          "baseline": 5.773592169947893,
+          "half": 5.77361516934129,
+          "difference": 0.010757999885216973
+        },
+        "force_curl": {
+          "baseline": 16.050995770184677,
+          "half": 16.050995770184677,
+          "difference": 0.0
+        }
+      },
+      "relative_residual_difference_to_term_sum": 0.0002884019559859253
+    }
+  },
+  "scope": "Compare sampled vorticity-balance fields across fixed-force dense time branches.\n\nBoth branches share one from-rest checkpoint and 17 saved event times. This is\nlocal timestep sensitivity of a sampled postprocessed balance, not a solver\nresidual, continuum error bound, or test of inherited pre-checkpoint error.",
+  "validated": true
+}

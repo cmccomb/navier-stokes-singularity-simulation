@@ -79,11 +79,12 @@ def test_fieldwise_residual_gap_and_force_identity(tmp_path, monkeypatch):
     assert core["volume"] == pytest.approx(1)
     assert core["rms"]["residual_five"]["difference"] == pytest.approx(0.1)
     assert core["rms"]["force_curl"]["difference"] == 0
+    assert result["force_field_identity"]["difference_rms"] == 0
     changed_force = branch(tmp_path, "force-shift", 1.1, 0.2)
     monkeypatch.setattr(
         subject,
         "load_branch",
         lambda paths: baseline[1:] if paths[0] == baseline[0][0] else changed_force[1:],
     )
-    with pytest.raises(ValueError, match="fixed force differs"):
+    with pytest.raises(ValueError, match="fixed force fields differ"):
         subject.measure_pair(baseline[0], changed_force[0])

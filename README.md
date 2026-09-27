@@ -114,8 +114,12 @@ reduces the finest-core three-versus-five-frame derivative difference from
 roughly 0.04 to 0.00025–0.00028. Its measured residual rises from 0.00293
 to 0.01359 over the candidate centers and differs from the sparse estimate.
 The [three dense balance records](site/results.html#precursor-diagnostics)
-do not establish residual convergence; a matched dense 128³ check and the
-independent fixed-force half-step comparison remain open.
+do not establish residual convergence. A completed
+[local fixed-force half-step comparison](site/data/outer-dense-n64-local-time.json)
+passes the candidate velocity gate at all three centers (0.0340%, 0.0224%,
+0.00835% relative L²), while [fieldwise balance gaps](site/results.html#precursor-diagnostics)
+remain comparable to the measured residuals. These branches share a checkpoint,
+so a from-rest 64³ half-step run and matched dense 128³ balance are still needed.
 
 An [audited native diagnostic trace](site/results.html#precursor-diagnostics)
 at the same six times shows increasing peak speed and sampled vorticity and a
