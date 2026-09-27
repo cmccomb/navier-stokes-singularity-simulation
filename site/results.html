@@ -100,6 +100,17 @@
           </tbody>
         </table>
         <p>At 0.995 the 128³ run has kinetic energy 0.038289 model units. Its sampled divergence RMS is 0.2241 over 7.471 of the domain’s 8 volume units; the 64³ value is 0.3356 over 6.955. Centered derivatives use only cells with six active neighbors on the same level, excluding AMR interfaces and outer boundaries. This divergence is an incompressibility diagnostic, not a full momentum residual. The endpoint vorticity maximum rises 16.2% under refinement. The finest-level half-peak radius also rises slightly between 0.990054 and 0.995, so contraction of that core measure is not established, even though the broader high-speed support shrinks. These traces remain finite-resolution evidence, not a singularity forecast.</p>
+        <h3>Candidate-prefix growth and localization</h3>
+        <p>The <a href="data/outer-precursor-n64-candidate.json">64³ outer-band record</a> and <a href="data/outer-precursor-n128-candidate.json">128³ outer-band record</a> audit peak, energy, force norm, half-peak support, vorticity, and sampled divergence at the three spatial-screen passes. Each table cell gives the 64³ value followed by the 128³ value. The 64³ source trajectory is still running; only these selected native frames have passed this diagnostic audit.</p>
+        <table>
+          <thead><tr><th scope="col">Time</th><th scope="col">Peak speed<br>64³ / 128³</th><th scope="col">Half-peak support radius<br>64³ / 128³</th><th scope="col">Peak |vorticity|<br>64³ / 128³</th><th scope="col">Kinetic energy<br>64³ / 128³</th></tr></thead>
+          <tbody>
+            <tr><td>0.615808</td><td>0.0968 / 0.0969</td><td>0.6662 / 0.6677</td><td>2.20 / 2.40</td><td>0.00343 / 0.00349</td></tr>
+            <tr><td>0.622498</td><td>0.1351 / 0.1352</td><td>0.6527 / 0.6590</td><td>3.15 / 3.46</td><td>0.00648 / 0.00660</td></tr>
+            <tr><td>0.629071</td><td>0.1774 / 0.1776</td><td>0.6399 / 0.6473</td><td>4.23 / 4.65</td><td>0.01085 / 0.01104</td></tr>
+          </tbody>
+        </table>
+        <p>The global peak lies on level 1 at all three times, outside the prescribed finest core, so no finest-core half-peak radius is reported. The broader half-peak support shrinks, but its equivalent radius remains about 0.64–0.67 model units. The finer grid raises the sampled vorticity maximum by roughly 9–10%; its derivative-interior volume also differs. These early states show broad activation and do not establish a localized precursor or a bound on later energy.</p>
         <h3>Pressure-free balance on the candidate prefix</h3>
         <p>Five archived outer-band states around each candidate checkpoint give a sampled curl-momentum diagnostic, ∇×[∂<sub>t</sub>u + (u·∇)u − νΔu − f]. Pressure drops out under the curl. The <a href="data/vorticity-balance-outer-n64-t06158.json">64³</a> and <a href="data/vorticity-balance-outer-n128-t06158.json">128³</a> records at 0.615808, the <a href="data/vorticity-balance-outer-n64-t06225.json">64³</a> and <a href="data/vorticity-balance-outer-n128-t06225.json">128³</a> records at 0.622498, and the <a href="data/vorticity-balance-outer-n64-t06291.json">64³</a> and <a href="data/vorticity-balance-outer-n128-t06291.json">128³</a> records at 0.629071 retain source hashes, sampled volumes, and term norms. Each derivative uses active cells with a two-cell neighborhood inside one native block.</p>
         <table>

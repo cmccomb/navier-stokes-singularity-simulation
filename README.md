@@ -92,6 +92,15 @@ audit, refined fixed-force timestep control, and diagnostic gates remain
 outstanding. The next locked checkpoints at `t=0.648114` and `0.666178` fail
 the forcing screen at 5.559% and 6.960%; six later checkpoints are pending.
 
+The [outer-band candidate diagnostics](site/results.html#precursor-diagnostics)
+show rising peak speed and sampled vorticity with shrinking broad half-peak
+support, but all three global peaks lie on level 1, outside the finest core.
+The 128³ sampled vorticity maximum is about 9–10% higher than the 64³ value.
+The spatial-screen passes therefore do not yet support a localized singularity
+precursor. The machine-readable [64³](site/data/outer-precursor-n64-candidate.json)
+and [128³](site/data/outer-precursor-n128-candidate.json) records retain hashes,
+energy, forcing, divergence, sampled volumes, and exact definitions.
+
 A [five-frame pressure-free balance diagnostic](site/results.html#precursor-diagnostics)
 now covers all three candidate checkpoints on both outer-band meshes. It
 samples the curl of the momentum equation only where every needed same-block

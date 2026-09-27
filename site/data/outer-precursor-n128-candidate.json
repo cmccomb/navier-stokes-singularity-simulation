@@ -1,0 +1,255 @@
+{
+  "schema_version": 1,
+  "kind": "outer-band-finite-precursor-diagnostics",
+  "source_snapshot_sha256": [
+    "a32f875665bbf424433f543bcc24c03588b9e2165ad9ce8bdbb124a23e575d58",
+    "9638684a860544f210700bb6f8da6826604bf2573d6071a7a2d9b49cf61edd3c",
+    "22e29171bca80aa89e94d539b17947da7f63b5ad955e6128d3ea389a715537ea"
+  ],
+  "source_run_state": [
+    {
+      "status": "completed",
+      "validated": true
+    },
+    {
+      "status": "completed",
+      "validated": true
+    },
+    {
+      "status": "completed",
+      "validated": true
+    }
+  ],
+  "source_binary_sha256": "92a0c36aff5cbef1cc9ed45c19da5e0a7610c68c361c4a9b1b1264203b356ecd",
+  "source_profile_sha256": "fb613aa587c4bd42d63af26ac783e71f02b0380f570813a027b752a82f20f994",
+  "analyzer_sha256": "5148f3c8f3129d130095e585ec708fdaa31841b5e6870927e5ffc1845f926f37",
+  "core_half_width": 0.0625,
+  "definitions": {
+    "support_radius": "Volume-equivalent radius of all active cells with speed at least half the global peak; not a connected core radius.",
+    "core_radius": "Volume-equivalent radius of the finest-level half-peak cells inside the prescribed central cube, reported only if the global peak occurs there.",
+    "derivatives": "Centered same-block active-cell interior only; AMR interfaces, patch edges, and outer boundaries excluded."
+  },
+  "frames": [
+    {
+      "time": 0.6158075087303938,
+      "step": 335,
+      "native_sha256": "c27a685306ef9ed90d27e50b3ed8eaa84f121501e64206f245283cd31b6deed4",
+      "target_l2_error": 9.689842194444529e-05,
+      "target_linf_error": 0.0011993369090695324,
+      "peak_speed": 0.09688129288672757,
+      "peak_level": 1,
+      "peak_in_finest_core": false,
+      "kinetic_energy": 0.0034906666916660924,
+      "force_l2": 1.618874018241314,
+      "half_peak_support_volume": 1.24673393368721,
+      "half_peak_support_equivalent_radius": 0.6676697861145269,
+      "finest_core_half_peak_volume": 0.0,
+      "finest_core_half_peak_equivalent_radius": null,
+      "derivative_interior_volume": 6.359397888183594,
+      "peak_vorticity": 2.4022383749947274,
+      "vorticity_rms": 0.3806085385346835,
+      "divergence_rms": 0.003802951943531712,
+      "divergence_linf": 0.06942631996597293,
+      "levels": [
+        {
+          "level": 0,
+          "active_cells": 1638848,
+          "derivative_cells": 1305097,
+          "derivative_volume": 4.978549957275391,
+          "vorticity_squared_integral": 0.532065340794328,
+          "divergence_squared_integral": 6.695066504302159e-05,
+          "peak_vorticity": 1.8088897618834074,
+          "divergence_linf": 0.05380658955238038
+        },
+        {
+          "level": 1,
+          "active_cells": 3404288,
+          "derivative_cells": 2679848,
+          "derivative_volume": 1.2778511047363281,
+          "vorticity_squared_integral": 0.3733976599025225,
+          "divergence_squared_integral": 2.5020977522989194e-05,
+          "peak_vorticity": 2.4022383749947274,
+          "divergence_linf": 0.06942631996597293
+        },
+        {
+          "level": 2,
+          "active_cells": 1835008,
+          "derivative_cells": 1512000,
+          "derivative_volume": 0.09012222290039062,
+          "vorticity_squared_integral": 0.015171004370360954,
+          "divergence_squared_integral": 7.895606945310728e-10,
+          "peak_vorticity": 0.6893402169357085,
+          "divergence_linf": 0.0007610998181264428
+        },
+        {
+          "level": 3,
+          "active_cells": 1835008,
+          "derivative_cells": 1512000,
+          "derivative_volume": 0.011265277862548828,
+          "vorticity_squared_integral": 0.0005458394810504421,
+          "divergence_squared_integral": 4.1265870361897373e-13,
+          "peak_vorticity": 0.4312856994517438,
+          "divergence_linf": 0.00012090830953404019
+        },
+        {
+          "level": 4,
+          "active_cells": 2097152,
+          "derivative_cells": 1728000,
+          "derivative_volume": 0.0016093254089355469,
+          "vorticity_squared_integral": 6.071890324022025e-05,
+          "divergence_squared_integral": 1.592161934502457e-14,
+          "peak_vorticity": 0.25485087240450793,
+          "divergence_linf": 0.0001026611316534698
+        }
+      ]
+    },
+    {
+      "time": 0.6224977197922241,
+      "step": 362,
+      "native_sha256": "6491df0a7a935f15a3b3554bee03b38eaee1ca6898328f5a8438125f88e6075c",
+      "target_l2_error": 0.0001336655439121832,
+      "target_linf_error": 0.0017030095055996517,
+      "peak_speed": 0.13523115039681924,
+      "peak_level": 1,
+      "peak_in_finest_core": false,
+      "kinetic_energy": 0.006597088202821977,
+      "force_l2": 1.8337746098251477,
+      "half_peak_support_volume": 1.1990376114845276,
+      "half_peak_support_equivalent_radius": 0.6590444883368931,
+      "finest_core_half_peak_volume": 0.0,
+      "finest_core_half_peak_equivalent_radius": null,
+      "derivative_interior_volume": 6.359397888183594,
+      "peak_vorticity": 3.456598407388686,
+      "vorticity_rms": 0.5230239882467769,
+      "divergence_rms": 0.005290600169432497,
+      "divergence_linf": 0.10459159465077272,
+      "levels": [
+        {
+          "level": 0,
+          "active_cells": 1638848,
+          "derivative_cells": 1305097,
+          "derivative_volume": 4.978549957275391,
+          "vorticity_squared_integral": 0.9692202428097144,
+          "divergence_squared_integral": 0.00012641738681145652,
+          "peak_vorticity": 2.395700461731192,
+          "divergence_linf": 0.08034562972299564
+        },
+        {
+          "level": 1,
+          "active_cells": 3404288,
+          "derivative_cells": 2679848,
+          "derivative_volume": 1.2778511047363281,
+          "vorticity_squared_integral": 0.7389672828721952,
+          "divergence_squared_integral": 5.1583317651301297e-05,
+          "peak_vorticity": 3.456598407388686,
+          "divergence_linf": 0.10459159465077272
+        },
+        {
+          "level": 2,
+          "active_cells": 1835008,
+          "derivative_cells": 1512000,
+          "derivative_volume": 0.09012222290039062,
+          "vorticity_squared_integral": 0.030234064790157483,
+          "divergence_squared_integral": 1.7041776895365949e-09,
+          "peak_vorticity": 0.9703577507229653,
+          "divergence_linf": 0.0012079136687899172
+        },
+        {
+          "level": 3,
+          "active_cells": 1835008,
+          "derivative_cells": 1512000,
+          "derivative_volume": 0.011265277862548828,
+          "vorticity_squared_integral": 0.0010977174785601462,
+          "divergence_squared_integral": 9.227603851471985e-13,
+          "peak_vorticity": 0.6142142040669217,
+          "divergence_linf": 0.00019837490105856226
+        },
+        {
+          "level": 4,
+          "active_cells": 2097152,
+          "derivative_cells": 1728000,
+          "derivative_volume": 0.0016093254089355469,
+          "vorticity_squared_integral": 0.00012000880873478947,
+          "divergence_squared_integral": 2.781142261228101e-14,
+          "peak_vorticity": 0.358858305641035,
+          "divergence_linf": 0.00010299837303051618
+        }
+      ]
+    },
+    {
+      "time": 0.6290714295556976,
+      "step": 389,
+      "native_sha256": "101c8052c013bf54b1498aeb3bff0981df72ebe1ea267d113909837451d0691d",
+      "target_l2_error": 0.00017352632838723087,
+      "target_linf_error": 0.0022029408798821407,
+      "peak_speed": 0.17756657372123932,
+      "peak_level": 1,
+      "peak_in_finest_core": false,
+      "kinetic_energy": 0.011037464618154566,
+      "force_l2": 1.9966778268729883,
+      "half_peak_support_volume": 1.1360228434205055,
+      "half_peak_support_equivalent_radius": 0.6472908754500128,
+      "finest_core_half_peak_volume": 0.0,
+      "finest_core_half_peak_equivalent_radius": null,
+      "derivative_interior_volume": 6.359397888183594,
+      "peak_vorticity": 4.649723009619398,
+      "vorticity_rms": 0.6766488855917848,
+      "divergence_rms": 0.006927547847587488,
+      "divergence_linf": 0.14635063587881575,
+      "levels": [
+        {
+          "level": 0,
+          "active_cells": 1638848,
+          "derivative_cells": 1305097,
+          "derivative_volume": 4.978549957275391,
+          "vorticity_squared_integral": 1.5648994574679675,
+          "divergence_squared_integral": 0.00021169163708133491,
+          "peak_vorticity": 2.9810132088889496,
+          "divergence_linf": 0.1089649435943259
+        },
+        {
+          "level": 1,
+          "active_cells": 3404288,
+          "derivative_cells": 2679848,
+          "derivative_volume": 1.2778511047363281,
+          "vorticity_squared_integral": 1.2913113880313136,
+          "divergence_squared_integral": 9.349843819596396e-05,
+          "peak_vorticity": 4.649723009619398,
+          "divergence_linf": 0.14635063587881575
+        },
+        {
+          "level": 2,
+          "active_cells": 1835008,
+          "derivative_cells": 1512000,
+          "derivative_volume": 0.09012222290039062,
+          "vorticity_squared_integral": 0.053298888051177135,
+          "divergence_squared_integral": 3.272679881157201e-09,
+          "peak_vorticity": 1.2852204566290664,
+          "divergence_linf": 0.0018108084504584454
+        },
+        {
+          "level": 3,
+          "active_cells": 1835008,
+          "derivative_cells": 1512000,
+          "derivative_volume": 0.011265277862548828,
+          "vorticity_squared_integral": 0.001954275813956346,
+          "divergence_squared_integral": 2.0874799344640386e-12,
+          "peak_vorticity": 0.8228789385902235,
+          "divergence_linf": 0.00041356961940097747
+        },
+        {
+          "level": 4,
+          "active_cells": 2097152,
+          "derivative_cells": 1728000,
+          "derivative_volume": 0.0016093254089355469,
+          "vorticity_squared_integral": 0.00020993491373898484,
+          "divergence_squared_integral": 4.452650625978917e-14,
+          "peak_vorticity": 0.4753841981176005,
+          "divergence_linf": 7.113240061684678e-05
+        }
+      ]
+    }
+  ],
+  "scope": "Measure finite precursor diagnostics from selected native outer-band frames.\n\nEvery exported block is hash-checked against its source snapshot. Derivatives\nuse only active cells with six same-block neighbors; patch edges and AMR\ninterfaces are excluded. A running source trajectory remains unaudited beyond\nthe selected immutable frames.",
+  "validated": true
+}

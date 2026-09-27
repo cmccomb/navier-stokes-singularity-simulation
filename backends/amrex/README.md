@@ -228,6 +228,13 @@ residual. The [64³](../../site/data/precursor-n64-fixed.json) and
 [128³](../../site/data/precursor-n128-fixed.json) records contain the six-time
 results and exact definitions.
 
+`scripts.outer_precursor_diagnostics` applies the same peak, energy, support,
+vorticity, and divergence measurements to immutable block-layout snapshots
+from the outer-band mesh. It supports selected frames of a running trajectory
+without treating that trajectory as a completed archive. Patch and refinement
+edges are excluded from derivative samples, and a finest-core support radius
+is reported only when the global peak occurs in that prescribed core.
+
 `scripts.vorticity_balance` checks five immutable native snapshots around a
 center time using the pressure-free curl of the momentum balance. A two-cell
 active neighborhood inside one block is required. It reports both five- and
