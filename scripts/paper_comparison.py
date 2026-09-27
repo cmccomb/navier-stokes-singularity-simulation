@@ -61,6 +61,7 @@ def compatible(coarse: dict, fine: dict, kind: str) -> None:
     for params in (a, b):
         params.pop("end")
         params.pop("box")  # the native checker verifies actual physical coverage
+        params.setdefault("integration_phase_step", 0)
     pa = copy.deepcopy(coarse["profile_manifest"]["parameters"])
     pb = copy.deepcopy(fine["profile_manifest"]["parameters"])
     if kind == "temporal":
@@ -68,6 +69,13 @@ def compatible(coarse: dict, fine: dict, kind: str) -> None:
             raise ValueError("temporal reference must halve max_dt")
         if pb.pop("forcing_phase_step") != pa.pop("forcing_phase_step") / 2:
             raise ValueError("temporal reference must halve the phase ceiling")
+    elif kind == "temporal-fixed-force":
+        if b.pop("max_dt") != a.pop("max_dt") / 2:
+            raise ValueError("temporal reference must halve max_dt")
+        a_phase = a.pop("integration_phase_step") or pa["forcing_phase_step"]
+        b_phase = b.pop("integration_phase_step") or pb["forcing_phase_step"]
+        if not math.isclose(b_phase, a_phase / 2, rel_tol=1e-12):
+            raise ValueError("temporal reference must halve the integration phase step")
     elif kind == "spatial":
         if b.pop("base_n") != 2 * a.pop("base_n"):
             raise ValueError("spatial reference must double base_n")
@@ -118,7 +126,9 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--coarse", type=Path, required=True)
     parser.add_argument("--reference", type=Path, required=True)
-    parser.add_argument("--kind", choices=["temporal", "spatial"], required=True)
+    parser.add_argument(
+        "--kind", choices=["temporal", "temporal-fixed-force", "spatial"], required=True
+    )
     parser.add_argument("--times", type=float, nargs="*")
     parser.add_argument(
         "--checker", type=Path, default=Path("build/amrex-omp/ns_archive_check")

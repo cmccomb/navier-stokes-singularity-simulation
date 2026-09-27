@@ -215,8 +215,12 @@ def validate_segment(
         phase = clock["forcing_log_rate_bound"] * math.log1p(
             row["dt"] / (clock["t_star"] - row["time"])
         )
-        if phase > clock["forcing_phase_step"] * (1 + 1e-9):
-            raise ValueError("forcing phase ceiling exceeded")
+        phase_ceiling = (
+            record.get("parameters", {}).get("integration_phase_step")
+            or clock["forcing_phase_step"]
+        )
+        if phase > phase_ceiling * (1 + 1e-9):
+            raise ValueError("integration phase ceiling exceeded")
         if row["openmp_max_threads"] != record["execution"]["threads"] or (
             row["force_threads_limit"] != record["execution"]["force_threads"]
         ):
@@ -383,8 +387,12 @@ def main() -> None:
         if probe_end >= args.end:
             raise ValueError("probe must leave a nonempty extension")
         max_dt = record["parameters"]["max_dt"]
+        phase_ceiling = (
+            record.get("parameters", {}).get("integration_phase_step")
+            or clock["forcing_phase_step"]
+        )
         phase_dt_end = -(clock["t_star"] - probe_end) * math.expm1(
-            -clock["forcing_phase_step"] / clock["forcing_log_rate_bound"]
+            -phase_ceiling / clock["forcing_log_rate_bound"]
         )
         fine_dt = min(max_dt, phase_dt_end) / 2
         limits = record["limits"]

@@ -27,6 +27,7 @@ struct Options {
     std::string force = "none";
     Real max_dt = 1e100;
     Real quiescent_max_dt = 0;
+    Real integration_phase_step = 0;
     Real epsilon_tau_ratio = 0;
     std::string table_file;
     Vector<Real> widths;
@@ -39,6 +40,7 @@ struct Options {
         pp.query("force", force);
         pp.query("max_dt", max_dt);
         pp.query("quiescent_max_dt", quiescent_max_dt);
+        pp.query("integration_phase_step", integration_phase_step);
         pp.query("epsilon_tau_ratio", epsilon_tau_ratio);
         pp.query("table_file", table_file);
         pp.queryarr("refine_half_width", widths);
@@ -77,9 +79,12 @@ struct Options {
             Abort("ns.force must be none, rest, oscillation, shear, or paper");
         if (!std::isfinite(max_dt) || max_dt <= 0) Abort("ns.max_dt must be finite and positive");
         if (!std::isfinite(quiescent_max_dt) || quiescent_max_dt < 0 ||
+            !std::isfinite(integration_phase_step) || integration_phase_step < 0 ||
             !std::isfinite(epsilon_tau_ratio) || epsilon_tau_ratio < 0)
-            Abort("quiescent dt and derivative ratio must be finite and nonnegative");
+            Abort("quiescent dt, integration phase step and derivative ratio must be finite and nonnegative");
         if (force == "paper" && table_file.empty()) Abort("paper force requires ns.table_file");
+        if (integration_phase_step > 0 && force != "paper")
+            Abort("ns.integration_phase_step requires paper forcing");
         for (int l=0; l<widths.size(); ++l)
             if (!std::isfinite(widths[l]) || widths[l] <= 0 || widths[l] >= (l ? widths[l-1] : 1.0))
                 Abort("fixed refinement widths must decrease inside [-1,1]^3");
@@ -142,7 +147,12 @@ inline Real limit_dt(Real time, Real dt, bool zero_cfl=false) {
         // A nonzero velocity/force CFL must retain the upstream stability bound.
         if (before_activation && zero_cfl && o.quiescent_max_dt>0)
             return std::min(o.quiescent_max_dt,p.cutoff_start-time);
-        dt=std::min(dt,ns_paper::phase_limit(p,time));
+        if (o.integration_phase_step > p.phase_step)
+            Abort("ns.integration_phase_step cannot relax the source phase ceiling");
+        Real phase_limit=o.integration_phase_step>0 && p.phase_rate>0
+            ? -(p.T-time)*std::expm1(-o.integration_phase_step/p.phase_rate)
+            : ns_paper::phase_limit(p,time);
+        dt=std::min(dt,phase_limit);
         if (before_activation) dt=std::min(dt,p.cutoff_start-time);
     }
     return std::min(dt,o.max_dt);

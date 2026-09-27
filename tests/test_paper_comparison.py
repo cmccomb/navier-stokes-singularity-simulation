@@ -54,3 +54,10 @@ def test_comparison_rejects_uncontrolled_changes():
     b["adapter_sha256"] = "d"
     with pytest.raises(ValueError, match="adapter"):
         compatible(a, b, "temporal")
+    b = deepcopy(a)
+    b["parameters"]["max_dt"] /= 2
+    b["parameters"]["integration_phase_step"] = 0.01875
+    compatible(a, b, "temporal-fixed-force")
+    b["profile_manifest"]["parameters"]["forcing_phase_step"] /= 2
+    with pytest.raises(ValueError, match="uncontrolled"):
+        compatible(a, b, "temporal-fixed-force")

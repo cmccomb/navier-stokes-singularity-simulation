@@ -171,6 +171,20 @@ output time and at activation, so no scheduled frame is skipped. Two cached
 force times per level avoid repeated evaluations within MOL stages; this adds
 six double-precision values per stored cell. Native forcing excludes pressure.
 
+`paper_run --integration-phase-step` can tighten only the solver's log-phase
+ceiling. The exported profile and the force's derivative window remain fixed;
+the default value `0` retains the original phase ceiling. Halve this option
+and `--max-dt` together for a controlled time-sensitivity pair, then use
+`paper_comparison --kind temporal-fixed-force`. The older `temporal` comparison
+mode halves the profile's phase ceiling and therefore also changes the discrete
+force; its historical result is a sensitivity probe, not a fixed-force time
+convergence test.
+In a validated 16³-base/two-level control through `t=0.62`, the baseline and
+refined runs used 215 and 407 steps. Their matched endpoint forcing fields were
+identical; the relative composite velocity L² difference was 0.225%.
+The [pilot record](../../site/data/temporal-fixed-force-pilot.json) verifies the
+new workflow, not late-time temporal accuracy.
+
 The first two-level v2 trajectory passes exact rest, all 26 scheduled frames
 through `t=0.62`, and zero measured full-field force readback error. Its coarse
 mesh does not establish physical accuracy. Separate fleet runs test spatial and
@@ -186,9 +200,10 @@ agreement test, not a simulation at that effective full-domain resolution.
 
 For matched-grid temporal sensitivity, `ns_archive_check` accepts
 `compare=other_plot report_difference=1`. It retains instantaneous-force
-verification but reports the velocity difference instead of enforcing the
-restart-equality gate. Composite L² excludes covered coarse cells; L∞ includes
-all stored cells. Domain, variable names, refinement regions, and output times
+verification and reports velocity and forcing-field differences instead of
+enforcing the restart-equality gate. Composite L² and the new active-cell L∞
+exclude covered coarse cells; the older `velocity_linf_difference` field still
+includes all stored cells. Domain, variable names, refinement regions, and output times
 must match (within 1e-12 for the report mode). A finer reference can be volume
 averaged to the comparison grid at an aligned integer refinement ratio;
 uncovered/mismatched regions are rejected. The default still enforces restart
@@ -296,10 +311,13 @@ The large experiment launched on September 12, 2026, is 128³ base with half-wid
 0.025 it needs 280 full-native frames, about 131.25 GiB before checkpoints.
 The corrected full-size activation/memory check passed: 19 steps through 0.552,
 three native events, zero force-readback difference, and 7.02 GiB peak RSS.
-Kay's run and Oliver's paired 64³-base reference use the same five-level regions,
-binary, profile, integration clock, and output events. This is a launch, not a
-completed or accuracy-certified result; see the timestamped
-[launch record](../../site/data/refined-long-run.json). Local
+Kay's run and Oliver's paired 64³-base reference subsequently completed with
+the same five-level regions, binary, profile, integration clock, and output
+events. The timestamped [launch record](../../site/data/refined-long-run.json)
+remains a launch snapshot; the
+[completed field comparison](../../site/data/paired-refinement-20260927.json)
+reports 4.54% velocity and 18.19% forcing relative L² differences at 0.995.
+These are sensitivity measurements, not an accuracy certificate. Local
 `scripts.force_resolution_scan` sensors show appreciable source discretization
 sensitivity even when velocity sensitivity is below 1%; they are overlapping
 local samples, not a global norm or production accuracy certificate. See the

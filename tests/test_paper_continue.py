@@ -132,6 +132,10 @@ def test_segment_checks_parent_boundary_and_finer_ceiling():
     }
     text = "NS_INCFLO_RESULT " + json.dumps(row)
     assert validate_segment(text, record, initial, row["time"], 2e-6) == [row]
+    tighter_clock = copy.deepcopy(record)
+    tighter_clock["parameters"] = {"integration_phase_step": 0.01}
+    with pytest.raises(ValueError, match="phase ceiling"):
+        validate_segment(text, tighter_clock, initial, row["time"], 2e-6)
     for key, value in [
         ("step", 1),
         ("dt", 1e-5),

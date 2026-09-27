@@ -1,0 +1,133 @@
+{
+  "schema_version": 1,
+  "kind": "temporal-fixed-force-native-sensitivity",
+  "scope": "Audit matched native paper-run fields without rewriting either run's status.\n\nTwo runs measure sensitivity, not observed order or a continuum error bound.\nNear-coincident legacy output events are listed, preserved, and compared; missing\nrequested events still fail. Aligned finer references are volume-restricted by\nthe separately verified AMReX archive checker.\n",
+  "checker_sha256": "99b5301bbfa6fe1a201f28bb6d13f1882a12f42943b11667e010f9b788fd4d5d",
+  "runs": [
+    {
+      "record_sha256": "4ea1f26faa2ee653cee72fe8fffe4fd94ed8b7e3d99264c27e3cd3b7d5c2856c",
+      "original_status": "completed",
+      "original_validated": true,
+      "original_error": null,
+      "parameters": {
+        "base_n": 16,
+        "widths": [
+          0.5
+        ],
+        "box": 32,
+        "end": 0.62,
+        "max_dt": 0.001,
+        "integration_phase_step": 0,
+        "epsilon_tau_ratio": 0,
+        "frame_dt": 0.025,
+        "frame_phase_step": 0.75,
+        "revolved_refinement": null
+      },
+      "adapter_sha256": "a8b7c6cfc383524abda54e2c9413ac844755bac678b83a41a86c5941415f28ed",
+      "binary_sha256": "495ac93555064ac9e1bcccfbde688bc219f05e7af215ec938ad2ceca786d2a4f",
+      "profile_sha256": "fb613aa587c4bd42d63af26ac783e71f02b0380f570813a027b752a82f20f994",
+      "history_endpoint": {
+        "schema_version": 1,
+        "adapter_sha256": "a8b7c6cfc383524abda54e2c9413ac844755bac678b83a41a86c5941415f28ed",
+        "case": "paper",
+        "problem": 0,
+        "step": 215,
+        "time": 0.62,
+        "dt": 0.00016426966724925052,
+        "levels": 2,
+        "stored_cells": 8192,
+        "active_cells": 7680,
+        "volume": 8,
+        "l2_error": 0.0024446821770376303,
+        "openmp_max_threads": 1,
+        "force_threads_limit": 1,
+        "linf_error": 0.006901384435217338,
+        "peak_speed": 0.11835000584448964,
+        "energy": 0.0038748848228692006,
+        "velocity_integral": [
+          -9.050651779145009e-06,
+          -5.813578454588954e-06,
+          -3.603189616969856e-06
+        ],
+        "peak_rss_mib": 39.6875
+      }
+    },
+    {
+      "record_sha256": "8831452af8d225e5bf57a1cd901b3634ba6847498367a3485101e4145055c8ee",
+      "original_status": "completed",
+      "original_validated": true,
+      "original_error": null,
+      "parameters": {
+        "base_n": 16,
+        "widths": [
+          0.5
+        ],
+        "box": 32,
+        "end": 0.62,
+        "max_dt": 0.0005,
+        "integration_phase_step": 0.01875,
+        "epsilon_tau_ratio": 0,
+        "frame_dt": 0.025,
+        "frame_phase_step": 0.75,
+        "revolved_refinement": null
+      },
+      "adapter_sha256": "a8b7c6cfc383524abda54e2c9413ac844755bac678b83a41a86c5941415f28ed",
+      "binary_sha256": "495ac93555064ac9e1bcccfbde688bc219f05e7af215ec938ad2ceca786d2a4f",
+      "profile_sha256": "fb613aa587c4bd42d63af26ac783e71f02b0380f570813a027b752a82f20f994",
+      "history_endpoint": {
+        "schema_version": 1,
+        "adapter_sha256": "a8b7c6cfc383524abda54e2c9413ac844755bac678b83a41a86c5941415f28ed",
+        "case": "paper",
+        "problem": 0,
+        "step": 407,
+        "time": 0.62,
+        "dt": 0.00016426966724880643,
+        "levels": 2,
+        "stored_cells": 8192,
+        "active_cells": 7680,
+        "volume": 8,
+        "l2_error": 0.002458636934882906,
+        "openmp_max_threads": 1,
+        "force_threads_limit": 1,
+        "linf_error": 0.006909110411513916,
+        "peak_speed": 0.11834937935210776,
+        "energy": 0.0038747376994579695,
+        "velocity_integral": [
+          -9.050529272265707e-06,
+          -5.81372798421361e-06,
+          -3.603129405327474e-06
+        ],
+        "peak_rss_mib": 39.171875
+      }
+    }
+  ],
+  "frames": [
+    {
+      "time": 0.62,
+      "step": 215,
+      "levels": 2,
+      "stored_cells": 8192,
+      "force_linf_error": 0,
+      "peak_speed": 0.11835000584448964,
+      "compared": true,
+      "report_difference": true,
+      "reference_resolution_ratio": 1,
+      "time_difference": 0,
+      "velocity_linf_difference": 0.00041830032552343105,
+      "active_velocity_linf_difference": 0.00041830032552343105,
+      "velocity_l2_difference": 7.001270625260847e-05,
+      "reference_velocity_l2": 0.031123695552817927,
+      "active_force_linf_difference": 0,
+      "force_l2_difference": 0,
+      "reference_force_l2": 1.4828270486602486,
+      "composite_volume": 8,
+      "requested_time": 0.62,
+      "coarse_frame": "plt00215",
+      "reference_frame": "plt00407",
+      "relative_l2_difference": 0.0022494984933198125,
+      "relative_force_l2_difference": 0.0
+    }
+  ],
+  "duplicate_events": [],
+  "passed": true
+}

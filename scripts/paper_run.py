@@ -176,7 +176,11 @@ def validate_history(text: str, record: dict) -> list[dict]:
                 phase = clock["forcing_log_rate_bound"] * math.log1p(
                     row["dt"] / (clock["t_star"] - row["time"])
                 )
-                if phase > clock["forcing_phase_step"] * (1 + 1e-9):
+                phase_ceiling = (
+                    params.get("integration_phase_step")
+                    or clock["forcing_phase_step"]
+                )
+                if phase > phase_ceiling * (1 + 1e-9):
                     raise ValueError("forcing phase step exceeded")
                 if row["dt"] > params["max_dt"] * (1 + 1e-10):
                     raise ValueError("active timestep ceiling exceeded")
@@ -259,6 +263,12 @@ def main() -> None:
     parser.add_argument("--box", type=int, default=32)
     parser.add_argument("--end", type=float, default=0.85)
     parser.add_argument("--max-dt", type=float, default=0.00025)
+    parser.add_argument(
+        "--integration-phase-step",
+        type=float,
+        default=0,
+        help="optional tighter solver phase ceiling; leaves the force profile unchanged",
+    )
     parser.add_argument("--epsilon-tau-ratio", type=float, default=0)
     parser.add_argument("--frame-dt", type=float, default=0.025)
     parser.add_argument(
@@ -306,6 +316,7 @@ def main() -> None:
     if not (
         0 < args.end < manifest["parameters"]["t_star"]
         and args.max_dt > 0
+        and args.integration_phase_step >= 0
         and args.frame_dt > 0
         and args.frame_phase_step >= 0
         and args.timeout >= 0
@@ -316,6 +327,7 @@ def main() -> None:
             for value in (
                 args.end,
                 args.max_dt,
+                args.integration_phase_step,
                 args.frame_dt,
                 args.frame_phase_step,
                 args.timeout,
@@ -325,6 +337,8 @@ def main() -> None:
         )
     ):
         parser.error("invalid run clock")
+    if args.integration_phase_step > manifest["parameters"]["forcing_phase_step"]:
+        parser.error("integration phase step cannot exceed the force profile ceiling")
     if args.base_n < 16 or args.base_n % 8 or args.box < 8 or args.box % 8:
         parser.error("mesh dimensions must be multiples of eight")
     planned_frames = output_times(
@@ -360,6 +374,8 @@ def main() -> None:
         f"amr.max_grid_size={args.box}",
         f"amr.plot_per_exact={args.frame_dt:.17g}",
     ]
+    if args.integration_phase_step:
+        command.append(f"ns.integration_phase_step={args.integration_phase_step:.17g}")
     if args.widths:
         command.append(
             "ns.refine_half_width=" + " ".join(f"{w:.17g}" for w in args.widths)
@@ -411,6 +427,7 @@ def main() -> None:
             "box": args.box,
             "end": args.end,
             "max_dt": args.max_dt,
+            "integration_phase_step": args.integration_phase_step,
             "epsilon_tau_ratio": args.epsilon_tau_ratio,
             "frame_dt": args.frame_dt,
             "frame_phase_step": args.frame_phase_step,

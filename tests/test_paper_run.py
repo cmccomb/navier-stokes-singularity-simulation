@@ -76,6 +76,10 @@ def test_paper_history_checks_from_rest_and_phase_clock():
     with pytest.raises(ValueError, match="phase step"):
         validate_history(text(rows), changed)
     changed = deepcopy(record)
+    changed["parameters"]["integration_phase_step"] = 0.01875
+    with pytest.raises(ValueError, match="phase step"):
+        validate_history(text(rows), changed)
+    changed = deepcopy(record)
     changed["parameters"]["max_dt"] = 0.0001
     with pytest.raises(ValueError, match="timestep ceiling"):
         validate_history(text(rows), changed)
