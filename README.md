@@ -73,6 +73,15 @@ made after the late-time comparison and does not define a prospective pass.
 The [32³→64³](site/data/onset-n32-n64-20260927.json) and
 [64³→128³](site/data/onset-n64-n128-20260927.json) audit records are retained.
 
+The outer-band 64³ companion has supplied two finalized active frames while
+its full run continues. Conservative comparison with the completed outer-band
+128³ run gives velocity gaps of 2.24% and 2.13% at `t≈0.566` and `0.588`;
+forcing gaps are 2.34% and 2.61%. The
+[native prefix record](site/data/outer-band-prefix-20260927.json) verifies
+complete active-volume coverage across different AMR footprints. Neither
+velocity gap passes the 2% working target. These selected frames are checked,
+but the 64³ trajectory is not yet complete or fully audited.
+
 An [audited native diagnostic trace](site/results.html#precursor-diagnostics)
 at the same six times shows increasing peak speed and sampled vorticity and a
 shrinking half-peak support volume. At `t=0.995`, the vorticity maximum changes

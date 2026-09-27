@@ -159,8 +159,15 @@ def main() -> None:
         "kind": "mixed-geometry-native-sensitivity",
         "source_snapshot_sha256": [sha(p / "manifest.json") for p in paths],
         "source_run_sha256": [a["source_record_sha256"], b["source_record_sha256"]],
+        "source_run_state": [
+            {"status": run["status"], "validated": run["validated"]}
+            for run in (ar, br)
+        ],
         "comparator_sha256": sha(Path(__file__)),
-        "scope": __doc__,
+        "scope": (
+            __doc__.strip()
+            + "\nOnly the selected native snapshots are audited; a running source's full trajectory remains unvalidated."
+        ),
         "frames": [],
         "validated": False,
     }
