@@ -81,9 +81,10 @@
             <tr><td>0.629071</td><td>1.919%</td><td>4.208%</td><td>Pass</td></tr>
             <tr><td>0.648114</td><td>1.807%</td><td>5.559%</td><td>Miss</td></tr>
             <tr><td>0.666178</td><td>1.746%</td><td>6.960%</td><td>Miss</td></tr>
+            <tr><td>0.699573</td><td>1.672%</td><td>10.601%</td><td>Miss</td></tr>
           </tbody>
         </table>
-        <p>The three consecutive passes identify 0.615808–0.629071 as a provisional spatial candidate at these sampled times. The next two locked checkpoints, 0.648114 and 0.666178, fail the forcing threshold; six later locked checkpoints remain unmeasured. The 64³ source run must finish and pass its full archive audit; a comparable refined fixed-force timestep comparison and diagnostic checks must still pass. The grid-dependent manufactured force makes this a finite-mesh sensitivity screen, not a continuum error bound or evidence of singularity formation.</p>
+        <p>The three consecutive passes identify 0.615808–0.629071 as a provisional spatial candidate at these sampled times. The next three locked checkpoints, through 0.699573, fail the forcing threshold; five later locked checkpoints remain unmeasured. At 0.699573 the velocity gap has fallen to 1.672% while the forcing gap has risen to 10.601%. The 64³ source run must finish and pass its full archive audit; a comparable refined fixed-force timestep comparison and diagnostic checks must still pass. The grid-dependent manufactured force makes this a finite-mesh sensitivity screen, not a continuum error bound or evidence of singularity formation.</p>
         <p>A separate <a href="data/temporal-fixed-force-late-control.json">16³-base/two-level timestep control</a> reaches 0.995 with the same discrete force in both runs. Its six matched velocity differences are at most 0.21% relative composite L², with 0.083% at the endpoint. This confirms the comparison method on a coarse mesh; it does not clear the timestep gate for this five-level pair.</p>
 
         <h2 id="precursor-diagnostics">Growth, localization, and residual checks</h2>

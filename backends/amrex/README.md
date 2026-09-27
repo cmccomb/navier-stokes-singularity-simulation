@@ -254,6 +254,11 @@ integration-phase ceiling while keeping the profile table and manufactured
 force definition fixed. A paired probe must use the same checkpoint and output
 events; its field differences measure local timestep sensitivity and retain
 errors inherited from the shared earlier trajectory.
+`scripts.compare_dense_temporal` checks the completed baseline and half-step
+receipts for the same checkpoint, binary, table, and output clock, then uses
+the native archive checker to compare every paired field. At the three spatial
+candidate times it tests the working quarter-of-spatial velocity threshold.
+Passing that local gate does not qualify the inherited from-rest time error.
 
 `scripts.compare_mixed_native` consumes `scripts.export_mesh_snapshot`
 manifests when adaptive refinement footprints differ. It volume-averages every
