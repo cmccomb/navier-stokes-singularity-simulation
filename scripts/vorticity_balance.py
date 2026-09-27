@@ -131,6 +131,7 @@ def measure(paths: list[Path]) -> dict:
         if (run["binary_sha256"] != runs[0]["binary_sha256"]
                 or run["adapter_sha256"] != runs[0]["adapter_sha256"]
                 or manifest["profile_sha256"] != manifests[0]["profile_sha256"]
+                or manifest.get("source_probe_sha256") != manifests[0].get("source_probe_sha256")
                 or manifest["parameters"] != manifests[0]["parameters"]
                 or frame["export"]["blocks"] != blocks):
             raise ValueError("snapshot source or AMR geometry changed across times")
@@ -178,6 +179,7 @@ def measure(paths: list[Path]) -> dict:
         "schema_version": 1,
         "kind": "sampled-native-vorticity-balance",
         "source_snapshot_sha256": [sha(path / "manifest.json") for path in paths],
+        "source_probe_sha256": [manifest.get("source_probe_sha256") for manifest in manifests],
         "source_run_state": [{"status": run["status"], "validated": run["validated"]} for run in runs],
         "source_binary_sha256": runs[0]["binary_sha256"],
         "source_profile_sha256": manifests[0]["profile_sha256"],
@@ -187,7 +189,8 @@ def measure(paths: list[Path]) -> dict:
         "viscosity": viscosity,
         "core_half_width": core_width,
         "regions": totals,
-        "scope": __doc__.strip(),
+        "scope": __doc__.strip() + (" Dense frames are checkpoint continuations with inherited parent error."
+                                   if manifests[0].get("source_probe_sha256") else ""),
         "validated": True,
     }
 

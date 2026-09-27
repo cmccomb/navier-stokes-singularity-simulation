@@ -103,12 +103,19 @@ and [128³](site/data/outer-precursor-n128-candidate.json) records retain hashes
 energy, forcing, divergence, sampled volumes, and exact definitions.
 
 A [five-frame pressure-free balance diagnostic](site/results.html#precursor-diagnostics)
-now covers all three candidate checkpoints on both outer-band meshes. It
+covers all three candidate checkpoints on both outer-band meshes. It
 samples the curl of the momentum equation only where every needed same-block
 neighbor is active. Within the prescribed finest core, switching from a
 three-frame to a five-frame time derivative changes the measured balance by
 more than the five-frame residual at every checkpoint. This output clock does
-not support a residual-convergence claim; denser output is needed.
+not support a residual-convergence claim. A completed
+[dense 64³ checkpoint continuation](site/data/outer-dense-n64-probe.json)
+reduces the finest-core three-versus-five-frame derivative difference from
+roughly 0.04 to 0.00025–0.00028. Its measured residual rises from 0.00293
+to 0.01359 over the candidate centers and differs from the sparse estimate.
+The [three dense balance records](site/results.html#precursor-diagnostics)
+do not establish residual convergence; a matched dense 128³ check and the
+independent fixed-force half-step comparison remain open.
 
 An [audited native diagnostic trace](site/results.html#precursor-diagnostics)
 at the same six times shows increasing peak speed and sampled vorticity and a

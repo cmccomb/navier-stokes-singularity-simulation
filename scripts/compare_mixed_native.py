@@ -124,6 +124,21 @@ def load_snapshot(path: Path) -> tuple[dict, dict]:
     run = json.loads((path / "run-snapshot.json").read_text())
     if not report["complete"] or sha(path / "run-snapshot.json") != report["source_record_sha256"]:
         raise ValueError("snapshot lineage is incomplete")
+    if "source_probe_sha256" in report:
+        probe_path = path / "probe-snapshot.json"
+        if sha(probe_path) != report["source_probe_sha256"]:
+            raise ValueError("dense probe receipt differs")
+        probe = json.loads(probe_path.read_text())
+        if (probe.get("status") != "completed" or not probe.get("validated")
+                or probe["parent_record_sha256"] != report["source_record_sha256"]
+                or probe["source_binary_sha256"] != run["binary_sha256"]
+                or probe["source_profile_sha256"] != report["profile_sha256"]):
+            raise ValueError("dense probe lineage is incomplete")
+        for frame in report["frames"]:
+            matches = [source for source in probe["native_frames"]
+                       if source["step"] == frame["step"] and source["time"] == frame["export"]["time"]]
+            if len(matches) != 1 or frame.get("native_audit") != matches[0]:
+                raise ValueError("dense native frame audit differs")
     for frame in report["frames"]:
         raw = path / frame["path"]
         if sha(raw) != frame["sha256"]:
