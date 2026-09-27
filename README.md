@@ -65,6 +65,14 @@ and [64³→128³](site/data/paired-refinement-20260927.json) native comparisons
 Nearly identical peak speeds do not establish field convergence, and the
 manufactured force itself changes with grid spacing.
 
+An exploratory [earlier active-interval search](site/results.html#paired-refinement)
+compares eight more matched states from `t≈0.566` to `0.700`. The finest-pair
+velocity gap remains 2.19–2.47%; forcing is below 5% only through `t≈0.629`.
+No sampled active state meets both working spatial targets. This selection was
+made after the late-time comparison and does not define a prospective pass.
+The [32³→64³](site/data/onset-n32-n64-20260927.json) and
+[64³→128³](site/data/onset-n64-n128-20260927.json) audit records are retained.
+
 An [audited native diagnostic trace](site/results.html#precursor-diagnostics)
 at the same six times shows increasing peak speed and sampled vorticity and a
 shrinking half-peak support volume. At `t=0.995`, the vorticity maximum changes
