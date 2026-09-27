@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "kind": "prospective-outer-band-spatial-checkpoints",
+  "locked_at_utc": "2026-09-27T19:55:42Z",
+  "coarse_run_status_at_lock": "running",
+  "coarse_last_observed_time_at_lock": 0.5973034368,
+  "source_binary_sha256": "92a0c36aff5cbef1cc9ed45c19da5e0a7610c68c361c4a9b1b1264203b356ecd",
+  "source_profile_sha256": "fb613aa587c4bd42d63af26ac783e71f02b0380f570813a027b752a82f20f994",
+  "mesh_pair_base_n": [
+    64,
+    128
+  ],
+  "checkpoints": [
+    {
+      "frame_index": 29,
+      "time": 0.6020692874341146
+    },
+    {
+      "frame_index": 30,
+      "time": 0.6089987316985057
+    },
+    {
+      "frame_index": 31,
+      "time": 0.6158075087303938
+    },
+    {
+      "frame_index": 32,
+      "time": 0.6224977197922241
+    },
+    {
+      "frame_index": 33,
+      "time": 0.6290714295556976
+    },
+    {
+      "frame_index": 36,
+      "time": 0.648113662215126
+    },
+    {
+      "frame_index": 39,
+      "time": 0.6661783303148294
+    },
+    {
+      "frame_index": 45,
+      "time": 0.699573136094869
+    },
+    {
+      "frame_index": 85,
+      "time": 0.8512123014757145
+    },
+    {
+      "frame_index": 147,
+      "time": 0.9499330850269806
+    },
+    {
+      "frame_index": 199,
+      "time": 0.9799170469879853
+    },
+    {
+      "frame_index": 239,
+      "time": 0.9900538310076937
+    },
+    {
+      "frame_index": 279,
+      "time": 0.995
+    }
+  ],
+  "method": "Export native fields from both runs at every listed completed frame. Conservatively volume-restrict active 128-base cells onto active 64-base cells, requiring complete active volume coverage and exact matched times. Divide velocity and force L2 differences by the corresponding restricted finer-field L2 norm.",
+  "spatial_screen": {
+    "velocity_relative_l2_max": 0.02,
+    "force_relative_l2_max": 0.05,
+    "eligible_sequence": "At least three consecutive listed checkpoints pass both limits; disclose all listed failures and do not interpolate across failures."
+  },
+  "remaining_qualification": "Require the 64-base run to complete and pass its native archive audit, then obtain a fixed-force halved-timestep comparison on a comparable refined mesh with a velocity gap below one-quarter of the spatial gap. Audit peak, support, vorticity, energy, and discrete residual behavior across the candidate sequence.",
+  "scope": "A practical finite-resolution visualization screen. The manufactured force and target are grid-dependent, so passing this screen would not establish convergence for one fixed continuum forcing or prove singularity formation."
+}

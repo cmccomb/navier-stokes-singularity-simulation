@@ -81,6 +81,9 @@ forcing gaps are 2.34% and 2.61%. The
 complete active-volume coverage across different AMR footprints. Neither
 velocity gap passes the 2% working target. These selected frames are checked,
 but the 64³ trajectory is not yet complete or fully audited.
+The [prospective outer-band checkpoint protocol](site/data/outer-band-protocol-20260927.json)
+locks thirteen subsequent scheduled states and the spatial screen before
+those states are produced.
 
 An [audited native diagnostic trace](site/results.html#precursor-diagnostics)
 at the same six times shows increasing peak speed and sampled vorticity and a
