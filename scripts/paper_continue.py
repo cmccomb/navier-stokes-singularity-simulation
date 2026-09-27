@@ -423,7 +423,7 @@ def main() -> None:
         checkpoint_bytes = sum(v["bytes"] for v in checkpoint_files.values())
         estimated_steps = math.ceil(
             clock["forcing_log_rate_bound"]
-            / clock["forcing_phase_step"]
+            / phase_ceiling
             * math.log(
                 (clock["t_star"] - initial["time"]) / (clock["t_star"] - args.end)
             )
