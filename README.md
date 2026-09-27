@@ -75,6 +75,12 @@ finest-pair velocity L² difference and 5% forcing L² difference at predefined
 matched checkpoints, with the halved-timestep difference below one-quarter of
 the spatial gap and peak/core/vorticity trends stable under further refinement.
 These thresholds set presentation fidelity, not a mathematical error bound.
+A completed [fixed-force timestep control](site/data/temporal-fixed-force-late-control.json)
+on a 16³-base/two-level mesh reached `t=0.995` with 5,146 versus 10,269
+integration steps. At six matched checkpoints its velocity difference stayed
+below 0.21% relative composite L², reaching 0.083% at the endpoint; saved
+endpoint forcing fields were identical. This verifies the late-time comparison
+method on a coarse mesh, not the timestep accuracy of the 64³/128³ runs.
 A 32³-base control on Mali and a 96³-base
 intermediate run on Kay were launched on September 27, 2026 after validated
 same-binary preflights. They are not yet part of the completed comparison.

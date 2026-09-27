@@ -184,6 +184,11 @@ refined runs used 215 and 407 steps. Their matched endpoint forcing fields were
 identical; the relative composite velocity L² difference was 0.225%.
 The [pilot record](../../site/data/temporal-fixed-force-pilot.json) verifies the
 new workflow, not late-time temporal accuracy.
+A second validated 16³-base/two-level pair reached `t=0.995` in 5,146 and
+10,269 steps. Across six matched native states the relative composite velocity
+L² difference was at most 0.21%, and 0.083% at the endpoint; the saved endpoint
+forcing fields were identical. See the [late-time control](../../site/data/temporal-fixed-force-late-control.json).
+Its coarse mesh cannot establish timestep accuracy for the refined trajectories.
 
 The first two-level v2 trajectory passes exact rest, all 26 scheduled frames
 through `t=0.62`, and zero measured full-field force readback error. Its coarse
