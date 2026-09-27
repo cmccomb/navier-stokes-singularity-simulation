@@ -61,6 +61,29 @@ def validate_readback(checked: dict, initial: dict) -> None:
         raise ValueError("restart readback differs from parent diagnostic")
 
 
+def time_controls(record: dict, factor: float) -> tuple[float, float]:
+    if not math.isfinite(factor) or not 0 < factor <= 1:
+        raise ValueError("time factor must be in (0, 1]")
+    phase = (record["parameters"].get("integration_phase_step")
+             or record["profile_manifest"]["parameters"]["forcing_phase_step"])
+    return record["parameters"]["max_dt"] * factor, phase * factor
+
+
+def controlled_command(record: dict, parent: Path, checkpoint: Path, times: list[float], factor: float, *, readback: bool = False) -> list[str]:
+    max_dt, phase = time_controls(record, factor)
+    argv = command(record, parent, checkpoint, times[-1], times, max_dt, readback=readback)
+    if factor < 1:
+        parameter = f"ns.integration_phase_step={phase:.17g}"
+        indices = [i for i, item in enumerate(argv) if item.startswith("ns.integration_phase_step=")]
+        if len(indices) > 1:
+            raise ValueError("ambiguous integration phase controls")
+        if indices:
+            argv[indices[0]] = parameter
+        else:
+            argv.append(parameter)
+    return argv
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--parent", type=Path, required=True, help="staged immutable parent prefix and native assets")
@@ -71,6 +94,7 @@ def main() -> None:
     parser.add_argument("--max-rss-mib", type=float, required=True)
     parser.add_argument("--min-disk-free-gib", type=float, required=True)
     parser.add_argument("--timeout-hours", type=float, required=True)
+    parser.add_argument("--time-factor", type=float, default=1.0, help="halve both integration ceilings with 0.5 while keeping the force table fixed")
     parser.add_argument("--check-only", action="store_true", help="validate staged inputs and storage without starting a child")
     args = parser.parse_args()
     if not all(math.isfinite(x) and x > 0 for x in (args.max_rss_mib, args.min_disk_free_gib, args.timeout_hours)):
@@ -82,6 +106,7 @@ def main() -> None:
     record_bytes = (parent / "run.json").read_bytes()
     log_bytes = (parent / "run.log").read_bytes()
     record = json.loads(record_bytes)
+    max_dt, phase_ceiling = time_controls(record, args.time_factor)
     if record["kind"] != "finite-paper-surrogate-from-rest-incflo" or record["status"] not in ("running", "completed"):
         raise ValueError("require an original from-rest parent prefix")
     for name, digest in record["adapter_source_hashes"].items():
@@ -125,7 +150,7 @@ def main() -> None:
     if shutil.disk_usage(parent).free - required < args.min_disk_free_gib * 2**30:
         raise RuntimeError("dense probe would violate disk reserve")
     if args.check_only:
-        print(json.dumps({"checkpoint_step": args.checkpoint_step, "checkpoint_time": initial["time"], "end": times[-1], "native_frames": len(times) - 1, "storage_budget_bytes": required, "source_binary_sha256": record["binary_sha256"]}))
+        print(json.dumps({"checkpoint_step": args.checkpoint_step, "checkpoint_time": initial["time"], "end": times[-1], "native_frames": len(times) - 1, "storage_budget_bytes": required, "source_binary_sha256": record["binary_sha256"], "time_factor": args.time_factor, "max_dt": max_dt, "integration_phase_step": phase_ceiling}))
         return
     output.mkdir(parents=True)
     receipt = {
@@ -141,6 +166,10 @@ def main() -> None:
         "checkpoint_files": checkpoint_files,
         "centers": centers,
         "spacing": args.spacing,
+        "time_factor": args.time_factor,
+        "max_dt": max_dt,
+        "integration_phase_step": phase_ceiling,
+        "force_definition_unchanged": True,
         "planned_times": times[1:],
         "reference_plots": {f"{t:.17g}": str(p) for t, p in references.items()},
         "storage_budget_bytes": required,
@@ -205,7 +234,7 @@ def main() -> None:
         save()
         readback = output / "restart-readback"
         readback.mkdir()
-        run(command(record, parent, checkpoint, initial["time"], [initial["time"]], record["parameters"]["max_dt"], readback=True), readback, "run.log")
+        run(controlled_command(record, parent, checkpoint, [initial["time"]], args.time_factor, readback=True), readback, "run.log")
         restored = readback / f"plt{initial['step']:05d}"
         checked = check(restored, "restart-readback-check.log")
         validate_readback(checked, initial)
@@ -214,10 +243,15 @@ def main() -> None:
         save()
         dense = output / "dense"
         dense.mkdir()
-        argv = command(record, parent, checkpoint, times[-1], times, record["parameters"]["max_dt"])
+        argv = controlled_command(record, parent, checkpoint, times, args.time_factor)
         receipt["command"] = argv
         save()
-        segment = validate_segment(run(argv, dense, "run.log"), record, initial, times[-1], record["parameters"]["max_dt"])
+        segment = validate_segment(run(argv, dense, "run.log"), record, initial, times[-1], max_dt)
+        clock = record["profile_manifest"]["parameters"]
+        for row in segment:
+            phase = clock["forcing_log_rate_bound"] * math.log1p(row["dt"] / (clock["t_star"] - row["time"]))
+            if phase > phase_ceiling * (1 + 1e-9):
+                raise ValueError("refined integration phase ceiling exceeded")
         receipt["segment_steps"] = len(segment)
         receipt["status"] = "auditing"
         save()

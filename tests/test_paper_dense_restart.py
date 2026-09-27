@@ -2,7 +2,12 @@
 
 import pytest
 
-from scripts.paper_dense_restart import schedule, validate_readback
+from scripts.paper_dense_restart import (
+    controlled_command,
+    schedule,
+    time_controls,
+    validate_readback,
+)
 
 
 def test_dense_schedule_keeps_original_events_and_center_stencils():
@@ -28,3 +33,18 @@ def test_zero_step_checker_can_validate_without_energy_field():
     validate_readback(checked, initial)
     with pytest.raises(ValueError, match="restart readback"):
         validate_readback({**checked, "stored_cells": 99}, initial)
+
+
+def test_fixed_force_time_controls_halve_only_integration_limits(tmp_path):
+    record = {
+        "parameters": {"max_dt": 0.00025, "integration_phase_step": 0},
+        "profile_manifest": {"parameters": {"forcing_phase_step": 0.0375}},
+        "command": ["solver", "inputs", "stop_time=0.995", "ns.table_file=table", "ns.max_dt=0.00025"],
+    }
+    assert time_controls(record, 0.5) == (0.000125, 0.01875)
+    argv = controlled_command(record, tmp_path, tmp_path / "chk00250", [0.6005, 0.63], 0.5)
+    assert "ns.max_dt=0.000125" in argv
+    assert "ns.integration_phase_step=0.018749999999999999" in argv
+    assert "ns.table_file=" + str(tmp_path / "profile.tbl") in argv
+    with pytest.raises(ValueError, match="time factor"):
+        time_controls(record, 1.5)

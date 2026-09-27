@@ -249,6 +249,11 @@ storage, and the exact dense event schedule before starting a child. The
 bounded run first checks a zero-step restart readback, then audits every dense
 native frame and compares the three center fields with the original run.
 It records a checkpoint continuation, never relabeling it as from rest.
+With `--time-factor 0.5`, it halves both the integration timestep ceiling and
+integration-phase ceiling while keeping the profile table and manufactured
+force definition fixed. A paired probe must use the same checkpoint and output
+events; its field differences measure local timestep sensitivity and retain
+errors inherited from the shared earlier trajectory.
 
 `scripts.compare_mixed_native` consumes `scripts.export_mesh_snapshot`
 manifests when adaptive refinement footprints differ. It volume-averages every
