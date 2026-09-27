@@ -217,6 +217,10 @@ def main() -> None:
             / row["reference_velocity_l2"]
             if row["reference_velocity_l2"]
             else None,
+            relative_force_l2_difference=row["force_l2_difference"]
+            / row["reference_force_l2"]
+            if row.get("reference_force_l2")
+            else None,
         )
         report["frames"].append(row)
         for label, path, record, group in (

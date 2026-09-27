@@ -2,7 +2,7 @@
   "schema_version": 1,
   "kind": "spatial-native-sensitivity",
   "scope": "Audit matched native paper-run fields without rewriting either run's status.\n\nTwo runs measure sensitivity, not observed order or a continuum error bound.\nNear-coincident legacy output events are listed, preserved, and compared; missing\nrequested events still fail. Aligned finer references are volume-restricted by\nthe separately verified AMReX archive checker.\n",
-  "checker_sha256": "1e2b85432ed0681da68f5b823da2ef30c75ecf94ff1b6306b52d7112ecb3c60c",
+  "checker_sha256": "a4a6ed138f238404f77472ae53846e10c68672b81b2f5fdec181f6c07fca93c8",
   "runs": [
     {
       "record_sha256": "036814dd3dcb1f15758c8061532c070dadef80b0df704778f61eeb9ee2e5295a",
@@ -116,13 +116,18 @@
       "reference_resolution_ratio": 2,
       "time_difference": 0,
       "velocity_linf_difference": 0.028952782421118983,
+      "active_velocity_linf_difference": 0.028952782421118983,
       "velocity_l2_difference": 0.004272877142761397,
       "reference_velocity_l2": 0.18683228844955158,
+      "active_force_linf_difference": 3.0232688270327683,
+      "force_l2_difference": 0.29193221558429655,
+      "reference_force_l2": 2.367320147729397,
       "composite_volume": 8,
       "requested_time": 0.699573136094869,
       "coarse_frame": "plt00722",
       "reference_frame": "plt00722",
-      "relative_l2_difference": 0.022870121531028395
+      "relative_l2_difference": 0.022870121531028395,
+      "relative_force_l2_difference": 0.12331759008780534
     },
     {
       "time": 0.851212301475714,
@@ -136,13 +141,18 @@
       "reference_resolution_ratio": 2,
       "time_difference": 0,
       "velocity_linf_difference": 0.050635934103425206,
+      "active_velocity_linf_difference": 0.050635934103425206,
       "velocity_l2_difference": 0.006338505150217763,
       "reference_velocity_l2": 0.1947139563488872,
+      "active_force_linf_difference": 11.201786324296261,
+      "force_l2_difference": 0.5650428927189003,
+      "reference_force_l2": 3.2592664303138186,
       "composite_volume": 8,
       "requested_time": 0.851212301475714,
       "coarse_frame": "plt01647",
       "reference_frame": "plt01647",
-      "relative_l2_difference": 0.03255290616590662
+      "relative_l2_difference": 0.03255290616590662,
+      "relative_force_l2_difference": 0.17336505155379248
     },
     {
       "time": 0.9499330850269804,
@@ -156,13 +166,18 @@
       "reference_resolution_ratio": 2,
       "time_difference": 0,
       "velocity_linf_difference": 0.0789374884576659,
+      "active_velocity_linf_difference": 0.0789374884576659,
       "velocity_l2_difference": 0.005308187712435285,
       "reference_velocity_l2": 0.15237286135534603,
+      "active_force_linf_difference": 92.52890269496478,
+      "force_l2_difference": 1.3703605309168956,
+      "reference_force_l2": 7.927456945784667,
       "composite_volume": 8,
       "requested_time": 0.9499330850269804,
       "coarse_frame": "plt02887",
       "reference_frame": "plt02887",
-      "relative_l2_difference": 0.034836831606490315
+      "relative_l2_difference": 0.034836831606490315,
+      "relative_force_l2_difference": 0.1728625636554947
     },
     {
       "time": 0.9799170469879851,
@@ -176,13 +191,18 @@
       "reference_resolution_ratio": 2,
       "time_difference": 0,
       "velocity_linf_difference": 0.21715693455212173,
+      "active_velocity_linf_difference": 0.21715693455212173,
       "velocity_l2_difference": 0.004917364326668322,
       "reference_velocity_l2": 0.12571932291360766,
+      "active_force_linf_difference": 351.30432052780804,
+      "force_l2_difference": 2.9608058493679534,
+      "reference_force_l2": 16.477124386372243,
       "composite_volume": 8,
       "requested_time": 0.9799170469879851,
       "coarse_frame": "plt03927",
       "reference_frame": "plt03927",
-      "relative_l2_difference": 0.03911383081539071
+      "relative_l2_difference": 0.03911383081539071,
+      "relative_force_l2_difference": 0.17969190375334856
     },
     {
       "time": 0.990053831007693,
@@ -196,13 +216,18 @@
       "reference_resolution_ratio": 2,
       "time_difference": 0,
       "velocity_linf_difference": 0.27928216400548134,
+      "active_velocity_linf_difference": 0.27928216400548134,
       "velocity_l2_difference": 0.00469594527498115,
       "reference_velocity_l2": 0.10969993817744543,
+      "active_force_linf_difference": 1159.4683532054291,
+      "force_l2_difference": 5.264901160074188,
+      "reference_force_l2": 29.603216662585005,
       "composite_volume": 8,
       "requested_time": 0.990053831007693,
       "coarse_frame": "plt04727",
       "reference_frame": "plt04727",
-      "relative_l2_difference": 0.04280718251076141
+      "relative_l2_difference": 0.04280718251076141,
+      "relative_force_l2_difference": 0.1778489554051876
     },
     {
       "time": 0.995,
@@ -216,13 +241,18 @@
       "reference_resolution_ratio": 2,
       "time_difference": 0,
       "velocity_linf_difference": 0.5214042698432068,
+      "active_velocity_linf_difference": 0.5214042698432068,
       "velocity_l2_difference": 0.004417899828715965,
       "reference_velocity_l2": 0.09723884257590507,
+      "active_force_linf_difference": 3470.7854545839964,
+      "force_l2_difference": 9.538184133665132,
+      "reference_force_l2": 52.42343225944457,
       "composite_volume": 8,
       "requested_time": 0.995,
       "coarse_frame": "plt05510",
       "reference_frame": "plt05510",
-      "relative_l2_difference": 0.04543348842585547
+      "relative_l2_difference": 0.04543348842585547,
+      "relative_force_l2_difference": 0.18194505248073944
     }
   ],
   "duplicate_events": [],

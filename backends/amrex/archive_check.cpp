@@ -23,7 +23,8 @@ int main(int argc, char** argv) {
         if (data.varNames()!=expected || data.spaceDim()!=3)
             Abort("native archive is missing velocity/force components");
         Real max_force_error=0, max_speed=0, max_velocity_difference=0; Long stored=0;
-        Real difference_sq=0, reference_sq=0,volume=0;
+        Real active_velocity_linf_difference=0, active_force_linf_difference=0;
+        Real difference_sq=0, reference_sq=0, force_difference_sq=0, reference_force_sq=0,volume=0;
         int reference_ratio=1;
         for (int lev=0; lev<=data.finestLevel(); ++lev) {
             MultiFab mf=data.get(lev);
@@ -73,14 +74,20 @@ int main(int argc, char** argv) {
                     Real speed2=0;
                     if (m(i,j,k)) ++active;
                     for (int c=0;c<3;++c) {
-                        if (!std::isfinite(a(i,j,k,c)) || !std::isfinite(a(i,j,k,c+3)) || !std::isfinite(b(i,j,k,c)))
+                        if (!std::isfinite(a(i,j,k,c)) || !std::isfinite(a(i,j,k,c+3)) ||
+                            !std::isfinite(b(i,j,k,c)) || !std::isfinite(b(i,j,k,c+3)))
                             Abort("non-finite archived vector");
                         speed2+=a(i,j,k,c)*a(i,j,k,c);
                         max_velocity_difference=std::max(max_velocity_difference,std::abs(a(i,j,k,c)-b(i,j,k,c)));
                         if (m(i,j,k)) {
                             Real difference=a(i,j,k,c)-b(i,j,k,c);
+                            Real force_difference=a(i,j,k,c+3)-b(i,j,k,c+3);
                             difference_sq+=difference*difference*dv;
                             reference_sq+=b(i,j,k,c)*b(i,j,k,c)*dv;
+                            force_difference_sq+=force_difference*force_difference*dv;
+                            reference_force_sq+=b(i,j,k,c+3)*b(i,j,k,c+3)*dv;
+                            active_velocity_linf_difference=std::max(active_velocity_linf_difference,std::abs(difference));
+                            active_force_linf_difference=std::max(active_force_linf_difference,std::abs(force_difference));
                         }
                         Real f=ns_case::options().force=="paper" ? external(i,j,k,c)
                             : ns_case::force_value(ns_case::options().force,x,y,z,data.time(),c,nu);
@@ -101,8 +108,13 @@ int main(int argc, char** argv) {
             <<",\"reference_resolution_ratio\":"<<reference_ratio
             <<",\"time_difference\":"<<(reference ? data.time()-reference->time() : 0)
             <<",\"velocity_linf_difference\":"<<max_velocity_difference
+            <<",\"active_velocity_linf_difference\":"<<active_velocity_linf_difference
             <<",\"velocity_l2_difference\":"<<std::sqrt(difference_sq/volume)
-            <<",\"reference_velocity_l2\":"<<std::sqrt(reference_sq/volume)<<",\"composite_volume\":"<<volume<<"}\n";
+            <<",\"reference_velocity_l2\":"<<std::sqrt(reference_sq/volume)
+            <<",\"active_force_linf_difference\":"<<active_force_linf_difference
+            <<",\"force_l2_difference\":"<<std::sqrt(force_difference_sq/volume)
+            <<",\"reference_force_l2\":"<<std::sqrt(reference_force_sq/volume)
+            <<",\"composite_volume\":"<<volume<<"}\n";
     }
     amrex::Finalize();
 }
