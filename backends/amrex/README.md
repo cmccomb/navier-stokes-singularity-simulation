@@ -223,6 +223,10 @@ against solver rows, then reports a half-peak support volume, finest-level
 half-peak volume, interior vorticity and divergence, force norm, and target
 deviation at specified saved times. Derivatives require all six neighbors to
 be active on the same level; interface and domain-edge cells are excluded.
+The divergence is a sampled incompressibility diagnostic, not a full momentum
+residual. The [64³](../../site/data/precursor-n64-fixed.json) and
+[128³](../../site/data/precursor-n128-fixed.json) records contain the six-time
+results and exact definitions.
 
 `scripts.vorticity_balance` checks five immutable native snapshots around a
 center time using the pressure-free curl of the momentum balance. A two-cell
@@ -230,10 +234,14 @@ active neighborhood inside one block is required. It reports both five- and
 three-frame time differences so sparse-output sensitivity is visible. The
 result is an independent sampled-field diagnostic, not incflo's full discrete
 momentum residual or a continuum error estimate.
-The divergence is a sampled incompressibility diagnostic, not a full momentum
-residual. The [64³](../../site/data/precursor-n64-fixed.json) and
-[128³](../../site/data/precursor-n128-fixed.json) records contain the six-time
-results and exact definitions.
+
+`scripts.paper_dense_restart` tests the residual's output-clock sensitivity
+from a copied native checkpoint and staged from-rest prefix. Its `--check-only`
+preflight verifies pinned assets, checkpoint clock, original center plots,
+storage, and the exact dense event schedule before starting a child. The
+bounded run first checks a zero-step restart readback, then audits every dense
+native frame and compares the three center fields with the original run.
+It records a checkpoint continuation, never relabeling it as from rest.
 
 `scripts.compare_mixed_native` consumes `scripts.export_mesh_snapshot`
 manifests when adaptive refinement footprints differ. It volume-averages every
@@ -242,7 +250,12 @@ levels in one coarse cell; every required coarse cell must have exactly one
 cell volume of coverage. This permits a comparison of the outer-band 64³ and
 128³ runs even though the older archive checker rejects their nonidentical
 level footprints. A validated 0.55 rest-frame preflight passes the coverage
-check; an active-field comparison awaits the full 64³ trajectory.
+check. The source 64³ trajectory is still running, so its final archive audit
+remains outstanding.
+Six active scheduled checkpoints have now been compared while the 64³ source
+continues. The [locked protocol](../../site/data/outer-band-protocol-20260927.json)
+and [prefix screen](../../site/data/outer-band-prospective-prefix-20260927.json)
+keep the complete-run audit boundary explicit.
 
 The longer pinned probes exposed roundoff-scale duplicate output events.
 The next-launch clipper uses the same 1e-12 acceptance tolerance as upstream
