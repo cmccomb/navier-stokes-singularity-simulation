@@ -55,8 +55,8 @@
             <tr><td>Appendix-B explicit axis data</td><td>Implemented</td></tr>
             <tr><td>Discrete divergence-free finite continuation</td><td>Implemented, surrogate</td></tr>
             <tr><td>Static core-refined comparison grids</td><td>32³, 64³, and 128³ native archives audited; spatial gate unmet</td></tr>
-            <tr><td>Outer-band candidate spatial and temporal screen</td><td>Three early checkpoints pass the spatial and local post-checkpoint velocity gates; full 64³ archive and from-rest time control remain open</td></tr>
-            <tr><td>Dense pressure-free balance</td><td>64³ baseline and half-step fields audited; residual remains time-sensitive, and matched dense 128³ analysis remains open</td></tr>
+            <tr><td>Outer-band candidate spatial and temporal screen</td><td>Three early checkpoints pass the spatial and independent from-rest velocity timestep gates; the 64³ parent stopped before five later locked checkpoints and has no final archive audit</td></tr>
+            <tr><td>Dense pressure-free balance</td><td>64³ baseline, half-step, quarter-step, and matched dense 128³ fields audited; the spatial residual sequence is mixed and remains materially timestep-sensitive</td></tr>
             <tr><td>Finite pulse hierarchy and grid corrector</td><td>Implemented, surrogate</td></tr>
             <tr><td>Exact stress-matched pulse construction</td><td>Not implemented</td></tr>
             <tr><td>All-order background and mean corrections</td><td>Not implemented</td></tr>
@@ -64,7 +64,7 @@
           </tbody>
         </table>
 
-        <div class="callout"><strong>Finite claim.</strong> No computation reaches <span class="math">t = 1</span> or instantiates an infinite hierarchy. The defensible numerical claim is convergence of increasingly faithful finite truncations on resolved pre-singular intervals. The analytical paper supplies the limit.</div>
+        <div class="callout"><strong>Finite claim.</strong> No computation reaches <span class="math">t = 1</span> or instantiates an infinite hierarchy. The current numerical result is a provisional finite-mesh candidate interval with local velocity timestep stability and unresolved residual qualification. Convergence of increasingly faithful finite truncations remains the numerical target; the analytical paper supplies the blowup result.</div>
 
         <h2>Failure conditions</h2>
         <ul>

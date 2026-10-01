@@ -85,7 +85,25 @@ def test_dense_refinement_records_keep_the_unqualified_result_visible() -> None:
     assert "still prevent a resolution-qualified precursor" in page
     assert page.count("<!-- FINAL_CONTINUATION:BEGIN -->") == 1
     assert page.count("<!-- FINAL_CONTINUATION:END -->") == 1
-    assert "Endpoint values and graphics are withheld" in page
+    final_record = SITE / "data/final-continuation.json"
+    if final_record.exists():
+        final = json.loads(final_record.read_text())
+        assert final["status"] == "completed" and final["validated"]
+        assert final["claim_boundary"] == {
+            "spatially_qualified": False,
+            "singularity_or_blowup_demonstrated": False,
+            "values_beyond_computed_endpoint": False,
+            "interpretation": (
+                "Finite continuation of one audited 128^3-base trajectory. "
+                "The extension is model extrapolation, not a new "
+                "spatial-convergence certificate or evidence of singularity "
+                "formation."
+            ),
+        }
+        assert "Endpoint values and graphics are withheld" not in page
+        assert 'src="media/final-continuation.svg"' in page
+    else:
+        assert "Endpoint values and graphics are withheld" in page
     quarter = json.loads((SITE / "data/outer-dense-n64-quarter-probe.json").read_text())
     fine = json.loads((SITE / "data/outer-dense-n128-probe.json").read_text())
     from_rest = json.loads((SITE / "data/outer-from-rest-n64-temporal.json").read_text())
@@ -105,6 +123,33 @@ def test_dense_refinement_records_keep_the_unqualified_result_visible() -> None:
         assert time_gap["time_controls"]["baseline"]["time_factor"] == 0.5
         assert time_gap["time_controls"]["half"]["time_factor"] == 0.25
         assert time_gap["velocity_field_sensitivity"]["relative_l2_difference"] < 0.0001
+
+
+def test_current_status_pages_match_the_published_machine_records() -> None:
+    results = (SITE / "results.html").read_text()
+    reproduction = (SITE / "reproduction.html").read_text()
+    refinement = (SITE / "refinement.html").read_text()
+    accuracy = (SITE / "accuracy.html").read_text()
+    explorer = json.loads((SITE / "data/native-explorer.json").read_text())
+    cubic = json.loads((SITE / "data/temporal-cubic-n32.json").read_text())
+    cubic_no_pulses = json.loads(
+        (SITE / "data/temporal-cubic-n32-no-pulses.json").read_text()
+    )
+
+    assert "64³ source trajectory is still running" not in results
+    assert "later stopped around" in results
+    assert "from-rest time control remain open" not in reproduction
+    assert "matched dense 128³ analysis remains open" not in reproduction
+    assert "the spatial residual sequence is mixed" in reproduction
+    assert "defensible numerical claim is convergence" not in reproduction
+    assert "Convergence of increasingly faithful finite truncations remains" in reproduction
+    assert "Interactive 3D refined-grid web export remains open" not in refinement
+    assert "validated interactive 3D record" in refinement
+    assert explorer["validated"] and explorer["complete_history"]
+    assert explorer["saved_frames"] == explorer["source_frames"] == 280
+    assert explorer["end_time"] == 0.995
+    assert "remaining cubic comparisons were still in progress" not in accuracy
+    assert cubic["pilot_gate"] and cubic_no_pulses["pilot_gate"]
 
 
 def test_site_keeps_peak_speed_without_illustrative_comparisons() -> None:
