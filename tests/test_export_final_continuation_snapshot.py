@@ -1,6 +1,7 @@
 """Final native export selection must remain receipt-bound."""
 
 import json
+from pathlib import Path
 
 import pytest
 
@@ -39,6 +40,21 @@ def test_selects_only_audited_extension_endpoint(tmp_path):
     source = receipt(tmp_path)
     _, row, frame = final_frame(source)
     assert row["step"] == 42 and frame["time"] == 0.9975
+
+
+def test_selects_byte_preserved_remote_endpoint_with_path_map(tmp_path):
+    source = receipt(tmp_path)
+    path = source / "continuation.json"
+    value = json.loads(path.read_text())
+    value["stages"]["extension"]["native_frames"][0]["path"] = (
+        "/Users/remote/archive/extension/plt00042"
+    )
+    path.write_text(json.dumps(value))
+    mapping = {Path("/Users/remote/archive"): source}
+    _, row, frame = final_frame(source, mapping)
+    assert row["step"] == 42 and frame["path"].startswith("/Users/remote/")
+    with pytest.raises(FileNotFoundError):
+        final_frame(source)
 
 
 @pytest.mark.parametrize("change", ["running", "time", "force", "path"])

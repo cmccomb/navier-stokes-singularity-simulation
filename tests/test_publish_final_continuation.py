@@ -177,6 +177,45 @@ def test_completed_continuation_becomes_bounded_public_record(tmp_path):
     assert "t = 0.9975" in text and "no fit or values beyond the endpoint" in text
 
 
+def test_byte_preserved_remote_archive_can_be_audited_with_path_map(tmp_path):
+    source = fixture(tmp_path)
+    receipt_path = source / "continuation.json"
+    receipt = json.loads(receipt_path.read_text())
+    parent = Path(receipt["parent"])
+    remote_source = Path("/Users/remote/continuation")
+    remote_parent = Path("/Users/remote/parent")
+
+    def remote(value: str) -> str:
+        path = Path(value)
+        if path.is_relative_to(source):
+            return str(remote_source / path.relative_to(source))
+        if path.is_relative_to(parent):
+            return str(remote_parent / path.relative_to(parent))
+        raise AssertionError(path)
+
+    receipt["parent"] = str(remote_parent)
+    for stage in receipt["stages"].values():
+        for frame in stage.get("native_frames", []):
+            frame["path"] = remote(frame["path"])
+    receipt_path.write_text(json.dumps(receipt) + "\n")
+    combined_path = source / "combined-frames.json"
+    combined = json.loads(combined_path.read_text())
+    for frame in combined["frames"]:
+        frame["path"] = remote(frame["path"])
+    combined_path.write_text(json.dumps(combined) + "\n")
+
+    mapping = {remote_source: source, remote_parent: parent}
+    report = audit_continuation(source, mapping, "f" * 64)
+    assert report["endpoint"]["time"] == 0.9975
+    assert report["source"]["archive_path_map_sha256"] == "f" * 64
+    assert report["source"]["archive_path_map"] == [
+        {"source": str(remote_source), "target": str(source)},
+        {"source": str(remote_parent), "target": str(parent)},
+    ]
+    with pytest.raises(FileNotFoundError):
+        audit_continuation(source)
+
+
 def test_endpoint_native_diagnostics_are_hash_and_value_bound(tmp_path):
     source = fixture(tmp_path)
     report = audit_continuation(source)

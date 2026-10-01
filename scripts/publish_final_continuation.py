@@ -16,6 +16,11 @@ from pathlib import Path
 
 import matplotlib
 
+from scripts.archive_path_map import (
+    load_path_map,
+    path_map_record,
+    resolve_archive_path,
+)
 from scripts.paper_run import MARKER, sha, write
 
 matplotlib.use("Agg")
@@ -92,7 +97,12 @@ def _parent_history(parent: Path, record: dict) -> list[dict]:
     return rows
 
 
-def audit_continuation(source: Path) -> dict:
+def audit_continuation(
+    source: Path,
+    path_map: dict[Path, Path] | None = None,
+    path_map_sha256: str | None = None,
+) -> dict:
+    path_map = path_map or {}
     source = source.resolve(strict=True)
     receipt_path = source / "continuation.json"
     receipt = _read(receipt_path)
@@ -115,7 +125,7 @@ def audit_continuation(source: Path) -> dict:
         if sha(source / "bundle" / name) != expected:
             raise ValueError(f"pinned continuation asset changed: {name}")
 
-    parent = Path(receipt["parent"]).resolve(strict=True)
+    parent = resolve_archive_path(receipt["parent"], path_map)
     parent_record_path = parent / "run.json"
     if sha(parent_record_path) != receipt["parent_record_sha256"]:
         raise ValueError("parent completion record changed")
@@ -161,7 +171,7 @@ def audit_continuation(source: Path) -> dict:
         native_frames = stages[name].get("native_frames", [])
         if len(native_frames) != len(expected) or any(
             not _close(frame["time"], time, 1e-12)
-            or not Path(frame["path"]).is_dir()
+            or not resolve_archive_path(frame["path"], path_map).is_dir()
             for frame, time in zip(native_frames, expected, strict=True)
         ):
             raise ValueError(f"{name} native-frame audit is incomplete")
@@ -198,7 +208,7 @@ def audit_continuation(source: Path) -> dict:
         or receipt.get("combined_frames") != len(frames)
         or len(frames) != len(expected_times)
         or any(not _close(frame["time"], time, 1e-12) for frame, time in zip(frames, expected_times, strict=True))
-        or any(not Path(frame["path"]).is_dir() for frame in frames)
+        or any(not resolve_archive_path(frame["path"], path_map).is_dir() for frame in frames)
     ):
         raise ValueError("combined from-rest native-frame lineage is incomplete")
 
@@ -222,6 +232,8 @@ def audit_continuation(source: Path) -> dict:
             "binary_sha256": receipt["bundle_sha256"]["ns_incflo"],
             "checker_sha256": receipt["bundle_sha256"]["ns_archive_check"],
             "profile_sha256": receipt["bundle_sha256"]["profile.tbl"],
+            "archive_path_map": path_map_record(path_map),
+            "archive_path_map_sha256": path_map_sha256,
         },
         "mesh": {
             "base_n": parent_record["parameters"]["base_n"],
@@ -476,8 +488,14 @@ def publish(
     endpoint_diagnostics: Path,
     endpoint_snapshot: Path,
     site: Path,
+    path_map_path: Path | None = None,
 ) -> dict:
-    report = audit_continuation(continuation)
+    path_map = load_path_map(path_map_path)
+    report = audit_continuation(
+        continuation,
+        path_map,
+        sha(path_map_path) if path_map_path else None,
+    )
     attach_endpoint_diagnostics(
         report, endpoint_diagnostics, endpoint_snapshot
     )
@@ -506,12 +524,14 @@ def main() -> None:
     parser.add_argument("--endpoint-diagnostics", type=Path, required=True)
     parser.add_argument("--endpoint-snapshot", type=Path, required=True)
     parser.add_argument("--site", type=Path, required=True)
+    parser.add_argument("--path-map", type=Path)
     args = parser.parse_args()
     report = publish(
         args.continuation,
         args.endpoint_diagnostics,
         args.endpoint_snapshot,
         args.site,
+        args.path_map,
     )
     print(json.dumps({"endpoint": report["endpoint"], "validated": True}))
 

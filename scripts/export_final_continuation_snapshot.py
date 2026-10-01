@@ -15,10 +15,18 @@ import os
 import shutil
 from pathlib import Path
 
+from scripts.archive_path_map import (
+    load_path_map,
+    path_map_record,
+    resolve_archive_path,
+)
 from scripts.export_mesh_snapshot import bounded, sha, tree_hashes
 
 
-def final_frame(source: Path) -> tuple[dict, dict, dict]:
+def final_frame(
+    source: Path, path_map: dict[Path, Path] | None = None
+) -> tuple[dict, dict, dict]:
+    path_map = path_map or {}
     receipt = json.loads((source / "continuation.json").read_text())
     if receipt.get("status") != "completed" or receipt.get("validated") is not True:
         raise ValueError("continuation must be completed and validated")
@@ -36,7 +44,7 @@ def final_frame(source: Path) -> tuple[dict, dict, dict]:
         or frame.get("force_linf_error", math.inf) > 1e-12
     ):
         raise ValueError("extension endpoint audit differs from its diagnostics")
-    plot = Path(frame["path"]).resolve(strict=True)
+    plot = resolve_archive_path(frame["path"], path_map)
     if not plot.is_relative_to(source / "extension") or plot.name != f"plt{row['step']:05d}":
         raise ValueError("extension endpoint path is outside the accepted stage")
     return receipt, row, frame
@@ -47,6 +55,7 @@ def main() -> None:
     for key in ("continuation", "exporter", "output"):
         parser.add_argument("--" + key, type=Path, required=True)
     parser.add_argument("--library-dir", type=Path)
+    parser.add_argument("--path-map", type=Path)
     args = parser.parse_args()
     source, exporter = (
         args.continuation.resolve(strict=True),
@@ -58,9 +67,10 @@ def main() -> None:
     if args.library_dir:
         os.environ["DYLD_LIBRARY_PATH"] = str(args.library_dir.resolve(strict=True))
 
+    path_map = load_path_map(args.path_map)
     continuation_bytes = (source / "continuation.json").read_bytes()
-    receipt, row, frame = final_frame(source)
-    parent = Path(receipt["parent"]).resolve(strict=True)
+    receipt, row, frame = final_frame(source, path_map)
+    parent = resolve_archive_path(receipt["parent"], path_map)
     parent_bytes = (parent / "run.json").read_bytes()
     run = json.loads(parent_bytes)
     if (
@@ -78,7 +88,7 @@ def main() -> None:
     output.mkdir(parents=True)
     (output / "run-snapshot.json").write_bytes(parent_bytes)
     (output / "continuation-snapshot.json").write_bytes(continuation_bytes)
-    plot = Path(frame["path"])
+    plot = resolve_archive_path(frame["path"], path_map)
     hashes = tree_hashes(plot)
     raw, log = output / f"{plot.name}.bin", output / f"{plot.name}.log"
     usage = bounded(
@@ -110,6 +120,8 @@ def main() -> None:
         "source_continuation_sha256": hashlib.sha256(continuation_bytes).hexdigest(),
         "exporter_sha256": sha(exporter),
         "export_script_sha256": sha(Path(__file__)),
+        "archive_path_map": path_map_record(path_map),
+        "archive_path_map_sha256": sha(args.path_map) if args.path_map else None,
         "profile_sha256": run["profile_manifest"]["sha256"],
         "parameters": run["parameters"],
         "frames": [
