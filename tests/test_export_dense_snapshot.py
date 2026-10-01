@@ -52,3 +52,67 @@ def test_snapshot_loader_rejects_tampered_dense_receipt(tmp_path):
     (tmp_path / "manifest.json").write_text(json.dumps(manifest))
     with pytest.raises(ValueError, match="native frame audit"):
         load_snapshot(tmp_path)
+
+
+def test_snapshot_loader_rejects_tampered_continuation_receipt(tmp_path):
+    raw = tmp_path / "plt00001.bin"
+    np.zeros((8, 8, 8, 6), dtype="<f8").tofile(raw)
+    run_file = tmp_path / "run-snapshot.json"
+    run_file.write_text(
+        json.dumps(
+            {
+                "binary_sha256": "binary",
+                "profile_manifest": {"sha256": "profile"},
+            }
+        )
+    )
+    audit = {"step": 1, "time": 0.1}
+    continuation_file = tmp_path / "continuation-snapshot.json"
+    continuation_file.write_text(
+        json.dumps(
+            {
+                "status": "completed",
+                "validated": True,
+                "parent_record_sha256": sha(run_file),
+                "bundle_sha256": {
+                    "ns_incflo": "binary",
+                    "profile.tbl": "profile",
+                },
+                "stages": {
+                    "extension": {
+                        "status": "completed",
+                        "validated": True,
+                        "native_frames": [audit],
+                    }
+                },
+            }
+        )
+    )
+    block = {
+        "level": 0,
+        "index_lo": [0, 0, 0],
+        "shape": [8, 8, 8, 6],
+        "spacing": [0.25] * 3,
+        "origin": [-1] * 3,
+        "offset_bytes": 0,
+    }
+    frame = {
+        "step": 1,
+        "path": raw.name,
+        "sha256": sha(raw),
+        "diagnostic": {"volume": 8, "energy": 0, "peak_speed": 0},
+        "native_audit": audit,
+        "export": {"time": 0.1, "blocks": [block]},
+    }
+    manifest = {
+        "complete": True,
+        "source_record_sha256": sha(run_file),
+        "source_continuation_sha256": sha(continuation_file),
+        "profile_sha256": "profile",
+        "frames": [frame],
+    }
+    (tmp_path / "manifest.json").write_text(json.dumps(manifest))
+    load_snapshot(tmp_path)
+    continuation_file.write_text("{}")
+    with pytest.raises(ValueError, match="continuation receipt"):
+        load_snapshot(tmp_path)

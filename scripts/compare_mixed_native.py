@@ -139,6 +139,34 @@ def load_snapshot(path: Path) -> tuple[dict, dict]:
                        if source["step"] == frame["step"] and source["time"] == frame["export"]["time"]]
             if len(matches) != 1 or frame.get("native_audit") != matches[0]:
                 raise ValueError("dense native frame audit differs")
+    if "source_continuation_sha256" in report:
+        continuation_path = path / "continuation-snapshot.json"
+        if sha(continuation_path) != report["source_continuation_sha256"]:
+            raise ValueError("continuation receipt differs")
+        continuation = json.loads(continuation_path.read_text())
+        extension = continuation.get("stages", {}).get("extension", {})
+        if (
+            continuation.get("status") != "completed"
+            or continuation.get("validated") is not True
+            or extension.get("status") != "completed"
+            or extension.get("validated") is not True
+            or continuation["parent_record_sha256"]
+            != report["source_record_sha256"]
+            or continuation["bundle_sha256"]["ns_incflo"]
+            != run["binary_sha256"]
+            or continuation["bundle_sha256"]["profile.tbl"]
+            != report["profile_sha256"]
+        ):
+            raise ValueError("continuation snapshot lineage is incomplete")
+        for frame in report["frames"]:
+            matches = [
+                source
+                for source in extension["native_frames"]
+                if source["step"] == frame["step"]
+                and source["time"] == frame["export"]["time"]
+            ]
+            if len(matches) != 1 or frame.get("native_audit") != matches[0]:
+                raise ValueError("continuation native frame audit differs")
     for frame in report["frames"]:
         raw = path / frame["path"]
         if sha(raw) != frame["sha256"]:
