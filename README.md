@@ -73,25 +73,27 @@ made after the late-time comparison and does not define a prospective pass.
 The [32³→64³](site/data/onset-n32-n64-20260927.json) and
 [64³→128³](site/data/onset-n64-n128-20260927.json) audit records are retained.
 
-The outer-band 64³ companion has supplied two finalized active frames while
-its full run continues. Conservative comparison with the completed outer-band
-128³ run gives velocity gaps of 2.24% and 2.13% at `t≈0.566` and `0.588`;
-forcing gaps are 2.34% and 2.61%. The
+The outer-band 64³ companion reached about `t=0.902` before its wall-clock
+guard stopped the process; its native prefix and checkpoint remain preserved.
+Conservative comparison with the completed outer-band 128³ run gives velocity
+gaps of 2.24% and 2.13% at `t≈0.566` and `0.588`; forcing gaps are 2.34% and
+2.61%. The
 [native prefix record](site/data/outer-band-prefix-20260927.json) verifies
 complete active-volume coverage across different AMR footprints. Neither
 velocity gap passes the 2% working target. These selected frames are checked,
-but the 64³ trajectory is not yet complete or fully audited.
+but the stopped 64³ trajectory is incomplete and has no final archive audit.
 The [prospective outer-band checkpoint protocol](site/data/outer-band-protocol-20260927.json)
 locks thirteen subsequent scheduled states and the spatial screen before
 those states are produced.
 Its first eight [audited comparisons](site/data/outer-band-prospective-prefix-20260927.json)
 show two velocity misses followed by three consecutive passes at
 `t=0.615808–0.629071` under the 2% velocity / 5% forcing working screen.
-This is a provisional spatial candidate at sampled times. The 64³ full-run
-audit, refined fixed-force timestep control, and diagnostic gates remain
-outstanding. The next three locked checkpoints through `t=0.699573` fail the
-forcing screen, reaching 10.601% even as the velocity gap falls to 1.672%.
-Five later checkpoints are pending.
+This is a provisional spatial candidate at sampled times. The next three
+locked checkpoints through `t=0.699573` fail the forcing screen, reaching
+10.601% even as the velocity gap falls to 1.672%. Five later locked
+checkpoints remain unmeasured because the 64³ source run stopped. The completed
+timestep controls and diagnostics below support velocity stability in the
+candidate interval, while mixed residual evidence still prevents qualification.
 
 The [outer-band candidate diagnostics](site/results.html#precursor-diagnostics)
 show rising peak speed and sampled vorticity with shrinking broad half-peak
