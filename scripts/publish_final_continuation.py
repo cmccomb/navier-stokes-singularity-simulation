@@ -383,8 +383,15 @@ def render(report: dict, output: Path) -> None:
             "svg.hashsalt": "final-finite-continuation-v1",
         }
     )
-    fig, axes = plt.subplots(2, 2, figsize=(12, 9), layout="constrained")
-    fig.get_layout_engine().set(rect=(0.02, 0.105, 0.98, 0.94))
+    fig, axes = plt.subplots(2, 2, figsize=(12, 9))
+    fig.subplots_adjust(
+        left=0.09,
+        right=0.98,
+        top=0.87,
+        bottom=0.20,
+        hspace=0.46,
+        wspace=0.28,
+    )
     panels = (
         ("peak_speed", "Peak speed", "model speed"),
         ("energy", "Kinetic energy", "model energy"),
@@ -395,7 +402,7 @@ def render(report: dict, output: Path) -> None:
         values = [row[key] for row in rows]
         ax.plot(times, values, color="#69d2e7", linewidth=2.2)
         ax.scatter(times[-1], values[-1], color="#ffd88c", s=42, zorder=3)
-        ax.set_title(title, fontsize=15, loc="left", color="#e5eef4")
+        ax.set_title(title, fontsize=14, loc="left", color="#e5eef4", pad=10)
         ax.set_xlabel("Computed time t")
         ax.set_ylabel(ylabel)
         ax.grid(color="#40546a", alpha=0.32, linewidth=0.7)
@@ -406,6 +413,7 @@ def render(report: dict, output: Path) -> None:
         f"t = {report['endpoint']['time']:.4f}",
         fontsize=20,
         color="#e5eef4",
+        y=0.96,
     )
     native = report.get("endpoint_native_diagnostics", {}).get("frame")
     if native is not None:
@@ -422,10 +430,16 @@ def render(report: dict, output: Path) -> None:
         )
         fig.text(
             0.02,
-            0.055,
+            0.105,
             "Native endpoint · "
             f"{peak_location}; {core}; support radius "
-            f"{native['half_peak_support_equivalent_radius']:.4g}; "
+            f"{native['half_peak_support_equivalent_radius']:.4g}",
+            color="#d3e2eb",
+            fontsize=10.5,
+        )
+        fig.text(
+            0.02,
+            0.077,
             f"|ω|max {native['peak_vorticity']:.4g}; ω RMS "
             f"{native['vorticity_rms']:.4g}; force L² {native['force_l2']:.4g}; "
             f"divergence RMS {native['divergence_rms']:.4g}",
@@ -434,13 +448,26 @@ def render(report: dict, output: Path) -> None:
         )
     fig.text(
         0.02,
-        0.018,
-        "Gold marks the last computed state. Lines connect solver steps; no fit or values beyond the endpoint. This single-mesh extension is not a singularity or convergence result.",
+        0.042,
+        "Gold marks the last computed state. Lines connect solver steps; no fit or values beyond the endpoint.",
         color="#aabfce",
-        fontsize=11,
+        fontsize=10.5,
+    )
+    fig.text(
+        0.02,
+        0.016,
+        "This single-mesh extension is neither a singularity result nor a convergence result.",
+        color="#aabfce",
+        fontsize=10.5,
     )
     output.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(output, format="svg", metadata={"Date": None})
+    output_format = output.suffix.removeprefix(".").lower()
+    if output_format == "svg":
+        fig.savefig(output, format="svg", metadata={"Date": None})
+    elif output_format == "png":
+        fig.savefig(output, format="png", dpi=96)
+    else:
+        raise ValueError("final continuation render must be SVG or PNG")
     plt.close(fig)
 
 

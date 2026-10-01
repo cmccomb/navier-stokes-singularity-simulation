@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 
 import pytest
+from PIL import Image
 
 from scripts.paper_run import sha
 from scripts.publish_final_continuation import (
@@ -228,6 +229,10 @@ def test_endpoint_native_diagnostics_are_hash_and_value_bound(tmp_path):
     assert "peak outside finest core" in chart_text
     assert "no finest-core half-peak radius" in chart_text
     assert "force L² 2" in chart_text
+    preview = tmp_path / "native-chart.png"
+    render(report, preview)
+    with Image.open(preview) as image:
+        assert image.size == (1152, 864)
     results = tmp_path / "results.html"
     results.write_text(
         "<article>\n"
