@@ -10,6 +10,7 @@ from scripts.publish_final_continuation import (
     attach_endpoint_diagnostics,
     audit_continuation,
     render,
+    updated_results_page,
 )
 
 
@@ -202,6 +203,7 @@ def test_endpoint_native_diagnostics_are_hash_and_value_bound(tmp_path):
         "vorticity_rms": 1,
         "force_l2": 2,
         "divergence_rms": 0.01,
+        "divergence_linf": 0.02,
     }
     diagnostics = {
         "kind": "outer-band-finite-precursor-diagnostics",
@@ -225,6 +227,20 @@ def test_endpoint_native_diagnostics_are_hash_and_value_bound(tmp_path):
     assert "peak outside finest core" in chart_text
     assert "no finest-core half-peak radius" in chart_text
     assert "force L² 2" in chart_text
+    results = tmp_path / "results.html"
+    results.write_text(
+        "<article>\n"
+        "        <!-- FINAL_CONTINUATION:BEGIN -->\n"
+        "        <p>Pending.</p>\n"
+        "        <!-- FINAL_CONTINUATION:END -->\n"
+        "</article>\n"
+    )
+    published = updated_results_page(report, results)
+    assert 'id="final-continuation"' in published
+    assert "peak is outside the finest core" in published
+    assert "provisional spatial candidate" in published
+    assert "does not add a spatial-convergence certificate" in published
+    assert "The analytical paper supplies the blowup result" in published
     diagnostics["frames"][0]["peak_speed"] += 1
     path.write_text(json.dumps(diagnostics) + "\n")
     with pytest.raises(ValueError, match="peak_speed differs"):

@@ -83,6 +83,9 @@ def test_site_pages_have_no_broken_local_links() -> None:
 def test_dense_refinement_records_keep_the_unqualified_result_visible() -> None:
     page = (SITE / "results.html").read_text()
     assert "still prevent a resolution-qualified precursor" in page
+    assert page.count("<!-- FINAL_CONTINUATION:BEGIN -->") == 1
+    assert page.count("<!-- FINAL_CONTINUATION:END -->") == 1
+    assert "Endpoint values and graphics are withheld" in page
     quarter = json.loads((SITE / "data/outer-dense-n64-quarter-probe.json").read_text())
     fine = json.loads((SITE / "data/outer-dense-n128-probe.json").read_text())
     from_rest = json.loads((SITE / "data/outer-from-rest-n64-temporal.json").read_text())

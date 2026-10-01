@@ -29,6 +29,8 @@ REQUIRED_STAGES = (
     "extension",
 )
 DIAGNOSTICS = ("peak_speed", "energy", "l2_error", "linf_error")
+RESULTS_BEGIN = "        <!-- FINAL_CONTINUATION:BEGIN -->"
+RESULTS_END = "        <!-- FINAL_CONTINUATION:END -->"
 
 
 def _read(path: Path) -> dict:
@@ -309,6 +311,60 @@ def attach_endpoint_diagnostics(
     return report
 
 
+def final_results_section(report: dict) -> str:
+    native = report["endpoint_native_diagnostics"]["frame"]
+    endpoint = report["endpoint"]
+    mesh = report["mesh"]
+    probe = report["temporal_probe"]
+    boundary = report["claim_boundary"]
+    if (
+        boundary["spatially_qualified"] is not False
+        or boundary["singularity_or_blowup_demonstrated"] is not False
+        or boundary["values_beyond_computed_endpoint"] is not False
+    ):
+        raise ValueError("final results section requires the finite claim boundary")
+    core_radius = native["finest_core_half_peak_equivalent_radius"]
+    core_text = (
+        f"{core_radius:.9g}"
+        if core_radius is not None
+        else "Not reported; the global peak is outside the finest core"
+    )
+    return f"""{RESULTS_BEGIN}
+        <h2 id="final-continuation">Final finite continuation</h2>
+        <p>The accepted 128³-base, five-level branch continues the audited from-rest trajectory through <span class="math">t = {endpoint['time']:.4f}</span>. Its short shared-checkpoint timestep probe passed before extension: relative composite L² {probe['relative_composite_l2']:.6g} against a {probe['l2_limit']:.6g} limit, and L∞ divided by baseline peak {probe['linf_over_baseline_peak']:.6g} against a {probe['linf_limit']:.6g} limit. The <a href="data/final-continuation.json">machine record</a> binds the runner, solver, force profile, complete native-frame lineage, endpoint snapshot, analyzer, and figure.</p>
+        <figure class="evidence-figure">
+          <div class="plot-viewport" tabindex="0" role="region" aria-label="Final finite continuation figure; scroll horizontally on narrow screens"><img src="media/final-continuation.svg" width="1152" height="864" loading="lazy" alt="Four computed diagnostic histories through t = {endpoint['time']:.4f}, followed by a native endpoint summary for core location, support radius, vorticity, force, and divergence. No values are fitted beyond the endpoint." /></div>
+          <p class="plot-scroll-hint">Scroll sideways to inspect all four continuation panels.</p>
+          <figcaption><a href="data/final-continuation.json">Audited continuation and endpoint data</a> · computed states only; no fit beyond the endpoint.</figcaption>
+        </figure>
+        <table>
+          <thead><tr><th scope="col">Final computed state</th><th scope="col">Value</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Base grid / fixed levels / finest equivalent</th><td>{mesh['base_n']}³ / {mesh['levels']} / {mesh['finest_equivalent_n']}³</td></tr>
+            <tr><th scope="row">Endpoint step / time</th><td>{endpoint['step']} / {endpoint['time']:.9g}</td></tr>
+            <tr><th scope="row">Peak speed</th><td>{endpoint['peak_speed']:.9g}</td></tr>
+            <tr><th scope="row">Kinetic energy</th><td>{endpoint['energy']:.9g}</td></tr>
+            <tr><th scope="row">RMS / maximum target deviation</th><td>{endpoint['l2_error']:.9g} / {endpoint['linf_error']:.9g}</td></tr>
+            <tr><th scope="row">Half-peak support equivalent radius</th><td>{native['half_peak_support_equivalent_radius']:.9g}</td></tr>
+            <tr><th scope="row">Finest-core half-peak equivalent radius</th><td>{core_text}</td></tr>
+            <tr><th scope="row">Peak / RMS vorticity</th><td>{native['peak_vorticity']:.9g} / {native['vorticity_rms']:.9g}</td></tr>
+            <tr><th scope="row">Manufactured-force L² norm</th><td>{native['force_l2']:.9g}</td></tr>
+            <tr><th scope="row">Sampled divergence RMS / maximum</th><td>{native['divergence_rms']:.9g} / {native['divergence_linf']:.9g}</td></tr>
+          </tbody>
+        </table>
+        <p>This extension follows one grid-dependent trajectory beyond the spatially tested interval. It is a finite model extrapolation and does not add a spatial-convergence certificate. The separate refinement evidence identifies 0.615808–0.629071 as a provisional spatial candidate and supports local velocity timestep stability there; mixed residual behavior, material residual timestep sensitivity, and peaks outside the finest core still prevent a resolution-qualified precursor or likely-singularity claim. The analytical paper supplies the blowup result; this computation supplies finite pre-singular diagnostics only.</p>
+{RESULTS_END}"""
+
+
+def updated_results_page(report: dict, page: Path) -> str:
+    text = page.read_text()
+    if text.count(RESULTS_BEGIN) != 1 or text.count(RESULTS_END) != 1:
+        raise ValueError("results page must contain one final-continuation slot")
+    start = text.index(RESULTS_BEGIN)
+    end = text.index(RESULTS_END, start) + len(RESULTS_END)
+    return text[:start] + final_results_section(report) + text[end:]
+
+
 def render(report: dict, output: Path) -> None:
     rows = report["trajectory"]
     times = [row["time"] for row in rows]
@@ -399,6 +455,8 @@ def main() -> None:
     attach_endpoint_diagnostics(
         report, args.endpoint_diagnostics, args.endpoint_snapshot
     )
+    results_page = args.site / "results.html"
+    results_text = updated_results_page(report, results_page)
     chart = args.site / "media/final-continuation.svg"
     render(report, chart)
     report["visualization"] = {
@@ -407,6 +465,11 @@ def main() -> None:
         "scope": "Computed solver-step diagnostics from the accepted baseline continuation branch; no temporal interpolation or fitted projection.",
     }
     report["publisher_sha256"] = sha(Path(__file__))
+    results_page.write_text(results_text)
+    report["publication"] = {
+        "results_page": "results.html",
+        "results_page_sha256": sha(results_page),
+    }
     write(args.site / "data/final-continuation.json", report)
     print(json.dumps({"endpoint": report["endpoint"], "validated": True}))
 
