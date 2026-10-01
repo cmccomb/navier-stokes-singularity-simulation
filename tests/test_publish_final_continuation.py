@@ -200,6 +200,7 @@ def test_endpoint_native_diagnostics_are_hash_and_value_bound(tmp_path):
         "finest_core_half_peak_equivalent_radius": None,
         "peak_vorticity": 100,
         "vorticity_rms": 1,
+        "force_l2": 2,
         "divergence_rms": 0.01,
     }
     diagnostics = {
@@ -218,6 +219,12 @@ def test_endpoint_native_diagnostics_are_hash_and_value_bound(tmp_path):
     path.write_text(json.dumps(diagnostics) + "\n")
     attach_endpoint_diagnostics(report, path, snapshot)
     assert report["endpoint_native_diagnostics"]["frame"]["peak_vorticity"] == 100
+    chart = tmp_path / "native-chart.svg"
+    render(report, chart)
+    chart_text = chart.read_text()
+    assert "peak outside finest core" in chart_text
+    assert "no finest-core half-peak radius" in chart_text
+    assert "force L² 2" in chart_text
     diagnostics["frames"][0]["peak_speed"] += 1
     path.write_text(json.dumps(diagnostics) + "\n")
     with pytest.raises(ValueError, match="peak_speed differs"):

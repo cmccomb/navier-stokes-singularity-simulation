@@ -327,7 +327,8 @@ def render(report: dict, output: Path) -> None:
             "svg.hashsalt": "final-finite-continuation-v1",
         }
     )
-    fig, axes = plt.subplots(2, 2, figsize=(12, 8), layout="constrained")
+    fig, axes = plt.subplots(2, 2, figsize=(12, 9), layout="constrained")
+    fig.get_layout_engine().set(rect=(0.02, 0.105, 0.98, 0.94))
     panels = (
         ("peak_speed", "Peak speed", "model speed"),
         ("energy", "Kinetic energy", "model energy"),
@@ -350,9 +351,34 @@ def render(report: dict, output: Path) -> None:
         fontsize=20,
         color="#e5eef4",
     )
+    native = report.get("endpoint_native_diagnostics", {}).get("frame")
+    if native is not None:
+        core_radius = native["finest_core_half_peak_equivalent_radius"]
+        core = (
+            f"finest-core half-peak radius {core_radius:.4g}"
+            if core_radius is not None
+            else "no finest-core half-peak radius"
+        )
+        peak_location = (
+            "peak inside finest core"
+            if native["peak_in_finest_core"]
+            else "peak outside finest core"
+        )
+        fig.text(
+            0.02,
+            0.055,
+            "Native endpoint · "
+            f"{peak_location}; {core}; support radius "
+            f"{native['half_peak_support_equivalent_radius']:.4g}; "
+            f"|ω|max {native['peak_vorticity']:.4g}; ω RMS "
+            f"{native['vorticity_rms']:.4g}; force L² {native['force_l2']:.4g}; "
+            f"divergence RMS {native['divergence_rms']:.4g}",
+            color="#d3e2eb",
+            fontsize=10.5,
+        )
     fig.text(
         0.02,
-        0.012,
+        0.018,
         "Gold marks the last computed state. Lines connect solver steps; no fit or values beyond the endpoint. This single-mesh extension is not a singularity or convergence result.",
         color="#aabfce",
         fontsize=11,
