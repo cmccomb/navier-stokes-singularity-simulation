@@ -9,6 +9,7 @@ from scripts.paper_run import sha
 from scripts.publish_final_continuation import (
     attach_endpoint_diagnostics,
     audit_continuation,
+    publish,
     render,
     updated_results_page,
 )
@@ -241,6 +242,21 @@ def test_endpoint_native_diagnostics_are_hash_and_value_bound(tmp_path):
     assert "provisional spatial candidate" in published
     assert "does not add a spatial-convergence certificate" in published
     assert "The analytical paper supplies the blowup result" in published
+    site = tmp_path / "site"
+    (site / "media").mkdir(parents=True)
+    (site / "data").mkdir()
+    (site / "results.html").write_text(results.read_text())
+    released = publish(source, path, snapshot, site)
+    assert released["validated"] is True
+    assert (site / "media/final-continuation.svg").is_file()
+    saved = json.loads((site / "data/final-continuation.json").read_text())
+    assert saved["publication"]["results_page_sha256"] == sha(
+        site / "results.html"
+    )
+    final_page = (site / "results.html").read_text()
+    assert "Pending." not in final_page
+    assert 'href="data/final-continuation.json"' in final_page
+    assert 'src="media/final-continuation.svg"' in final_page
     diagnostics["frames"][0]["peak_speed"] += 1
     path.write_text(json.dumps(diagnostics) + "\n")
     with pytest.raises(ValueError, match="peak_speed differs"):

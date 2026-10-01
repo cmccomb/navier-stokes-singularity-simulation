@@ -444,20 +444,19 @@ def render(report: dict, output: Path) -> None:
     plt.close(fig)
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--continuation", type=Path, required=True)
-    parser.add_argument("--endpoint-diagnostics", type=Path, required=True)
-    parser.add_argument("--endpoint-snapshot", type=Path, required=True)
-    parser.add_argument("--site", type=Path, required=True)
-    args = parser.parse_args()
-    report = audit_continuation(args.continuation)
+def publish(
+    continuation: Path,
+    endpoint_diagnostics: Path,
+    endpoint_snapshot: Path,
+    site: Path,
+) -> dict:
+    report = audit_continuation(continuation)
     attach_endpoint_diagnostics(
-        report, args.endpoint_diagnostics, args.endpoint_snapshot
+        report, endpoint_diagnostics, endpoint_snapshot
     )
-    results_page = args.site / "results.html"
+    results_page = site / "results.html"
     results_text = updated_results_page(report, results_page)
-    chart = args.site / "media/final-continuation.svg"
+    chart = site / "media/final-continuation.svg"
     render(report, chart)
     report["visualization"] = {
         "path": "media/final-continuation.svg",
@@ -470,7 +469,23 @@ def main() -> None:
         "results_page": "results.html",
         "results_page_sha256": sha(results_page),
     }
-    write(args.site / "data/final-continuation.json", report)
+    write(site / "data/final-continuation.json", report)
+    return report
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--continuation", type=Path, required=True)
+    parser.add_argument("--endpoint-diagnostics", type=Path, required=True)
+    parser.add_argument("--endpoint-snapshot", type=Path, required=True)
+    parser.add_argument("--site", type=Path, required=True)
+    args = parser.parse_args()
+    report = publish(
+        args.continuation,
+        args.endpoint_diagnostics,
+        args.endpoint_snapshot,
+        args.site,
+    )
     print(json.dumps({"endpoint": report["endpoint"], "validated": True}))
 
 
