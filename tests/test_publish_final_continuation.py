@@ -6,7 +6,11 @@ from pathlib import Path
 import pytest
 
 from scripts.paper_run import sha
-from scripts.publish_final_continuation import audit_continuation, render
+from scripts.publish_final_continuation import (
+    attach_endpoint_diagnostics,
+    audit_continuation,
+    render,
+)
 
 
 def row(step, time, dt, peak=1.0):
@@ -168,6 +172,56 @@ def test_completed_continuation_becomes_bounded_public_record(tmp_path):
     render(result, chart)
     text = chart.read_text()
     assert "t = 0.9975" in text and "no fit or values beyond the endpoint" in text
+
+
+def test_endpoint_native_diagnostics_are_hash_and_value_bound(tmp_path):
+    source = fixture(tmp_path)
+    report = audit_continuation(source)
+    snapshot = tmp_path / "snapshot"
+    snapshot.mkdir()
+    manifest = {
+        "complete": True,
+        "source_continuation_sha256": report["source"][
+            "continuation_record_sha256"
+        ],
+    }
+    (snapshot / "manifest.json").write_text(json.dumps(manifest) + "\n")
+    endpoint = report["endpoint"]
+    frame = {
+        "step": endpoint["step"],
+        "time": endpoint["time"],
+        "peak_speed": endpoint["peak_speed"],
+        "kinetic_energy": endpoint["energy"],
+        "target_l2_error": endpoint["l2_error"],
+        "target_linf_error": endpoint["linf_error"],
+        "peak_level": 4,
+        "peak_in_finest_core": False,
+        "half_peak_support_equivalent_radius": 0.1,
+        "finest_core_half_peak_equivalent_radius": None,
+        "peak_vorticity": 100,
+        "vorticity_rms": 1,
+        "divergence_rms": 0.01,
+    }
+    diagnostics = {
+        "kind": "outer-band-finite-precursor-diagnostics",
+        "validated": True,
+        "source_snapshot_sha256": [sha(snapshot / "manifest.json")],
+        "source_binary_sha256": report["source"]["binary_sha256"],
+        "source_profile_sha256": report["source"]["profile_sha256"],
+        "analyzer_sha256": "d" * 64,
+        "definitions": {"support_radius": "test"},
+        "core_half_width": 0.0625,
+        "frames": [frame],
+        "scope": "one native endpoint",
+    }
+    path = tmp_path / "endpoint.json"
+    path.write_text(json.dumps(diagnostics) + "\n")
+    attach_endpoint_diagnostics(report, path, snapshot)
+    assert report["endpoint_native_diagnostics"]["frame"]["peak_vorticity"] == 100
+    diagnostics["frames"][0]["peak_speed"] += 1
+    path.write_text(json.dumps(diagnostics) + "\n")
+    with pytest.raises(ValueError, match="peak_speed differs"):
+        attach_endpoint_diagnostics(report, path, snapshot)
 
 
 @pytest.mark.parametrize("change", ["status", "gate", "lineage", "runner"])

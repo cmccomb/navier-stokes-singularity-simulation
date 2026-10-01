@@ -259,6 +259,56 @@ def audit_continuation(source: Path) -> dict:
     }
 
 
+def attach_endpoint_diagnostics(
+    report: dict, diagnostics_path: Path, snapshot: Path
+) -> dict:
+    diagnostics_path = diagnostics_path.resolve(strict=True)
+    snapshot = snapshot.resolve(strict=True)
+    diagnostics = _read(diagnostics_path)
+    manifest_path = snapshot / "manifest.json"
+    manifest = _read(manifest_path)
+    frames = diagnostics.get("frames", [])
+    if (
+        diagnostics.get("kind") != "outer-band-finite-precursor-diagnostics"
+        or diagnostics.get("validated") is not True
+        or len(frames) != 1
+        or diagnostics.get("source_snapshot_sha256") != [sha(manifest_path)]
+        or manifest.get("complete") is not True
+        or manifest.get("source_continuation_sha256")
+        != report["source"]["continuation_record_sha256"]
+        or diagnostics.get("source_binary_sha256")
+        != report["source"]["binary_sha256"]
+        or diagnostics.get("source_profile_sha256")
+        != report["source"]["profile_sha256"]
+    ):
+        raise ValueError("endpoint native diagnostic lineage is incomplete")
+    frame = frames[0]
+    endpoint = report["endpoint"]
+    for key, diagnostic_key in (
+        ("time", "time"),
+        ("peak_speed", "peak_speed"),
+        ("energy", "kinetic_energy"),
+        ("l2_error", "target_l2_error"),
+        ("linf_error", "target_linf_error"),
+    ):
+        if not math.isclose(
+            endpoint[key], frame[diagnostic_key], rel_tol=1e-9, abs_tol=1e-12
+        ):
+            raise ValueError(f"endpoint native {diagnostic_key} differs")
+    if endpoint["step"] != frame["step"]:
+        raise ValueError("endpoint native step differs")
+    report["endpoint_native_diagnostics"] = {
+        "source_diagnostics_sha256": sha(diagnostics_path),
+        "source_snapshot_manifest_sha256": sha(manifest_path),
+        "analyzer_sha256": diagnostics["analyzer_sha256"],
+        "definitions": diagnostics["definitions"],
+        "core_half_width": diagnostics["core_half_width"],
+        "frame": frame,
+        "scope": diagnostics["scope"],
+    }
+    return report
+
+
 def render(report: dict, output: Path) -> None:
     rows = report["trajectory"]
     times = [row["time"] for row in rows]
@@ -315,9 +365,14 @@ def render(report: dict, output: Path) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--continuation", type=Path, required=True)
+    parser.add_argument("--endpoint-diagnostics", type=Path, required=True)
+    parser.add_argument("--endpoint-snapshot", type=Path, required=True)
     parser.add_argument("--site", type=Path, required=True)
     args = parser.parse_args()
     report = audit_continuation(args.continuation)
+    attach_endpoint_diagnostics(
+        report, args.endpoint_diagnostics, args.endpoint_snapshot
+    )
     chart = args.site / "media/final-continuation.svg"
     render(report, chart)
     report["visualization"] = {
