@@ -117,9 +117,21 @@ The [three dense balance records](site/results.html#precursor-diagnostics)
 do not establish residual convergence. A completed
 [local fixed-force half-step comparison](site/data/outer-dense-n64-local-time.json)
 passes the candidate velocity gate at all three centers (0.0340%, 0.0224%,
-0.00835% relative L²), while [fieldwise balance gaps](site/results.html#precursor-diagnostics)
-remain comparable to the measured residuals. These branches share a checkpoint,
-so a from-rest 64³ half-step run and matched dense 128³ balance are still needed.
+0.00835% relative L²). An audited
+[quarter-step continuation](site/data/outer-dense-n64-quarter-probe.json) reduces
+the half-to-quarter velocity gaps to 0.00519%, 0.00342%, and 0.00905%. Its
+fieldwise balance gaps are 0.00252, 0.00521, and 0.00372, smaller than the
+baseline-to-half gaps at all three centers but still 38–48% of the quarter-step
+residual norms. A separate [from-rest half-step run](site/data/outer-from-rest-n64-temporal.json)
+gives 0.0192%, 0.0166%, and 0.0152% velocity gaps with exact force readback.
+
+The matched [dense 128³ continuation](site/data/outer-dense-n128-probe.json)
+also completed. Its finest-core residuals are 0.00677, 0.00478, and 0.01121;
+the finer value is lower at the latter two centers but more than twice the 64³
+value at the first. The dense derivative stencil is stable, but the spatial
+residual sequence is mixed. These results support local velocity timestep
+stability through the three candidate times; they do not establish residual
+convergence or a resolution-qualified singularity precursor.
 
 An [audited native diagnostic trace](site/results.html#precursor-diagnostics)
 at the same six times shows increasing peak speed and sampled vorticity and a
@@ -146,10 +158,13 @@ integration steps. At six matched checkpoints its velocity difference stayed
 below 0.21% relative composite L², reaching 0.083% at the endpoint; saved
 endpoint forcing fields were identical. This verifies the late-time comparison
 method on a coarse mesh, not the timestep accuracy of the 64³/128³ runs.
-The 32³-base control on Mali completed and joined the matched comparison. A
-96³-base intermediate run on Kay and a 64³-base outer-band companion on Oliver
-were launched after validated preflights. Their full trajectories are not yet
-completed or part of the published refinement sequence.
+The 32³-base control on Mali and the 96³-base intermediate run on Kay both
+completed their native audits. The 64³-base outer-band companion reached about
+`t=0.902` before its wall-clock guard stopped the process, leaving its native
+prefix and checkpoint intact. The completed, audited 128³ outer-band model is
+therefore the final production mesh. A bounded continuation from its `t=0.995`
+checkpoint toward `t=0.9975` is an explicitly extrapolative final run, not a
+new spatial-convergence certificate.
 
 ## Earlier PhiFlow publication workflow
 

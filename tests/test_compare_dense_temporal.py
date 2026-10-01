@@ -39,6 +39,28 @@ def test_same_checkpoint_and_halved_integration_controls_required():
         compatible(baseline, half)
 
 
+def test_half_to_quarter_controls_and_exact_checkpoint_parent_are_audited():
+    half, quarter = receipt(0.5), receipt(0.25)
+    quarter["parent_record_sha256"] = "later-parent-snapshot"
+    with pytest.raises(ValueError, match="parent_record"):
+        compatible(half, quarter, baseline_factor=0.5)
+    audit = compatible(
+        half,
+        quarter,
+        baseline_factor=0.5,
+        allow_equivalent_checkpoint_parent=True,
+    )
+    assert audit["checkpoint_parent_identity"] == "exact_checkpoint_state"
+    quarter["checkpoint_files"]["Header"]["sha256"] = "different-state"
+    with pytest.raises(ValueError, match="checkpoint_files"):
+        compatible(
+            half,
+            quarter,
+            baseline_factor=0.5,
+            allow_equivalent_checkpoint_parent=True,
+        )
+
+
 def test_pinned_legacy_baseline_controls_are_derived_from_parent():
     baseline, half = receipt(1), receipt(0.5)
     for key in (

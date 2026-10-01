@@ -1,0 +1,183 @@
+{
+  "schema_version": 1,
+  "kind": "temporal-fixed-force-native-sensitivity",
+  "scope": "Audit matched native paper-run fields without rewriting either run's status.\n\nTwo runs measure sensitivity, not observed order or a continuum error bound.\nNear-coincident legacy output events are listed, preserved, and compared; missing\nrequested events still fail. Aligned finer references are volume-restricted by\nthe separately verified AMReX archive checker.\n",
+  "checker_sha256": "f30abf1212b0d0538e1986aeb1d6fcaaa374c594a50f16fa22c755bc378db992",
+  "runs": [
+    {
+      "record_sha256": "7fd21d99a78350cd462914a3475944db61227ec8337a82a1f025354d0facf11e",
+      "original_status": "running",
+      "original_validated": false,
+      "original_error": null,
+      "parameters": {
+        "base_n": 64,
+        "widths": [
+          0.5,
+          0.25,
+          0.125,
+          0.0625
+        ],
+        "box": 32,
+        "end": 0.995,
+        "max_dt": 0.00025,
+        "integration_phase_step": 0,
+        "epsilon_tau_ratio": 0,
+        "frame_dt": 0.025,
+        "frame_phase_step": 0.75,
+        "revolved_refinement": {
+          "path": "refinement.bands",
+          "sha256": "04615722df9117e5b5931979491d04f6b820b12e0af435b02ce63ea0717be668"
+        }
+      },
+      "adapter_sha256": "728f068616e10d86ea73956710f172ba441e64fbf67416b999d0a1d6af680ec2",
+      "binary_sha256": "92a0c36aff5cbef1cc9ed45c19da5e0a7610c68c361c4a9b1b1264203b356ecd",
+      "profile_sha256": "fb613aa587c4bd42d63af26ac783e71f02b0380f570813a027b752a82f20f994",
+      "history_endpoint": {
+        "schema_version": 1,
+        "adapter_sha256": "728f068616e10d86ea73956710f172ba441e64fbf67416b999d0a1d6af680ec2",
+        "case": "paper",
+        "problem": 0,
+        "step": 1074,
+        "time": 0.7606245496019152,
+        "dt": 0.00021034895937835712,
+        "levels": 5,
+        "stored_cells": 1573888,
+        "active_cells": 1409920,
+        "volume": 8,
+        "l2_error": 0.0032664228001542924,
+        "openmp_max_threads": 2,
+        "force_threads_limit": 2,
+        "linf_error": 0.022874905415084246,
+        "peak_speed": 1.0368312988954633,
+        "energy": 0.18762499100052113,
+        "velocity_integral": [
+          -1.5435377956143735e-05,
+          9.223582448700794e-07,
+          0.00010923513042074951
+        ],
+        "peak_rss_mib": 1769.265625
+      }
+    },
+    {
+      "record_sha256": "ea7e4c6afe2c366741659c0010e12a496372b29693e1ef77727169c5a2eda3b5",
+      "original_status": "completed",
+      "original_validated": true,
+      "original_error": null,
+      "parameters": {
+        "base_n": 64,
+        "widths": [
+          0.5,
+          0.25,
+          0.125,
+          0.0625
+        ],
+        "box": 32,
+        "end": 0.6300714295556976,
+        "max_dt": 0.000125,
+        "integration_phase_step": 0.01875,
+        "epsilon_tau_ratio": 0.0,
+        "frame_dt": 0.025,
+        "frame_phase_step": 0.75,
+        "revolved_refinement": {
+          "path": "refinement.bands",
+          "sha256": "04615722df9117e5b5931979491d04f6b820b12e0af435b02ce63ea0717be668"
+        }
+      },
+      "adapter_sha256": "728f068616e10d86ea73956710f172ba441e64fbf67416b999d0a1d6af680ec2",
+      "binary_sha256": "92a0c36aff5cbef1cc9ed45c19da5e0a7610c68c361c4a9b1b1264203b356ecd",
+      "profile_sha256": "fb613aa587c4bd42d63af26ac783e71f02b0380f570813a027b752a82f20f994",
+      "history_endpoint": {
+        "schema_version": 1,
+        "adapter_sha256": "728f068616e10d86ea73956710f172ba441e64fbf67416b999d0a1d6af680ec2",
+        "case": "paper",
+        "problem": 0,
+        "step": 765,
+        "time": 0.6300714295556976,
+        "dt": 3.652146978005977e-05,
+        "levels": 5,
+        "stored_cells": 1573888,
+        "active_cells": 1409920,
+        "volume": 8,
+        "l2_error": 0.0006412819937248145,
+        "openmp_max_threads": 2,
+        "force_threads_limit": 2,
+        "linf_error": 0.004522418866417226,
+        "peak_speed": 0.18420519134984867,
+        "energy": 0.01164261814826057,
+        "velocity_integral": [
+          1.0381825551220486e-05,
+          5.118151676546179e-06,
+          -3.919105145117674e-06
+        ],
+        "peak_rss_mib": 1553.5625
+      }
+    }
+  ],
+  "frames": [
+    {
+      "time": 0.6158075087303938,
+      "step": 335,
+      "levels": 5,
+      "stored_cells": 1573888,
+      "force_linf_error": 0,
+      "peak_speed": 0.09682642155009834,
+      "compared": true,
+      "report_difference": true,
+      "reference_resolution_ratio": 1,
+      "time_difference": 0,
+      "velocity_linf_difference": 7.47666260216555e-05,
+      "velocity_l2_difference": 5.6158962480332094e-06,
+      "reference_velocity_l2": 0.029273944170388724,
+      "composite_volume": 8,
+      "requested_time": 0.6158075087303938,
+      "coarse_frame": "plt00335",
+      "reference_frame": "plt00646",
+      "relative_l2_difference": 0.0001918394123916455,
+      "relative_force_l2_difference": null
+    },
+    {
+      "time": 0.6224977197922241,
+      "step": 362,
+      "levels": 5,
+      "stored_cells": 1573888,
+      "force_linf_error": 0,
+      "peak_speed": 0.13514069165264941,
+      "compared": true,
+      "report_difference": true,
+      "reference_resolution_ratio": 1,
+      "time_difference": 0,
+      "velocity_linf_difference": 8.797998922152259e-05,
+      "velocity_l2_difference": 6.700230942163641e-06,
+      "reference_velocity_l2": 0.040254900109361134,
+      "composite_volume": 8,
+      "requested_time": 0.6224977197922241,
+      "coarse_frame": "plt00362",
+      "reference_frame": "plt00703",
+      "relative_l2_difference": 0.00016644510168851534,
+      "relative_force_l2_difference": null
+    },
+    {
+      "time": 0.6290714295556976,
+      "step": 389,
+      "levels": 5,
+      "stored_cells": 1573888,
+      "force_linf_error": 0,
+      "peak_speed": 0.17742980911846368,
+      "compared": true,
+      "report_difference": true,
+      "reference_resolution_ratio": 1,
+      "time_difference": 0,
+      "velocity_linf_difference": 0.0001016179190810474,
+      "velocity_l2_difference": 7.924733564324984e-06,
+      "reference_velocity_l2": 0.052082349844972876,
+      "composite_volume": 8,
+      "requested_time": 0.6290714295556976,
+      "coarse_frame": "plt00389",
+      "reference_frame": "plt00756",
+      "relative_l2_difference": 0.0001521577576264044,
+      "relative_force_l2_difference": null
+    }
+  ],
+  "duplicate_events": [],
+  "passed": true
+}

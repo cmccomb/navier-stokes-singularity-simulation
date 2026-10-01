@@ -1,0 +1,138 @@
+{
+  "schema_version": 1,
+  "kind": "local-dense-vorticity-balance-time-sensitivity",
+  "times": [
+    0.6280714295556976,
+    0.6285714295556977,
+    0.6290714295556976,
+    0.6295714295556976,
+    0.6300714295556976
+  ],
+  "center_time": 0.6290714295556976,
+  "source_snapshot_sha256": [
+    [
+      "0e7e7453d671d47b20931420d1e4d4b80facb64fe923f3a4f3de6e1b5ab930d9",
+      "c4335589746f5f9e76be87381975de542e15ff7d065e39f5dd3c24e3b99c5be2",
+      "246ccaf0d6a83e4bcf84bcfb487c1bcb99888e6ad6dfe88bc29059b5a36aba7b",
+      "8bcb1f85a3ebc98b3ceb274eec76058fde1c3059eabc36a47392022d910928b6",
+      "c29ce3c3f738461606727e22f8dc0bc328c020efcb589dc6ccd05690e9bf4c59"
+    ],
+    [
+      "3c511fe2a5fb1f375e1b1db353be96fbb9973f00148aa1b5f8d12f5157e25f88",
+      "2f6d091db6431f296062527637cd42370750690d5ca7c6b8d7407ac4e7f65015",
+      "742af4935fbef6f48cc0c5378e697f9ec47a22837fde11ffd747ddd034a2c1cc",
+      "c1c9dac5cba24bd54ba740cf297fa48338d31d2d6767fc0f95144ff1b0e4e2c2",
+      "eb795b634f309b820e9024d2ab274ade1b3f9809a6d1e9a3c3e84f6afe08bedb"
+    ]
+  ],
+  "source_probe_sha256": [
+    "60dda6b262ef364d4b2f202c53616100cb0899e0e43923f08b2467e548fead45",
+    "fbc9cc2f1bbfb4c23d18cfceb462569dd906482d9ec495fd3ac90d9409e51c34"
+  ],
+  "source_binary_sha256": "92a0c36aff5cbef1cc9ed45c19da5e0a7610c68c361c4a9b1b1264203b356ecd",
+  "source_profile_sha256": "fb613aa587c4bd42d63af26ac783e71f02b0380f570813a027b752a82f20f994",
+  "time_controls": {
+    "baseline": {
+      "time_factor": 0.5,
+      "max_dt": 0.000125,
+      "integration_phase_step": 0.01875,
+      "force_definition_unchanged": true,
+      "inferred_from_pinned_legacy_runner": false
+    },
+    "half": {
+      "time_factor": 0.25,
+      "max_dt": 6.25e-05,
+      "integration_phase_step": 0.009375,
+      "force_definition_unchanged": true,
+      "inferred_from_pinned_legacy_runner": false
+    },
+    "checkpoint_parent_identity": "exact_parent_record"
+  },
+  "velocity_field_sensitivity": {
+    "difference_squared_integral": 1.7777949244649242e-10,
+    "reference_squared_integral": 0.021700722028301977,
+    "volume": 8.0,
+    "max_component_difference": 6.759660377982004e-05,
+    "reference_rms": 0.05208253309448137,
+    "difference_rms": 4.714067941365668e-06,
+    "relative_l2_difference": 9.051149514586817e-05
+  },
+  "force_field_identity": {
+    "difference_squared_integral": 2.8751999412674035e-18,
+    "reference_squared_integral": 30.94243099210205,
+    "volume": 8.0,
+    "max_component_difference": 3.920563873549554e-09,
+    "reference_rms": 1.966673301291487,
+    "difference_rms": 5.99499785369791e-10,
+    "relative_l2_difference": 3.0482937098709164e-10
+  },
+  "analyzer_sha256": "2efb3e2940df138b0472ef6770ea2fe6a5a92937076b724b658db4638239b7cd",
+  "regions": {
+    "all_interior": {
+      "cells": 809566,
+      "volume": 3.85916805267334,
+      "rms": {
+        "residual_five": {
+          "baseline": 1.2238778054191335,
+          "half": 1.1115746560034219,
+          "difference": 0.19420929432127285
+        },
+        "time_curl_five": {
+          "baseline": 23.143036624933316,
+          "half": 23.14332434157114,
+          "difference": 0.22404174632873922
+        },
+        "advection_curl": {
+          "baseline": 0.3860870492022048,
+          "half": 0.38609025282902243,
+          "difference": 0.00019839678192075667
+        },
+        "viscous_curl": {
+          "baseline": 9.980471950250612,
+          "half": 9.978622410710537,
+          "difference": 0.032249007742809206
+        },
+        "force_curl": {
+          "baseline": 29.51064664750736,
+          "half": 29.51064664561584,
+          "difference": 3.523727485492062e-08
+        }
+      },
+      "relative_residual_difference_to_term_sum": 0.0030816970439970616
+    },
+    "finest_core_interior": {
+      "cells": 175616,
+      "volume": 0.001308441162109375,
+      "rms": {
+        "residual_five": {
+          "baseline": 0.008195867994327059,
+          "half": 0.009808603466269435,
+          "difference": 0.003723673684045811
+        },
+        "time_curl_five": {
+          "baseline": 14.029116131691561,
+          "half": 14.029131112562814,
+          "difference": 0.0006769683344168951
+        },
+        "advection_curl": {
+          "baseline": 0.4426490178850597,
+          "half": 0.4426492872145659,
+          "difference": 1.9285511769160194e-05
+        },
+        "viscous_curl": {
+          "baseline": 5.77361516934129,
+          "half": 5.773587834424386,
+          "difference": 0.004284790103387733
+        },
+        "force_curl": {
+          "baseline": 16.050995770184677,
+          "half": 16.050995771173728,
+          "difference": 7.893299610137198e-07
+        }
+      },
+      "relative_residual_difference_to_term_sum": 0.0001025907841296527
+    }
+  },
+  "scope": "Compare sampled vorticity-balance fields across fixed-force dense time branches.\n\nBoth branches share one from-rest checkpoint and 17 saved event times. This is\nlocal timestep sensitivity of a sampled postprocessed balance, not a solver\nresidual, continuum error bound, or test of inherited pre-checkpoint error.",
+  "validated": true
+}

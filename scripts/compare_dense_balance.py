@@ -76,10 +76,22 @@ def load_branch(paths: list[Path]) -> tuple[list[dict], list[dict], dict]:
     return manifests, runs, probe
 
 
-def measure_pair(baseline_paths: list[Path], half_paths: list[Path]) -> dict:
+def measure_pair(
+    baseline_paths: list[Path],
+    half_paths: list[Path],
+    *,
+    baseline_time_factor: float = 1,
+    allow_equivalent_checkpoint_parent: bool = False,
+) -> dict:
     baseline, bruns, bprobe = load_branch(baseline_paths)
     half, hruns, hprobe = load_branch(half_paths)
-    control_audit = compatible(bprobe, hprobe, bruns[0])
+    control_audit = compatible(
+        bprobe,
+        hprobe,
+        bruns[0],
+        baseline_factor=baseline_time_factor,
+        allow_equivalent_checkpoint_parent=allow_equivalent_checkpoint_parent,
+    )
     times = [manifest["frames"][0]["export"]["time"] for manifest in baseline]
     half_times = [manifest["frames"][0]["export"]["time"] for manifest in half]
     if any(abs(a - b) > 1e-12 for a, b in zip(times, half_times, strict=True)):
@@ -111,6 +123,12 @@ def measure_pair(baseline_paths: list[Path], half_paths: list[Path]) -> dict:
         "volume": 0.0,
         "max_component_difference": 0.0,
     }
+    velocity_field = {
+        "difference_squared_integral": 0.0,
+        "reference_squared_integral": 0.0,
+        "volume": 0.0,
+        "max_component_difference": 0.0,
+    }
     for block in blocks:
         h = float(block["spacing"][0])
         active = active_mask(block, blocks)
@@ -126,6 +144,21 @@ def measure_pair(baseline_paths: list[Path], half_paths: list[Path]) -> dict:
         if delta.size:
             force_field["max_component_difference"] = max(
                 force_field["max_component_difference"], float(np.abs(delta).max())
+            )
+        velocity_a = values(raw_a[2], block)[..., :3][active]
+        velocity_b = values(raw_b[2], block)[..., :3][active]
+        velocity_delta = velocity_a - velocity_b
+        velocity_field["difference_squared_integral"] += (
+            float(np.square(velocity_delta).sum()) * dv
+        )
+        velocity_field["reference_squared_integral"] += (
+            float(np.square(velocity_b).sum()) * dv
+        )
+        velocity_field["volume"] += int(active.sum()) * dv
+        if velocity_delta.size:
+            velocity_field["max_component_difference"] = max(
+                velocity_field["max_component_difference"],
+                float(np.abs(velocity_delta).max()),
             )
         mask = eroded_active(active)
         if not mask.any():
@@ -188,22 +221,23 @@ def measure_pair(baseline_paths: list[Path], half_paths: list[Path]) -> dict:
         )
     if not sums.get("all_interior") or not sums.get("finest_core_interior"):
         raise ValueError("no common interior samples")
-    if not math.isclose(force_field["volume"], 8, rel_tol=0, abs_tol=1e-12):
-        raise ValueError("fixed force fields lack full active coverage")
-    force_field["reference_rms"] = math.sqrt(
-        force_field["reference_squared_integral"] / force_field["volume"]
-    )
-    force_field["difference_rms"] = math.sqrt(
-        force_field["difference_squared_integral"] / force_field["volume"]
-    )
-    force_field["relative_l2_difference"] = (
-        math.sqrt(
-            force_field["difference_squared_integral"]
-            / force_field["reference_squared_integral"]
+    for name, field in (("force", force_field), ("velocity", velocity_field)):
+        if not math.isclose(field["volume"], 8, rel_tol=0, abs_tol=1e-12):
+            raise ValueError(f"{name} fields lack full active coverage")
+        field["reference_rms"] = math.sqrt(
+            field["reference_squared_integral"] / field["volume"]
         )
-        if force_field["reference_squared_integral"]
-        else None
-    )
+        field["difference_rms"] = math.sqrt(
+            field["difference_squared_integral"] / field["volume"]
+        )
+        field["relative_l2_difference"] = (
+            math.sqrt(
+                field["difference_squared_integral"]
+                / field["reference_squared_integral"]
+            )
+            if field["reference_squared_integral"]
+            else None
+        )
     if force_field["difference_rms"] > 1e-10 + 1e-8 * force_field["reference_rms"]:
         raise ValueError("fixed force fields differ materially between time branches")
     return {
@@ -222,6 +256,7 @@ def measure_pair(baseline_paths: list[Path], half_paths: list[Path]) -> dict:
         "source_binary_sha256": bruns[0]["binary_sha256"],
         "source_profile_sha256": baseline[0]["profile_sha256"],
         "time_controls": control_audit,
+        "velocity_field_sensitivity": velocity_field,
         "force_field_identity": force_field,
         "analyzer_sha256": sha(Path(__file__)),
         "regions": sums,
@@ -236,6 +271,8 @@ def main() -> None:
         "--baseline-snapshot", type=Path, action="append", required=True
     )
     parser.add_argument("--half-snapshot", type=Path, action="append", required=True)
+    parser.add_argument("--baseline-time-factor", type=float, default=1)
+    parser.add_argument("--allow-equivalent-checkpoint-parent", action="store_true")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     output = args.output.resolve()
@@ -244,6 +281,8 @@ def main() -> None:
     result = measure_pair(
         [path.resolve(strict=True) for path in args.baseline_snapshot],
         [path.resolve(strict=True) for path in args.half_snapshot],
+        baseline_time_factor=args.baseline_time_factor,
+        allow_equivalent_checkpoint_parent=args.allow_equivalent_checkpoint_parent,
     )
     write(output, result)
     print(

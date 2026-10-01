@@ -1,0 +1,650 @@
+{
+  "schema_version": 1,
+  "kind": "dense-output-checkpoint-probe",
+  "status": "completed",
+  "parent_record_sha256": "afe8898110109ff25600c3cb58e3a9911b5baf6f6f8f7f14ff3dbbd826ded97c",
+  "parent_log_sha256": "3fb414009ab84421225ccb6d6ffa4d6a64bf68232ee08593acadd7483a2867fc",
+  "source_binary_sha256": "92a0c36aff5cbef1cc9ed45c19da5e0a7610c68c361c4a9b1b1264203b356ecd",
+  "source_profile_sha256": "fb613aa587c4bd42d63af26ac783e71f02b0380f570813a027b752a82f20f994",
+  "checkpoint_step": 250,
+  "checkpoint_time": 0.6005534368496662,
+  "checkpoint_files": {
+    "Header": {
+      "bytes": 18558,
+      "sha256": "76be56616e0555627827d1f5df76a31ceac89a59b16cabcccfd73a7b38d50345"
+    },
+    "Level_0/density_D_00000": {
+      "bytes": 23893808,
+      "sha256": "b532d3a1731256d42f18cb655ea1108c2246de42ac7e5a014caee7cd865e9bed"
+    },
+    "Level_0/density_H": {
+      "bytes": 7549,
+      "sha256": "db19e24853905160197e64d051826ff055c0ab0db4c16775993876bb973bbd2d"
+    },
+    "Level_0/gradp_D_00000": {
+      "bytes": 50337536,
+      "sha256": "675629041f6567ed496966489a0c4459a2b107dbce594e3e01afd70b8d52b57a"
+    },
+    "Level_0/gradp_H": {
+      "bytes": 13772,
+      "sha256": "023d9d5fe9955d2d8046918b32425e927254faa0ba6164bc2276df7bac0cbe68"
+    },
+    "Level_0/p_nd_D_00000": {
+      "bytes": 18405632,
+      "sha256": "5aafd75ff4585a1c3d0223d12ecca08cd7cfba37c98284411587d5fb9f8793c7"
+    },
+    "Level_0/p_nd_H": {
+      "bytes": 7412,
+      "sha256": "303cf584e573a24967ebdfb21c0052f5617ae255e7e68c66a31205c06f6e8af8"
+    },
+    "Level_0/tracer_D_00000": {
+      "bytes": 23893808,
+      "sha256": "1d6e3ce2d6d5a90bc5d2397d7e676fac4a85548503bb49d2869999ba70fd512b"
+    },
+    "Level_0/tracer_H": {
+      "bytes": 7485,
+      "sha256": "dd2f377fcd9378e9f5a46f0aaa8afceec5abdac09b3b2e0c33338b2a482c7375"
+    },
+    "Level_0/velocity_D_00000": {
+      "bytes": 71669552,
+      "sha256": "d16e696793ab73f9b8ab2c9bfcc97f89fc9ecf2502535efa24a2aec4fd89f1da"
+    },
+    "Level_0/velocity_H": {
+      "bytes": 13969,
+      "sha256": "9e444263dadcd914b2ce0f2bdb4f9769625e59e40b7ac60217d69ffb725f55fb"
+    },
+    "Level_1/density_D_00000": {
+      "bytes": 45018691,
+      "sha256": "171061129bea954b47d95930da70859bb4c7d02281a5ded443061ba9d6666835"
+    },
+    "Level_1/density_H": {
+      "bytes": 30006,
+      "sha256": "6d51e887bbbd7b4c2604535244ecf2d7f2cc2e4bbe8e99b4d3c1e167b86d3579"
+    },
+    "Level_1/gradp_D_00000": {
+      "bytes": 88017987,
+      "sha256": "1558fb403157ac86eaba188091c783a410df55a79ec377a2d2585ff2a10c0466"
+    },
+    "Level_1/gradp_H": {
+      "bytes": 53985,
+      "sha256": "2f3b21aff7a99d726ab71bb846fe885d517aad6a4dc3f852e0178c7ef4cad8cf"
+    },
+    "Level_1/p_nd_D_00000": {
+      "bytes": 32836411,
+      "sha256": "dfd981dd539d2ec8942cee748dfae6f397152e0f1501ef232bd8597c4a29d680"
+    },
+    "Level_1/p_nd_H": {
+      "bytes": 29499,
+      "sha256": "ff638c10a6ef417d054ad10e5391bfea4a122c29988eb45bca0f7f64d42b690b"
+    },
+    "Level_1/tracer_D_00000": {
+      "bytes": 45018691,
+      "sha256": "e3333aaff8247b0685a3e69a1c3521ea1ab0f72a2f59ee5e53983be4a6d97cc7"
+    },
+    "Level_1/tracer_H": {
+      "bytes": 29759,
+      "sha256": "d8adb57532a1958f64b34ebc9e72fe8a5e22156060f2822c5e7f9670f5f4f813"
+    },
+    "Level_1/velocity_D_00000": {
+      "bytes": 135008835,
+      "sha256": "193db9ca6af53ee0e768b956de0b3f82fbbeb3bc7bc33e0a983db666b514d573"
+    },
+    "Level_1/velocity_H": {
+      "bytes": 54838,
+      "sha256": "b10f6d9bd7b04fb705ea05fae0be758f5bc5f57b7dcb36877f4a85d62351c3e3"
+    },
+    "Level_2/density_D_00000": {
+      "bytes": 23894144,
+      "sha256": "a5d98d41188efd852865044e984b8f549d5141680f2b3a3918d21d93269f5f0b"
+    },
+    "Level_2/density_H": {
+      "bytes": 7933,
+      "sha256": "d10455f4c37fa9088cd5f1fc1e7a9ec839bf1db85ff33e60b492c220d5f3d60b"
+    },
+    "Level_2/gradp_D_00000": {
+      "bytes": 50337920,
+      "sha256": "b18ddf3cab8fda8224a7315f3fec14c4ac90da3485ebc4cf755f9ddacf926011"
+    },
+    "Level_2/gradp_H": {
+      "bytes": 14156,
+      "sha256": "5d4e64f4927f420c4e52cd0bfd8dc38790206169c2c5ac0938452a351818e3cf"
+    },
+    "Level_2/p_nd_D_00000": {
+      "bytes": 18406016,
+      "sha256": "99615ac4cfecb973dbd0ca7ec9fdc7506a156f54a1bdcdc639f840b784ccc05e"
+    },
+    "Level_2/p_nd_H": {
+      "bytes": 7764,
+      "sha256": "0f585bd6600ce0513fa983f9b43c3016c3f5bf125a63b5588cccdfd42cf6f6c4"
+    },
+    "Level_2/tracer_D_00000": {
+      "bytes": 23894144,
+      "sha256": "b7283d6fcf80e35ba8b20c7a6724432ecb52d537f6b71f356bc3806109d11010"
+    },
+    "Level_2/tracer_H": {
+      "bytes": 7869,
+      "sha256": "deda5148b363749da5ad54a4886b245b5b599b238cb53d23f52c8dca145ec17d"
+    },
+    "Level_2/velocity_D_00000": {
+      "bytes": 71669888,
+      "sha256": "eb0a8766e41bf9e417965e00ea1b75d0efc3733f9888a61e42a1ffb421ebf60b"
+    },
+    "Level_2/velocity_H": {
+      "bytes": 14341,
+      "sha256": "109346de356de1ef58632aeb85edb287b53d12f109848a076d4df3e513919692"
+    },
+    "Level_3/density_D_00000": {
+      "bytes": 23894144,
+      "sha256": "522f6664dc19ac2e2b4c4535f5e6fdd1783adb97eb0bd16250eec9be3f1be98b"
+    },
+    "Level_3/density_H": {
+      "bytes": 7933,
+      "sha256": "89f2431d050b2c4e6e0fd9c151e01fbc096cb1839019e2fde74fdd84c6c6691c"
+    },
+    "Level_3/gradp_D_00000": {
+      "bytes": 50337920,
+      "sha256": "34b73df9207d05adc795c8ac46657619221a3e9691b0014a3fac3a4a9920ab96"
+    },
+    "Level_3/gradp_H": {
+      "bytes": 14156,
+      "sha256": "724f2d816dcbfb1b006781f49ddf84f3d9ec66c0fabc6a981eec3c3956577612"
+    },
+    "Level_3/p_nd_D_00000": {
+      "bytes": 18406016,
+      "sha256": "c0487f96bc7a32be24adb784a4ec8e60a863704c1f548d732c50b43d716460f1"
+    },
+    "Level_3/p_nd_H": {
+      "bytes": 7732,
+      "sha256": "b2ced49c68b3c67e173a214a3cba0900dcdf4636726b31a66a95b4cfeaa46a1f"
+    },
+    "Level_3/tracer_D_00000": {
+      "bytes": 23894144,
+      "sha256": "c1cab589eadd4e68e6be441a76acc37bff74220e594fa532db365b1f1633e55d"
+    },
+    "Level_3/tracer_H": {
+      "bytes": 7869,
+      "sha256": "2d3c1ad5c55cd027ad50c2254c30c155cf062c82602cef189221072c758cf0a7"
+    },
+    "Level_3/velocity_D_00000": {
+      "bytes": 71669888,
+      "sha256": "e8d93d138a2e427ae05b363bdb398636b4c682220479e7d6ebc3cad158f9f398"
+    },
+    "Level_3/velocity_H": {
+      "bytes": 14337,
+      "sha256": "da77ffa94e389fdebcc554dbf97841b9b150046d8d9d120129ae8da4d591022e"
+    },
+    "Level_4/density_D_00000": {
+      "bytes": 23894384,
+      "sha256": "b31d02d0a0d3ff6ec4bb99884bc05ba2b0fecb56977ee88a1394b559885ccc71"
+    },
+    "Level_4/density_H": {
+      "bytes": 8173,
+      "sha256": "9069deaa640ba2610fa9d9529fd4b947963a5138a352010382add8b6392aef47"
+    },
+    "Level_4/gradp_D_00000": {
+      "bytes": 50338160,
+      "sha256": "81c2abfa4161348911bd9c59493fa4a464dd14e90b88021e2354ae79fde9a001"
+    },
+    "Level_4/gradp_H": {
+      "bytes": 14394,
+      "sha256": "02b1317ace64244c10e92cdae994d9fefb63d2b6605244a95719fd01579b3e63"
+    },
+    "Level_4/p_nd_D_00000": {
+      "bytes": 18406256,
+      "sha256": "97e5a21757db4158ecda13cd0d655c94b0d3cc03de3813764650fb7a1b1041b9"
+    },
+    "Level_4/p_nd_H": {
+      "bytes": 7972,
+      "sha256": "1bc73998b042e7b3479f02b62d89f333f6090bccc331a455db05d74b489714b5"
+    },
+    "Level_4/tracer_D_00000": {
+      "bytes": 23894384,
+      "sha256": "229226e04fa50ae4b75f7116c7d6a1923689e1376f561c42592289741f036b4d"
+    },
+    "Level_4/tracer_H": {
+      "bytes": 8109,
+      "sha256": "ace1505c355bf85b0e05b385a007bf42825997057b3b99f7cb2ab556fc1ec7cb"
+    },
+    "Level_4/velocity_D_00000": {
+      "bytes": 71670128,
+      "sha256": "d1432e58e49cac4da19c078bb19372b6cfe105b8c6bfbaa66be20ba5252a11f4"
+    },
+    "Level_4/velocity_H": {
+      "bytes": 14577,
+      "sha256": "4428e4b26abb53925c45377ad254eea6a0ebd5b15998d3fe2d26726286d25ec6"
+    },
+    "incflo_job_info": {
+      "bytes": 10132,
+      "sha256": "b606d03a5e1eee1e6cdc54f4bd4dd3a1ae1133241e31597c175a93964e0749e7"
+    }
+  },
+  "centers": [
+    0.6158075087303938,
+    0.6224977197922241,
+    0.6290714295556976
+  ],
+  "spacing": 0.0005,
+  "time_factor": 1.0,
+  "max_dt": 0.00025,
+  "integration_phase_step": 0.0375,
+  "force_definition_unchanged": true,
+  "planned_times": [
+    0.6020692874341146,
+    0.6089987316985057,
+    0.6148075087303938,
+    0.6153075087303939,
+    0.6158075087303938,
+    0.6163075087303937,
+    0.6168075087303938,
+    0.6214977197922241,
+    0.6219977197922242,
+    0.6224977197922241,
+    0.6229977197922241,
+    0.6234977197922241,
+    0.6280714295556976,
+    0.6285714295556977,
+    0.6290714295556976,
+    0.6295714295556976,
+    0.6300714295556976
+  ],
+  "reference_plots": {
+    "0.6158075087303938": "/Users/ccm/Codex/runs/ns-dense-residual-20260927/n128/parent/plt00335",
+    "0.62249771979222412": "/Users/ccm/Codex/runs/ns-dense-residual-20260927/n128/parent/plt00362",
+    "0.62907142955569761": "/Users/ccm/Codex/runs/ns-dense-residual-20260927/n128/parent/plt00389"
+  },
+  "storage_budget_bytes": 13776321612,
+  "limits": {
+    "max_rss_mib": 10500.0,
+    "min_disk_free_gib": 30.0,
+    "timeout_hours": 8.0
+  },
+  "runner_sha256": "99c48d92ccc4fc3629bea31962826a25966d4dd3a4feabda4f6479c495cb3d75",
+  "scope": "Bounded dense-output probe from a pinned, from-rest native checkpoint.\n\nThe staged parent is an immutable copy of a validated running prefix, selected\ncheckpoint, and reference center plots. This is a checkpoint continuation, not\na second from-rest trajectory. New output events may perturb integration steps;\nthe center plots are compared against the original for that reason.",
+  "validated": true,
+  "updated_at": "2026-09-28T03:46:09.849846+00:00",
+  "restart_readback": {
+    "time": 0.6005534368496662,
+    "step": 250,
+    "levels": 5,
+    "stored_cells": 12055040,
+    "force_linf_error": 0,
+    "peak_speed": 0.032564850311427036,
+    "compared": false,
+    "report_difference": false,
+    "reference_resolution_ratio": 1,
+    "time_difference": 0,
+    "velocity_linf_difference": 0,
+    "velocity_l2_difference": 0,
+    "reference_velocity_l2": 0.010274155347434633,
+    "composite_volume": 8
+  },
+  "command": [
+    "/Users/ccm/Codex/runs/ns-dense-residual-20260927/n128/parent/ns_incflo",
+    "/Users/ccm/Codex/runs/ns-dense-residual-20260927/n128/parent/inputs.paper",
+    "ns.table_file=/Users/ccm/Codex/runs/ns-dense-residual-20260927/n128/parent/profile.tbl",
+    "stop_time=0.63007142955569762",
+    "ns.max_dt=0.00025000000000000001",
+    "ns.epsilon_tau_ratio=0",
+    "ns.force_threads=2",
+    "ns.expected_omp_threads=4",
+    "amr.n_cell=128 128 128",
+    "amr.max_level=4",
+    "amr.max_grid_size=32",
+    "amr.plot_per_exact=-1",
+    "ns.refine_half_width=0.5 0.25 0.125 0.0625",
+    "ns.refine_rz_file=/Users/ccm/Codex/runs/ns-dense-residual-20260927/n128/parent/refinement.bands",
+    "amr.plot_int=1000000000",
+    "ns.plot_times=0.60055343684966622 0.60206928743411459 0.60899873169850571 0.6148075087303938 0.61530750873039386 0.6158075087303938 0.61630750873039375 0.61680750873039381 0.62149771979222412 0.62199771979222418 0.62249771979222412 0.62299771979222407 0.62349771979222413 0.62807142955569761 0.62857142955569767 0.62907142955569761 0.62957142955569756 0.63007142955569762",
+    "amr.restart=/Users/ccm/Codex/runs/ns-dense-residual-20260927/n128/parent/chk00250",
+    "amr.plotfile_on_restart=0",
+    "amr.check_int=250",
+    "max_step=10000000"
+  ],
+  "segment_steps": 197,
+  "native_frames": [
+    {
+      "path": "/Users/ccm/Codex/runs/ns-dense-residual-20260927/n128/probe-v2/dense/plt00257",
+      "time": 0.6020692874341146,
+      "step": 257,
+      "levels": 5,
+      "stored_cells": 12055040,
+      "force_linf_error": 0,
+      "peak_speed": 0.03733414069193156,
+      "compared": false,
+      "report_difference": false,
+      "reference_resolution_ratio": 1,
+      "time_difference": 0,
+      "velocity_linf_difference": 0,
+      "velocity_l2_difference": 0,
+      "reference_velocity_l2": 0.011739318318964792,
+      "composite_volume": 8
+    },
+    {
+      "path": "/Users/ccm/Codex/runs/ns-dense-residual-20260927/n128/probe-v2/dense/plt00304",
+      "time": 0.6089987316985057,
+      "step": 304,
+      "levels": 5,
+      "stored_cells": 12055040,
+      "force_linf_error": 0,
+      "peak_speed": 0.0638252806990534,
+      "compared": false,
+      "report_difference": false,
+      "reference_resolution_ratio": 1,
+      "time_difference": 0,
+      "velocity_linf_difference": 0,
+      "velocity_l2_difference": 0,
+      "reference_velocity_l2": 0.01976213743601114,
+      "composite_volume": 8
+    },
+    {
+      "path": "/Users/ccm/Codex/runs/ns-dense-residual-20260927/n128/probe-v2/dense/plt00331",
+      "time": 0.6148075087303938,
+      "step": 331,
+      "levels": 5,
+      "stored_cells": 12055040,
+      "force_linf_error": 0,
+      "peak_speed": 0.09162317607992214,
+      "compared": false,
+      "report_difference": false,
+      "reference_resolution_ratio": 1,
+      "time_difference": 0,
+      "velocity_linf_difference": 0,
+      "velocity_l2_difference": 0,
+      "reference_velocity_l2": 0.02800115315531835,
+      "composite_volume": 8
+    },
+    {
+      "path": "/Users/ccm/Codex/runs/ns-dense-residual-20260927/n128/probe-v2/dense/plt00333",
+      "time": 0.6153075087303937,
+      "step": 333,
+      "levels": 5,
+      "stored_cells": 12055040,
+      "force_linf_error": 0,
+      "peak_speed": 0.09423578021110153,
+      "compared": false,
+      "report_difference": false,
+      "reference_resolution_ratio": 1,
+      "time_difference": 0,
+      "velocity_linf_difference": 0,
+      "velocity_l2_difference": 0,
+      "reference_velocity_l2": 0.028766917878366924,
+      "composite_volume": 8
+    },
+    {
+      "path": "/Users/ccm/Codex/runs/ns-dense-residual-20260927/n128/probe-v2/dense/plt00335",
+      "time": 0.6158075087303937,
+      "step": 335,
+      "levels": 5,
+      "stored_cells": 12055040,
+      "force_linf_error": 0,
+      "peak_speed": 0.09688129285192272,
+      "compared": false,
+      "report_difference": false,
+      "reference_resolution_ratio": 1,
+      "time_difference": 0,
+      "velocity_linf_difference": 0,
+      "velocity_l2_difference": 0,
+      "reference_velocity_l2": 0.02954093216166676,
+      "composite_volume": 8
+    },
+    {
+      "path": "/Users/ccm/Codex/runs/ns-dense-residual-20260927/n128/probe-v2/dense/plt00337",
+      "time": 0.6163075087303936,
+      "step": 337,
+      "levels": 5,
+      "stored_cells": 12055040,
+      "force_linf_error": 0,
+      "peak_speed": 0.09955928695311451,
+      "compared": false,
+      "report_difference": false,
+      "reference_resolution_ratio": 1,
+      "time_difference": 0,
+      "velocity_linf_difference": 0,
+      "velocity_l2_difference": 0,
+      "reference_velocity_l2": 0.03032303398852835,
+      "composite_volume": 8
+    },
+    {
+      "path": "/Users/ccm/Codex/runs/ns-dense-residual-20260927/n128/probe-v2/dense/plt00339",
+      "time": 0.6168075087303936,
+      "step": 339,
+      "levels": 5,
+      "stored_cells": 12055040,
+      "force_linf_error": 0,
+      "peak_speed": 0.1022693319728563,
+      "compared": false,
+      "report_difference": false,
+      "reference_resolution_ratio": 1,
+      "time_difference": 0,
+      "velocity_linf_difference": 0,
+      "velocity_l2_difference": 0,
+      "reference_velocity_l2": 0.03111306091633221,
+      "composite_volume": 8
+    },
+    {
+      "path": "/Users/ccm/Codex/runs/ns-dense-residual-20260927/n128/probe-v2/dense/plt00358",
+      "time": 0.6214977197922241,
+      "step": 358,
+      "levels": 5,
+      "stored_cells": 12055040,
+      "force_linf_error": 0,
+      "peak_speed": 0.1291703762977439,
+      "compared": false,
+      "report_difference": false,
+      "reference_resolution_ratio": 1,
+      "time_difference": 0,
+      "velocity_linf_difference": 0,
+      "velocity_l2_difference": 0,
+      "reference_velocity_l2": 0.03887969206656771,
+      "composite_volume": 8
+    },
+    {
+      "path": "/Users/ccm/Codex/runs/ns-dense-residual-20260927/n128/probe-v2/dense/plt00361",
+      "time": 0.6219977197922242,
+      "step": 361,
+      "levels": 5,
+      "stored_cells": 12055040,
+      "force_linf_error": 0,
+      "peak_speed": 0.13218723977227956,
+      "compared": false,
+      "report_difference": false,
+      "reference_resolution_ratio": 1,
+      "time_difference": 0,
+      "velocity_linf_difference": 0,
+      "velocity_l2_difference": 0,
+      "reference_velocity_l2": 0.03974241521260798,
+      "composite_volume": 8
+    },
+    {
+      "path": "/Users/ccm/Codex/runs/ns-dense-residual-20260927/n128/probe-v2/dense/plt00367",
+      "time": 0.6224977197922241,
+      "step": 367,
+      "levels": 5,
+      "stored_cells": 12055040,
+      "force_linf_error": 0,
+      "peak_speed": 0.13523116238354646,
+      "compared": false,
+      "report_difference": false,
+      "reference_resolution_ratio": 1,
+      "time_difference": 0,
+      "velocity_linf_difference": 0,
+      "velocity_l2_difference": 0,
+      "reference_velocity_l2": 0.04061123464113781,
+      "composite_volume": 8
+    },
+    {
+      "path": "/Users/ccm/Codex/runs/ns-dense-residual-20260927/n128/probe-v2/dense/plt00372",
+      "time": 0.6229977197922241,
+      "step": 372,
+      "levels": 5,
+      "stored_cells": 12055040,
+      "force_linf_error": 0,
+      "peak_speed": 0.13830170542218898,
+      "compared": false,
+      "report_difference": false,
+      "reference_resolution_ratio": 1,
+      "time_difference": 0,
+      "velocity_linf_difference": 0,
+      "velocity_l2_difference": 0,
+      "reference_velocity_l2": 0.041485992313108976,
+      "composite_volume": 8
+    },
+    {
+      "path": "/Users/ccm/Codex/runs/ns-dense-residual-20260927/n128/probe-v2/dense/plt00383",
+      "time": 0.6234977197922241,
+      "step": 383,
+      "levels": 5,
+      "stored_cells": 12055040,
+      "force_linf_error": 0,
+      "peak_speed": 0.14139843622520426,
+      "compared": false,
+      "report_difference": false,
+      "reference_resolution_ratio": 1,
+      "time_difference": 0,
+      "velocity_linf_difference": 0,
+      "velocity_l2_difference": 0,
+      "reference_velocity_l2": 0.042366534621661775,
+      "composite_volume": 8
+    },
+    {
+      "path": "/Users/ccm/Codex/runs/ns-dense-residual-20260927/n128/probe-v2/dense/plt00409",
+      "time": 0.6280714295556976,
+      "step": 409,
+      "levels": 5,
+      "stored_cells": 12055040,
+      "force_linf_error": 0,
+      "peak_speed": 0.1708676990967316,
+      "compared": false,
+      "report_difference": false,
+      "reference_resolution_ratio": 1,
+      "time_difference": 0,
+      "velocity_linf_difference": 0,
+      "velocity_l2_difference": 0,
+      "reference_velocity_l2": 0.050663807551771974,
+      "composite_volume": 8
+    },
+    {
+      "path": "/Users/ccm/Codex/runs/ns-dense-residual-20260927/n128/probe-v2/dense/plt00412",
+      "time": 0.6285714295556977,
+      "step": 412,
+      "levels": 5,
+      "stored_cells": 12055040,
+      "force_linf_error": 0,
+      "peak_speed": 0.17420636521978766,
+      "compared": false,
+      "report_difference": false,
+      "reference_resolution_ratio": 1,
+      "time_difference": 0,
+      "velocity_linf_difference": 0,
+      "velocity_l2_difference": 0,
+      "reference_velocity_l2": 0.05159466116040433,
+      "composite_volume": 8
+    },
+    {
+      "path": "/Users/ccm/Codex/runs/ns-dense-residual-20260927/n128/probe-v2/dense/plt00428",
+      "time": 0.6290714295556976,
+      "step": 428,
+      "levels": 5,
+      "stored_cells": 12055040,
+      "force_linf_error": 0,
+      "peak_speed": 0.1775666300432189,
+      "compared": false,
+      "report_difference": false,
+      "reference_resolution_ratio": 1,
+      "time_difference": 0,
+      "velocity_linf_difference": 0,
+      "velocity_l2_difference": 0,
+      "reference_velocity_l2": 0.0525296892076037,
+      "composite_volume": 8
+    },
+    {
+      "path": "/Users/ccm/Codex/runs/ns-dense-residual-20260927/n128/probe-v2/dense/plt00440",
+      "time": 0.6295714295556976,
+      "step": 440,
+      "levels": 5,
+      "stored_cells": 12055040,
+      "force_linf_error": 0,
+      "peak_speed": 0.1809480876362897,
+      "compared": false,
+      "report_difference": false,
+      "reference_resolution_ratio": 1,
+      "time_difference": 0,
+      "velocity_linf_difference": 0,
+      "velocity_l2_difference": 0,
+      "reference_velocity_l2": 0.05346875649288325,
+      "composite_volume": 8
+    },
+    {
+      "path": "/Users/ccm/Codex/runs/ns-dense-residual-20260927/n128/probe-v2/dense/plt00447",
+      "time": 0.6300714295556976,
+      "step": 447,
+      "levels": 5,
+      "stored_cells": 12055040,
+      "force_linf_error": 0,
+      "peak_speed": 0.18435036192285792,
+      "compared": false,
+      "report_difference": false,
+      "reference_resolution_ratio": 1,
+      "time_difference": 0,
+      "velocity_linf_difference": 0,
+      "velocity_l2_difference": 0,
+      "reference_velocity_l2": 0.05441173119542092,
+      "composite_volume": 8
+    }
+  ],
+  "center_comparisons": [
+    {
+      "time": 0.6158075087303937,
+      "reference": "/Users/ccm/Codex/runs/ns-dense-residual-20260927/n128/parent/plt00335",
+      "step": 335,
+      "levels": 5,
+      "stored_cells": 12055040,
+      "force_linf_error": 0,
+      "peak_speed": 0.09688129285192272,
+      "compared": true,
+      "report_difference": true,
+      "reference_resolution_ratio": 1,
+      "time_difference": -1.1102230246251565e-16,
+      "velocity_linf_difference": 9.397715932359585e-07,
+      "velocity_l2_difference": 2.867234266561202e-08,
+      "reference_velocity_l2": 0.029540932160563454,
+      "composite_volume": 8
+    },
+    {
+      "time": 0.6224977197922241,
+      "reference": "/Users/ccm/Codex/runs/ns-dense-residual-20260927/n128/parent/plt00362",
+      "step": 367,
+      "levels": 5,
+      "stored_cells": 12055040,
+      "force_linf_error": 0,
+      "peak_speed": 0.13523116238354646,
+      "compared": true,
+      "report_difference": true,
+      "reference_resolution_ratio": 1,
+      "time_difference": 0,
+      "velocity_linf_difference": 7.175217371619552e-05,
+      "velocity_l2_difference": 1.9710033483351495e-06,
+      "reference_velocity_l2": 0.04061123059821863,
+      "composite_volume": 8
+    },
+    {
+      "time": 0.6290714295556976,
+      "reference": "/Users/ccm/Codex/runs/ns-dense-residual-20260927/n128/parent/plt00389",
+      "step": 428,
+      "levels": 5,
+      "stored_cells": 12055040,
+      "force_linf_error": 0,
+      "peak_speed": 0.1775666300432189,
+      "compared": true,
+      "report_difference": true,
+      "reference_resolution_ratio": 1,
+      "time_difference": 0,
+      "velocity_linf_difference": 0.00016179508964149492,
+      "velocity_l2_difference": 4.351439832342929e-06,
+      "reference_velocity_l2": 0.052529669278755825,
+      "composite_volume": 8
+    }
+  ],
+  "final_step": 447,
+  "final_time": 0.6300714295556976
+}

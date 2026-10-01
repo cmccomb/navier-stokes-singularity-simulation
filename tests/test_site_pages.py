@@ -80,6 +80,30 @@ def test_site_pages_have_no_broken_local_links() -> None:
     assert not missing, f"broken site links: {missing}"
 
 
+def test_dense_refinement_records_keep_the_unqualified_result_visible() -> None:
+    page = (SITE / "results.html").read_text()
+    assert "still prevent a resolution-qualified precursor" in page
+    quarter = json.loads((SITE / "data/outer-dense-n64-quarter-probe.json").read_text())
+    fine = json.loads((SITE / "data/outer-dense-n128-probe.json").read_text())
+    from_rest = json.loads((SITE / "data/outer-from-rest-n64-temporal.json").read_text())
+    assert quarter["status"] == fine["status"] == "completed"
+    assert quarter["validated"] and fine["validated"]
+    assert len(quarter["native_frames"]) == len(fine["native_frames"]) == 17
+    assert from_rest["passed"] and len(from_rest["frames"]) == 3
+    assert max(row["relative_l2_difference"] for row in from_rest["frames"]) < 0.0002
+    for suffix in ("t06158", "t06225", "t06291"):
+        time_gap = json.loads(
+            (SITE / f"data/vorticity-balance-dense-quarter-gap-outer-n64-{suffix}.json").read_text()
+        )
+        spatial = json.loads(
+            (SITE / f"data/vorticity-balance-dense-outer-n128-{suffix}.json").read_text()
+        )
+        assert time_gap["validated"] and spatial["validated"]
+        assert time_gap["time_controls"]["baseline"]["time_factor"] == 0.5
+        assert time_gap["time_controls"]["half"]["time_factor"] == 0.25
+        assert time_gap["velocity_field_sensitivity"]["relative_l2_difference"] < 0.0001
+
+
 def test_site_keeps_peak_speed_without_illustrative_comparisons() -> None:
     index = (SITE / "index.html").read_text(encoding="utf-8")
     app = (SITE / "app.js").read_text(encoding="utf-8")

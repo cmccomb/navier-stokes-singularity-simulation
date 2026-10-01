@@ -67,7 +67,14 @@ def controls(probe: dict, parent: dict | None = None) -> dict:
     }
 
 
-def compatible(baseline: dict, half: dict, parent: dict | None = None) -> dict:
+def compatible(
+    baseline: dict,
+    half: dict,
+    parent: dict | None = None,
+    *,
+    baseline_factor: float = 1,
+    allow_equivalent_checkpoint_parent: bool = False,
+) -> dict:
     if (
         baseline.get("status") != "completed"
         or half.get("status") != "completed"
@@ -75,8 +82,14 @@ def compatible(baseline: dict, half: dict, parent: dict | None = None) -> dict:
         or not half.get("validated")
     ):
         raise ValueError("both dense probes must complete native audits")
+    if not math.isfinite(baseline_factor) or baseline_factor <= 0:
+        raise ValueError("baseline time factor must be finite and positive")
+    parent_records_match = (
+        baseline["parent_record_sha256"] == half["parent_record_sha256"]
+    )
+    if not parent_records_match and not allow_equivalent_checkpoint_parent:
+        raise ValueError("dense probe parent_record_sha256 differs")
     for key in (
-        "parent_record_sha256",
         "source_binary_sha256",
         "source_profile_sha256",
         "checkpoint_step",
@@ -90,8 +103,8 @@ def compatible(baseline: dict, half: dict, parent: dict | None = None) -> dict:
             raise ValueError(f"dense probe {key} differs")
     a, b = controls(baseline, parent), controls(half, parent)
     if (
-        a["time_factor"] != 1
-        or b["time_factor"] != 0.5
+        not math.isclose(a["time_factor"], baseline_factor, rel_tol=1e-12)
+        or not math.isclose(b["time_factor"], baseline_factor / 2, rel_tol=1e-12)
         or not math.isclose(b["max_dt"], a["max_dt"] / 2, rel_tol=1e-12)
         or not math.isclose(
             b["integration_phase_step"], a["integration_phase_step"] / 2, rel_tol=1e-12
@@ -106,7 +119,13 @@ def compatible(baseline: dict, half: dict, parent: dict | None = None) -> dict:
         == len(baseline["planned_times"])
     ):
         raise ValueError("dense frame count differs")
-    return {"baseline": a, "half": b}
+    return {
+        "baseline": a,
+        "half": b,
+        "checkpoint_parent_identity": (
+            "exact_parent_record" if parent_records_match else "exact_checkpoint_state"
+        ),
+    }
 
 
 def center_gates(rows: list[dict], centers: list[float], spatial: dict) -> list[dict]:
