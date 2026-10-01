@@ -438,6 +438,10 @@ footer p { margin-bottom: 0; }
 .mesh-diagram img { display: block; width: 720px; height: auto; }
 .plot-viewport { overflow-x: auto; overscroll-behavior-x: contain; }
 .plot-scroll-hint { display: none; margin: 0.5rem 0; color: var(--muted); font-size: 0.875rem; }
+.evidence-figure { margin: 1.5rem 0 2.5rem; }
+.evidence-figure img { display: block; width: 100%; min-width: 900px; height: auto; }
+.evidence-figure figcaption { margin-top: 0.7rem; color: var(--muted); font-size: 0.875rem; }
+.evidence-figure figcaption a { color: var(--cyan); }
 #mesh-3d { height: clamp(540px, calc(100vw + 170px), 760px); }
 @media (max-width: 751px) { .plot-scroll-hint { display: block; } }
 @media (max-width: 1032px) { .three-view .plot-scroll-hint { display: block; } }

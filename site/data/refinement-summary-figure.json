@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "kind": "refinement-qualification-summary-figure",
+  "source_sha256": {
+    "outer-band-protocol-20260927.json": "1a41ad71251a9f4f68f8f2148b6ad633e02715a834b06928963f33daedfb6d36",
+    "outer-band-prospective-prefix-20260927.json": "f4608afe9507064c0dac71e702c109c64dce5c9ef5ca454a5c3e3a7dcd5f45ae",
+    "outer-from-rest-n64-temporal.json": "f62a52d1dc440661a067dcf01b1398994993aa441e5adc9bcfe14219c3789306",
+    "vorticity-balance-dense-outer-n64-t06158.json": "ca2cb88d43011e56dc2c130206c6d3d6d94c267dc97d578165b106d1c4f84e5a",
+    "vorticity-balance-dense-outer-n128-t06158.json": "690fe9060144c5f4f44d78df578982a271361a0deb6255e7a95e46a0197fd64a",
+    "vorticity-balance-dense-quarter-gap-outer-n64-t06158.json": "01efc0228e92ded91dabcd075711c3388ec7bb32a05ff2009f55d18e040d45ae",
+    "vorticity-balance-dense-outer-n64-t06225.json": "88ef82b2428ff945809ed08919babd18bca2196fe2b9b6e8deb7e6732b4a9e48",
+    "vorticity-balance-dense-outer-n128-t06225.json": "8d91be345464a7e662d0a9e00df867063619e8e1a7cafae84f076f365a1f2dc6",
+    "vorticity-balance-dense-quarter-gap-outer-n64-t06225.json": "1d5b7927828677b6bf9860b382bc6174e3f4e04685d32dcc9b766efa83dfca36",
+    "vorticity-balance-dense-outer-n64-t06291.json": "a3c9fe22616fc5984f705db6dd2f09bd55539150ecaaa33d973bf3bbdb6bc590",
+    "vorticity-balance-dense-outer-n128-t06291.json": "a81ea9493dda06de7f8841ddde301f4861d1cfeba02cef38d41b3b6c5dd396f3",
+    "vorticity-balance-dense-quarter-gap-outer-n64-t06291.json": "c2433e6f481aa233d3fd416b315dc5de27aca3898ca3018522d9e3f9251b80a3"
+  },
+  "spatial": {
+    "times": [
+      0.6020692874341146,
+      0.6089987316985057,
+      0.6158075087303938,
+      0.6224977197922241,
+      0.6290714295556976,
+      0.648113662215126,
+      0.6661783303148294,
+      0.699573136094869
+    ],
+    "velocity_relative_l2": [
+      0.020543847318237395,
+      0.02023361555271489,
+      0.019925547375418563,
+      0.01958958817224408,
+      0.01918913596144667,
+      0.018065979343059972,
+      0.017459928064985947,
+      0.01672019873060249
+    ],
+    "force_relative_l2": [
+      0.02983319277735188,
+      0.032479104920348195,
+      0.03551946765580099,
+      0.038731281814938345,
+      0.042079531910650246,
+      0.05558702852055192,
+      0.06960187008297537,
+      0.10600823444012819
+    ],
+    "velocity_limit": 0.02,
+    "force_limit": 0.05
+  },
+  "candidate": {
+    "times": [
+      0.6158075087303938,
+      0.6224977197922241,
+      0.6290714295556976
+    ],
+    "interval": [
+      0.6158075087303938,
+      0.6290714295556976
+    ],
+    "from_rest_half_step_velocity_relative_l2": [
+      0.0001918394123916455,
+      0.00016644510168851534,
+      0.0001521577576264044
+    ],
+    "local_half_to_quarter_velocity_relative_l2": [
+      5.194682701052073e-05,
+      3.4204263136493565e-05,
+      9.051149514586817e-05
+    ],
+    "quarter_spatial_velocity_gap": [
+      0.004981386843854641,
+      0.00489739704306102,
+      0.004797283990361667
+    ],
+    "finest_core_balance_rms_n64": [
+      0.0029285914735644285,
+      0.006239738154534634,
+      0.013592786090462853
+    ],
+    "finest_core_balance_rms_n128": [
+      0.0067660294391044375,
+      0.004777246118603762,
+      0.011206120858925703
+    ],
+    "half_to_quarter_balance_gap_over_quarter_residual": [
+      0.4809634374470866,
+      0.39556316525917795,
+      0.37963342048142334
+    ]
+  },
+  "conclusion": {
+    "spatial_screen_candidate": true,
+    "velocity_timestep_stable": true,
+    "residual_spatially_converged": false,
+    "residual_timestep_stable": false,
+    "locked_protocol_fully_qualified": false,
+    "reason": "The three spatial-screen passes and independent velocity timestep control support a candidate interval. Mixed 64-to-128 residual behavior, material residual timestep sensitivity, peaks outside the finest core, and the incomplete 64-base parent trajectory prevent a resolution-qualified precursor claim."
+  },
+  "scope": "Audited finite-surrogate comparisons. Thresholds are presentation gates, not continuum error bounds or singularity criteria.",
+  "plotter_sha256": "999a38d32677ae718903950778f017940935f28d8eafde4d369930270753637e",
+  "image_sha256": "d21574380b7d38c2aba0a695ef1ab5d6ca86f3b0e3ddc6b3cfe9c0ec06dd4a73"
+}

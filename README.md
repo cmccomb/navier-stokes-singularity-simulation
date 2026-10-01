@@ -132,6 +132,10 @@ value at the first. The dense derivative stencil is stable, but the spatial
 residual sequence is mixed. These results support local velocity timestep
 stability through the three candidate times; they do not establish residual
 convergence or a resolution-qualified singularity precursor.
+The source-bound [qualification summary figure](site/media/refinement-summary.svg)
+and its [machine-readable record](site/data/refinement-summary-figure.json)
+place the spatial, velocity-timestep, and sampled-residual evidence on one
+common clock and retain the hashes of every plotted source.
 
 An [audited native diagnostic trace](site/results.html#precursor-diagnostics)
 at the same six times shows increasing peak speed and sampled vorticity and a
