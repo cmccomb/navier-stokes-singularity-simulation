@@ -169,6 +169,10 @@ prefix and checkpoint intact. The completed, audited 128³ outer-band model is
 therefore the final production mesh. A bounded continuation from its `t=0.995`
 checkpoint toward `t=0.9975` is an explicitly extrapolative final run, not a
 new spatial-convergence certificate.
+After completion, `scripts/export_final_continuation_snapshot.py` freezes the
+accepted native endpoint, `scripts/outer_precursor_diagnostics.py` measures its
+field diagnostics, and `scripts/publish_final_continuation.py` requires both
+hash-bound artifacts before writing the public record and computed-step chart.
 
 ## Earlier PhiFlow publication workflow
 
