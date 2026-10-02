@@ -41,7 +41,7 @@
           construction addressing that question. This project explores its
           concentrating flow with a numerical solver.
         </p>
-        <a class="intro-jump" href="#result">Watch the current simulation <span aria-hidden="true">↓</span></a>
+        <a class="intro-jump" href="#result">See the final continuation <span aria-hidden="true">↓</span></a>
 
         <div class="context-grid">
           <section aria-labelledby="why-ns">
@@ -102,16 +102,27 @@
       </section>
 
       <section class="measure latest-result" id="result" aria-labelledby="latest-title">
-        <p class="eyebrow">Completed September 23, 2026</p>
-        <h2 id="latest-title">The current simulation</h2>
-        <p>Oliver’s outer-refinement run starts at exact rest and reaches t = 0.995 in 5,510 steps. All 280 saved velocity and forcing states passed the completion audit.</p>
-        <p class="measure-note">A finite manufactured-force simulation. Core convergence and singularity formation remain unproven. <a href="results.html">Run details →</a></p>
+        <p class="eyebrow">Completed October 2, 2026</p>
+        <h2 id="latest-title">The final finite continuation</h2>
+        <p>The accepted 128³-base, five-level branch reaches t = 0.9975 at step 6,300. Its audited lineage contains 320 native states from exact rest, with 10,810,304 active cells and 2048³-equivalent spacing inside the finest cube.</p>
+        <p class="measure-note">The extension follows one grid-dependent trajectory. The latest resolution-tested candidate interval is t = 0.615808–0.629071; residual convergence and singularity formation remain unproven. <a href="results.html">Full numerical record →</a></p>
       </section>
 
       <section class="big-numbers" aria-label="Simulation in numbers">
         <div><p class="number-label">Active solver cells</p><p class="number-value" id="cell-count">10,810,304</p><p class="number-note" id="cell-grid">128³ base · outer bands · 2048³-equivalent core only</p></div>
-        <div><p class="number-label">Saved frames from rest</p><p class="number-value" id="frame-count">280</p><p class="number-note">Complete · t = 0 to 0.995</p></div>
-        <div><p class="number-label">Endpoint peak speed</p><p class="number-value" id="peak-speed">7.415</p><p class="number-note" id="speed-time">Model units · full-field diagnostic at t = 0.995</p></div>
+        <div><p class="number-label">Saved frames from rest</p><p class="number-value" id="frame-count">320</p><p class="number-note">Complete lineage · t = 0 to 0.9975</p></div>
+        <div><p class="number-label">Endpoint peak speed</p><p class="number-value" id="peak-speed">10.542</p><p class="number-note" id="speed-time">Model units · final continuation at t = 0.9975</p></div>
+      </section>
+
+      <section class="measure featured-measure" aria-labelledby="final-figure-title">
+        <h2 id="final-figure-title">What the final continuation shows</h2>
+        <p class="measure-note">Computed solver-step diagnostics from t = 0.995 to 0.9975. Gold marks the last computed state; the lines contain no fit or projected values beyond the endpoint.</p>
+        <figure class="evidence-figure" id="final-continuation-figure">
+          <div class="plot-viewport" tabindex="0" role="region" aria-label="Final finite continuation figure; scroll horizontally on narrow screens"><img src="media/final-continuation.svg" width="1152" height="864" alt="Four computed diagnostic histories through t = 0.9975, followed by a native endpoint summary for core location, support radius, vorticity, force, and divergence. No values are fitted beyond the endpoint." /></div>
+          <p class="plot-scroll-hint">Scroll sideways to inspect all four continuation panels.</p>
+          <figcaption><a href="data/final-continuation.json">Audited continuation and endpoint data</a> · <a href="results.html#final-continuation">interpretation and qualification</a></figcaption>
+        </figure>
+        <p class="measure-note">At t = 0.9975, peak speed is 10.5416, peak sampled vorticity is 3,144.97, and the half-peak support equivalent radius is 0.05328. The sampled divergence maximum is 153.53, and this single-mesh extension is neither a convergence result nor evidence of singularity formation.</p>
       </section>
 
       <section class="measure featured-measure" aria-labelledby="flow-title">

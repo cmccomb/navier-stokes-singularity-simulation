@@ -168,6 +168,20 @@ def test_site_keeps_peak_speed_without_illustrative_comparisons() -> None:
         assert removed not in content
 
 
+def test_homepage_features_the_audited_final_continuation() -> None:
+    index = (SITE / "index.html").read_text(encoding="utf-8")
+    final = json.loads((SITE / "data/final-continuation.json").read_text())
+    assert final["status"] == "completed" and final["validated"]
+    assert final["combined_native_frames"] == 320
+    assert final["endpoint"]["time"] == 0.9975
+    assert 'id="final-continuation-figure"' in index
+    assert 'src="media/final-continuation.svg"' in index
+    assert 'href="data/final-continuation.json"' in index
+    assert "320 native states from exact rest" in index
+    assert "t = 0.9975" in index
+    assert "neither a convergence result nor evidence of singularity formation" in index
+
+
 def test_refinement_pilot_is_documentation_not_a_replacement_flow_run() -> None:
     docs = (SITE / "documentation.html").read_text()
     page = (SITE / "refinement.html").read_text()
