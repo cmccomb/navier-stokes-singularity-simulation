@@ -157,8 +157,28 @@
         </figure>
         <!-- FINAL_CONTINUATION:BEGIN -->
         <h2 id="final-continuation">Final finite continuation</h2>
-        <p>The gated 128³-base continuation toward <span class="math">t = 0.9975</span> is still computing. Endpoint values and graphics are withheld until the runner completes its native-frame audit and the exported endpoint passes hash-bound field diagnostics.</p>
-        <p>This final branch extends one grid-dependent trajectory. Its eventual result will remain a finite model extrapolation, separate from the provisional refinement interval and from the analytical blowup result.</p>
+        <p>The accepted 128³-base, five-level branch continues the audited from-rest trajectory through <span class="math">t = 0.9975</span>. Its short shared-checkpoint timestep probe passed before extension: relative composite L² 0.000108707 against a 0.001 limit, and L∞ divided by baseline peak 0.000422193 against a 0.01 limit. The <a href="data/final-continuation.json">machine record</a> binds the runner, solver, force profile, complete native-frame lineage, endpoint snapshot, analyzer, and figure.</p>
+        <figure class="evidence-figure">
+          <div class="plot-viewport" tabindex="0" role="region" aria-label="Final finite continuation figure; scroll horizontally on narrow screens"><img src="media/final-continuation.svg" width="1152" height="864" loading="lazy" alt="Four computed diagnostic histories through t = 0.9975, followed by a native endpoint summary for core location, support radius, vorticity, force, and divergence. No values are fitted beyond the endpoint." /></div>
+          <p class="plot-scroll-hint">Scroll sideways to inspect all four continuation panels.</p>
+          <figcaption><a href="data/final-continuation.json">Audited continuation and endpoint data</a> · computed states only; no fit beyond the endpoint.</figcaption>
+        </figure>
+        <table>
+          <thead><tr><th scope="col">Final computed state</th><th scope="col">Value</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Base grid / fixed levels / finest equivalent</th><td>128³ / 5 / 2048³</td></tr>
+            <tr><th scope="row">Endpoint step / time</th><td>6300 / 0.9975</td></tr>
+            <tr><th scope="row">Peak speed</th><td>10.5415658</td></tr>
+            <tr><th scope="row">Kinetic energy</th><td>0.0309232733</td></tr>
+            <tr><th scope="row">RMS / maximum target deviation</th><td>0.00157084116 / 0.200991072</td></tr>
+            <tr><th scope="row">Half-peak support equivalent radius</th><td>0.0532769531</td></tr>
+            <tr><th scope="row">Finest-core half-peak equivalent radius</th><td>0.0505347204</td></tr>
+            <tr><th scope="row">Peak / RMS vorticity</th><td>3144.97245 / 13.8394391</td></tr>
+            <tr><th scope="row">Manufactured-force L² norm</th><td>100.733761</td></tr>
+            <tr><th scope="row">Sampled divergence RMS / maximum</th><td>0.302018277 / 153.534609</td></tr>
+          </tbody>
+        </table>
+        <p>This extension follows one grid-dependent trajectory beyond the spatially tested interval. It is a finite model extrapolation and does not add a spatial-convergence certificate. The separate refinement evidence identifies 0.615808–0.629071 as a provisional spatial candidate and supports local velocity timestep stability there; mixed residual behavior, material residual timestep sensitivity, and peaks outside the finest core still prevent a resolution-qualified precursor or likely-singularity claim. The analytical paper supplies the blowup result; this computation supplies finite pre-singular diagnostics only.</p>
         <!-- FINAL_CONTINUATION:END -->
         <h2>Reading the movies</h2>
         <p>The horizontal x–y slice stays at z = 0 and the vertical x–z slice stays at y = 0. Each plane samples the finest containing native cell at 256² display points without spatial smoothing. The isometric panel uses trilinear reconstruction of native magnitudes for visualization, retaining native center spacing in the core.</p>

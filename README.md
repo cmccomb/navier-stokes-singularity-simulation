@@ -168,13 +168,15 @@ The 32³-base control on Mali and the 96³-base intermediate run on Kay both
 completed their native audits. The 64³-base outer-band companion reached about
 `t=0.902` before its wall-clock guard stopped the process, leaving its native
 prefix and checkpoint intact. The completed, audited 128³ outer-band model is
-therefore the final production mesh. A bounded continuation from its `t=0.995`
-checkpoint toward `t=0.9975` is an explicitly extrapolative final run, not a
-new spatial-convergence certificate.
-After completion, `scripts/export_final_continuation_snapshot.py` freezes the
-accepted native endpoint, `scripts/outer_precursor_diagnostics.py` measures its
-field diagnostics, and `scripts/publish_final_continuation.py` requires both
-hash-bound artifacts before writing the public record and computed-step chart.
+therefore the final production mesh. Its bounded continuation from `t=0.995`
+completed at step 6300 and `t=0.9975`, with 320 native frames in the combined
+from-rest lineage. The [final record](site/data/final-continuation.json) binds
+the continuation, endpoint snapshot, field diagnostics, and
+[computed-step chart](site/media/final-continuation.svg). At the endpoint, peak
+speed is 10.5416, peak sampled vorticity is 3144.97, and the half-peak support
+equivalent radius is 0.05328. The sampled divergence maximum is 153.53, and the
+extension has no matched spatial-refinement certificate. It is an explicitly
+extrapolative finite run, not evidence of singularity formation.
 
 ## Earlier PhiFlow publication workflow
 
