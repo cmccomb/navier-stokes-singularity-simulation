@@ -91,7 +91,7 @@ def measure_raw(raw: Path, blocks: list[dict], expected: dict, core_width: float
     return {
         "peak_speed": peak,
         "peak_level": peak_level,
-        "peak_in_finest_core": peak_level == max(by_level) and peak_in_core,
+        "peak_in_finest_core": bool(peak_level == max(by_level) and peak_in_core),
         "kinetic_energy": energy,
         "force_l2": math.sqrt(force_sq / volume),
         "half_peak_support_volume": support_volume,

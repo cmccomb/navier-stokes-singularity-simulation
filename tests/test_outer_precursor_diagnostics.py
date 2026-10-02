@@ -1,5 +1,7 @@
 """Verify native block precursor measurements on simple vector fields."""
 
+import json
+
 import numpy as np
 import pytest
 
@@ -22,6 +24,7 @@ def test_constant_velocity_and_force_cover_full_active_domain(tmp_path):
     assert result["divergence_rms"] == pytest.approx(0)
     assert result["derivative_interior_volume"] == pytest.approx(6**3 * 0.25**3)
     assert result["finest_core_half_peak_equivalent_radius"] is None
+    assert json.loads(json.dumps(result))["peak_in_finest_core"] is False
 
 
 def test_solid_rotation_has_vorticity_two_and_zero_divergence(tmp_path):
