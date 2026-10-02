@@ -18,17 +18,17 @@
     <main class="docs-shell" id="content">
       <nav class="docs-nav" aria-label="Documentation pages"><a href="method.html">Model &amp; method</a><a href="running.html">Run it</a><a href="voxels.html">Native voxels</a><a href="rendering-3d.html" aria-current="page">3D rendering</a></nav>
       <article class="doc-page">
-        <p class="eyebrow">Current run · September 23, 2026</p>
+        <p class="eyebrow">Current run · October 2, 2026</p>
         <h1>One native history, three fixed views.</h1>
-        <p class="dek">Oliver’s complete 280-state trajectory appears as fixed x–y and x–z slices beside an isometric view, separately for velocity and applied force. Every view starts at exact rest and ends at t = 0.995.</p>
+        <p class="dek">The accepted 320-state lineage appears as fixed x–y and x–z slices beside an isometric view, separately for velocity and applied force. It joins the completed Oliver parent to the accepted Mali continuation, starts at exact rest, and ends at t = 0.9975.</p>
         <h2>Trace every image to the saved fields</h2>
         <p>The renderer reads the original float64 native AMReX blocks, including the irregular outer refinement bands. Covered coarse cells are excluded from independent volume, kinetic-energy, and peak-speed checks. The renderer checks these values against the solver diagnostics and verifies its center slices against an independent native slice exporter.</p>
-        <p>Every saved state carries source, native-block, geometry, and image hashes. The final movies require all 280 states, the exact saved-time sequence, fixed camera and color scales, and matching GIF/MP4 playback clocks. <a href="data/best.json">Completion record</a> · <a href="data/three-view.json">Rendering record</a></p>
+        <p>Every saved state carries source, native-block, geometry, and image hashes. The final movies require all 320 states, the exact saved-time sequence, fixed camera and color scales, and matching GIF/MP4 playback clocks. <a href="data/best.json">Completion record</a> · <a href="data/three-view.json">Rendering record</a></p>
         <h2>Display sampling</h2>
         <p>Each fixed slice uses 256² display samples from the finest containing native cell, with positive-side ownership at cell faces and no smoothing. The isometric view reconstructs scalar magnitudes linearly across same-level native boxes. Coarser reconstruction supplies uncovered stencil slots; the finest containing native cell determines ownership. Native cell centers are retained in the core. This is display interpolation, not additional solver resolution.</p>
         <p>Velocity surfaces use thresholds 0.15, 1.5, and 4 in model units; force surfaces use 10, 100, and 1000. Surface geometry is neither smoothed nor decimated. The cameras are orthographic and fixed through each full movie. The reference cube has half-width 0.5; the periodic simulation domain is [−1, 1]³.</p>
         <h2>Playback</h2>
-        <p>All 280 saved states appear with no interpolated times. Ordinary states hold for 0.2 seconds, the initial rest state for one second, and the endpoint for half a second. The total is 57.1 seconds. Simulation-time spacing is nonuniform, and the timestamp always identifies the original saved state.</p>
+        <p>All 320 saved states appear with no interpolated times. Ordinary states hold for 0.2 seconds, the initial rest state for one second, and the endpoint for half a second. The total is 65.1 seconds. Simulation-time spacing is nonuniform, and the timestamp always identifies the original saved state.</p>
         <h2>The mesh view</h2>
         <p>The static grid displays active native cell edges in the three central sections, including the outer bands. Covered coarse interiors are excluded. The rotatable view and the two fixed projections use the same exported native box geometry. The close-up retains the actual unchanged inner refinement interface.</p>
         <p><a href="results.html">Run details and numerical limits →</a></p>

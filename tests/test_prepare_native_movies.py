@@ -9,7 +9,12 @@ import numpy as np
 import pytest
 
 pytest.importorskip("zarr")
-from scripts.prepare_native_movies import check_fields, read_planes, rendered_image
+from scripts.prepare_native_movies import (
+    check_fields,
+    media_slug,
+    read_planes,
+    rendered_image,
+)
 from scripts.render_native_3d import composite_axes, sha
 from scripts.render_native_triptych import Triptych
 
@@ -74,6 +79,10 @@ def test_triptych_caption_uses_selected_run():
         fig.close()
 
 
+def test_media_slug_is_path_safe_for_multi_machine_lineage():
+    assert media_slug("Oliver + Mali") == "oliver-mali"
+
+
 def test_isometric_image_must_match_frame_source_and_hash(tmp_path):
     from PIL import Image
 
@@ -126,7 +135,7 @@ def test_current_field_documentation_matches_current_run():
     site = Path(__file__).parents[1] / "site"
     run = json.loads((site / "data/best.json").read_text())
     page = (site / "voxels.html").read_text()
-    assert run["machine"] == "Oliver" and run["parameters"]["base_n"] == 128
+    assert run["machine"] == "Oliver + Mali" and run["parameters"]["base_n"] == 128
     assert f'{run["stored_cells"]:,}' in page
     assert f'{run["active_cells"]:,}' in page
     assert "huggingface.co/spaces" not in page

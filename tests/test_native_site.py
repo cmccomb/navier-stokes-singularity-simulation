@@ -31,7 +31,7 @@ def test_homepage_keeps_mesh_interaction_without_the_data_explorer():
         < html.index('src="mesh-explorer.html?embed=whole&amp;v=outer128"')
     )
     assert 'id="flow-video"' in html and 'id="force-video"' in html
-    assert "All 280 saved states are included." in html
+    assert "All 320 audited states are included." in html
     assert 'href="voxels.html"' in (SITE / "documentation.html").read_text()
     script = (SITE / "native-explorer.js").read_text()
     assert "IntersectionObserver" in script and "observer.disconnect()" in script

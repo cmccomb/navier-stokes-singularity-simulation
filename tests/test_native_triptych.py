@@ -72,7 +72,7 @@ def test_published_triptychs_cover_exact_best_history():
                     hashlib.file_digest(stream, "sha256").hexdigest() == asset["sha256"]
                 )
         with Image.open(site / assets["gif"]["path"]) as gif:
-            assert gif.n_frames == 280 and gif.size == (1600, 640)
+            assert gif.n_frames == best["saved_frames"] and gif.size == (1600, 640)
             for i, hold in enumerate(best["playback"]["source_frame_duration_ms"]):
                 gif.seek(i)
                 assert gif.info["duration"] == hold

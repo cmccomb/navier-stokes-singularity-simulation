@@ -75,7 +75,9 @@ def stage(source, slices, movies, site, *, machine="Kay", run_id="refined-n128-l
         "source_binary_sha256": record["binary_sha256"],
         "source_checker_sha256": record["checker_sha256"],
         "completed_at": record.get("completed_at", record.get("updated_at")),
-        "elapsed_seconds": record.get("wall_seconds"),
+        "elapsed_seconds": (
+            None if record.get("continuation_provenance") else record.get("wall_seconds")
+        ),
         "parameters": record["parameters"],
         "profile": record["profile_manifest"]["parameters"],
         "stored_cells": final["stored_cells"],
@@ -101,6 +103,8 @@ def stage(source, slices, movies, site, *, machine="Kay", run_id="refined-n128-l
         "render": views,
         "scope": "Finite localized three-pulse manufactured-force surrogate; archive validation is not convergence certification or evidence of a singularity. 2048³-equivalent spacing applies only to the innermost refined cube, not the full domain.",
     }
+    if record.get("continuation_provenance"):
+        best["execution_lineage"] = record["continuation_provenance"]
 
     def write(path, obj):
         path.write_text(json.dumps(obj, indent=2) + "\n")

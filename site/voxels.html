@@ -20,12 +20,12 @@
         <a href="method.html">Model &amp; method</a><a href="running.html">Run it</a><a href="results.html">Numerical record</a><a href="refinement.html">Refined-mesh pilot</a><a href="voxels.html" aria-current="page">Native voxels</a>
       </nav>
       <article class="doc-page">
-        <p class="eyebrow">Guide 09 · September 23, 2026</p>
+        <p class="eyebrow">Guide 09 · October 2, 2026</p>
         <h1>The fields behind the movie.</h1>
-        <p class="dek">Oliver’s completed native archive preserves all three velocity and all three forcing components in float64 at each of the 280 saved states.</p>
+        <p class="dek">The completed parent and accepted continuation preserve all three velocity and all three forcing components in float64 at each of the 320 saved states.</p>
         <h2>The current archive</h2>
         <p>The fixed AMReX hierarchy covers [−1,1]³ with a 128³ base, four nested core refinements, and 27 outer refinement bands. Each state stores 12,055,040 cells; 10,810,304 remain active after covered coarse cells are excluded. The finest central spacing is 1/1024, equivalent to 2048³ only within the innermost cube.</p>
-        <p>The six-component raw payload is 551.84 MiB per state and approximately 150.89 GiB for the full history, before headers and checkpoints. The archive remains on Oliver. The site publishes its complete <a href="index.html#result">velocity and forcing movies</a>, <a href="data/best.json">completion record</a>, and <a href="mesh-explorer.html">native mesh</a>.</p>
+        <p>The six-component raw payload is 551.84 MiB per state and approximately 172.45 GiB across the 320-state history, before headers and checkpoints. The retained archive joins the Oliver parent to the accepted Mali continuation. The site publishes its complete <a href="index.html#result">velocity and forcing movies</a>, <a href="data/best.json">completion record</a>, and <a href="mesh-explorer.html">native mesh</a>.</p>
         <h2>Native cells and display samples</h2>
         <p>The x–y and x–z movie planes use a fixed 256 × 256 display grid and select the finest native cell containing each location. At cell boundaries the positive-side cell is selected. The display grid does not change the solver’s resolution. No peak-following slice, vector arrows, or temporal interpolation is used.</p>
         <p>The isometric surfaces reconstruct native scalar magnitudes with fixed thresholds. Irregular fine boxes own only the locations they cover; uncovered regions retain coarse ownership. Same-level box boundaries are joined for reconstruction, and the native core centers are preserved. <a href="rendering-3d.html">Rendering method →</a></p>

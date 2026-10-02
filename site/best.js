@@ -2,8 +2,8 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
 function asset(record) {
   const url = new URL(record.path, window.location.href);
-  if (url.origin !== window.location.origin || !/^media\/oliver-(flow|force)-views\.(gif|mp4|png)$/.test(record.path)) {
-    throw new Error("Expected a current Oliver media asset");
+  if (url.origin !== window.location.origin || !/^media\/oliver-mali-(flow|force)-views\.(gif|mp4|png)$/.test(record.path)) {
+    throw new Error("Expected a current final-lineage media asset");
   }
   url.searchParams.set("v", record.sha256.slice(0, 12));
   return url.href;

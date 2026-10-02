@@ -46,7 +46,7 @@ async function exercise(reduced, invalidRecord = false, invalidViews = false, wr
       assert.equal(nodes.get(`${kind}-pending`).hidden, false);
       assert(nodes.get(`${kind}-pending`).textContent.includes("metadata unavailable"));
       assert.equal(nodes.get(`${kind}-figure`).hidden, false);
-      assert(html.includes(`href="media/oliver-${kind}-views.gif?v=outer128"`));
+      assert(html.includes(`href="media/oliver-mali-${kind}-views.gif?v=final320"`));
     }
     return;
   }
@@ -68,7 +68,7 @@ async function exercise(reduced, invalidRecord = false, invalidViews = false, wr
     assert.equal(nodes.get(`${kind}-pending`).hidden, false);
     assert(nodes.get(`${kind}-pending`).textContent.includes("GIF download"));
   }
-  assert(captions.every((c) => c.textContent.includes("280 saved frames")));
+  assert(captions.every((c) => c.textContent.includes("320 saved frames")));
 }
 exercise(false).then(() => exercise(true)).then(() => exercise(false, true))
   .then(() => exercise(false, false, true)).then(() => exercise(false, false, false, true))

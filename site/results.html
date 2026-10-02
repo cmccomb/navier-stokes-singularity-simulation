@@ -46,7 +46,7 @@
             <tr><th scope="row">Integration wall time</th><td>131.20 hours, before the final archive audit</td></tr>
           </tbody>
         </table>
-        <p>The <a href="data/best.json">completion record</a> and <a href="data/three-view.json">movie record</a> bind every displayed state to this run. The flow, force, and mesh views all use Oliver’s outer-refinement geometry. The two movies share one saved-time clock.</p>
+        <p>The current <a href="data/best.json">completion record</a> and <a href="data/three-view.json">movie record</a> bind all 320 displayed states to the accepted lineage: this 280-state Oliver parent followed by the 40-state Mali continuation through t = 0.9975. The flow, force, and mesh views use the same outer-refinement geometry, and the two movies share one saved-time clock.</p>
         <h2>What the checks establish</h2>
         <p>The complete from-rest history, output clock, native archive, and implemented discrete-force readback are verified. RMS and maximum component deviations compare the computed velocity against the prescribed target on active native cells. They do not measure error against an independently known continuum solution.</p>
         <p>The finite manufactured force depends on grid spacing. The finest core spacing is 1/1024, and core convergence remains unproven. This finite run stops before t = 1 and cannot establish singularity formation or the paper’s infinite all-order cancellation construction.</p>
@@ -182,7 +182,7 @@
         <!-- FINAL_CONTINUATION:END -->
         <h2>Reading the movies</h2>
         <p>The horizontal x–y slice stays at z = 0 and the vertical x–z slice stays at y = 0. Each plane samples the finest containing native cell at 256² display points without spatial smoothing. The isometric panel uses trilinear reconstruction of native magnitudes for visualization, retaining native center spacing in the core.</p>
-        <p>All 280 saved states appear in order. Ordinary states hold for 0.2 seconds, the initial rest state for one second, and the endpoint for half a second. GIFs and MP4s use the same holds. Saved simulation times become closer together toward the endpoint, so the playback clock is not proportional to simulation time.</p>
+        <p>All 320 saved states appear in order. Ordinary states hold for 0.2 seconds, the initial rest state for one second, and the endpoint for half a second. GIFs and MP4s use the same holds for a total of 65.1 seconds. Saved simulation times become closer together toward the endpoint, so the playback clock is not proportional to simulation time.</p>
         <p><a href="rendering-3d.html">Rendering and verification details →</a></p>
 
         <nav class="page-links" aria-label="Adjacent documentation"><a href="running.html">← Run it</a><a href="reproduction.html">Reproduction target →</a></nav>

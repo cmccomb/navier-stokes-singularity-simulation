@@ -3,7 +3,7 @@
   "kind": "native-three-view",
   "validated": true,
   "complete_history": true,
-  "saved_frames": 280,
+  "saved_frames": 320,
   "frame_times": [
     0,
     0.025,
@@ -284,16 +284,56 @@
     0.9948075541508846,
     0.9948979738218752,
     0.9949868189522466,
-    0.995
+    0.995,
+    0.9950870684775711,
+    0.995172620771185,
+    0.9952566832832075,
+    0.9953392819562414,
+    0.9954204422811332,
+    0.9955001893048394,
+    0.9955785476381566,
+    0.9956555414633165,
+    0.9957311945414485,
+    0.9958055302199134,
+    0.9958785714395073,
+    0.9959503407415434,
+    0.9960208602748066,
+    0.9960901518023899,
+    0.9961582367084099,
+    0.9962251360046074,
+    0.9962908703368308,
+    0.9963554599914081,
+    0.9964189249014072,
+    0.9964812846527877,
+    0.9965425584904455,
+    0.9966027653241512,
+    0.9966619237343867,
+    0.9967200519780793,
+    0.9967771679942358,
+    0.9968332894094776,
+    0.9968884335434824,
+    0.9969426174143287,
+    0.996995857743746,
+    0.9970481709622778,
+    0.9970995732143508,
+    0.9971500803632574,
+    0.9971997079960517,
+    0.9972484714283594,
+    0.9972963857091047,
+    0.9973434656251542,
+    0.997389725705881,
+    0.9974351802276474,
+    0.997479843218212,
+    0.9975
   ],
   "view_order": [
     "xy",
     "xz",
     "isometric"
   ],
-  "source_record_sha256": "afe8898110109ff25600c3cb58e3a9911b5baf6f6f8f7f14ff3dbbd826ded97c",
-  "prepared_manifest_sha256": "92dd9d645f5f5b01faf0c3a5896b21c9d098ecb3a60cbcc3e1b436314125162e",
-  "renderer_sha256": "9cc2b0f3bb759eecd887582862d579f456323bc80be6929569974db7860ca74c",
+  "source_record_sha256": "b9f99e8d794d824224070ed02f69ed414ebfdbc45f3913e1d8a2c9c881fb5bfc",
+  "prepared_manifest_sha256": "b9af05660cdc9cb4b596f73a39739bc137b32fb79a7bf81d0ff1ac9b5e1c63b8",
+  "renderer_sha256": "beeb886ca0ba5603b66de4a79a52ce5553e5828de8648bda13fff9f6f8b59d0a",
   "surface_sampling": "Native scalar magnitudes on irregular AMR boxes; trilinear display reconstruction across same-level box boundaries, coarse reconstruction in uncovered stencil slots, and finest containing native-cell ownership. Native core centers retained; no surface smoothing, decimation, or time interpolation.",
   "display_shape": [
     424,
@@ -317,8 +357,8 @@
     ]
   },
   "slice_color_max": {
-    "flow": 7.3680171148305105,
-    "force": 13773.338217096023
+    "flow": 10.440849296362487,
+    "force": 38667.778724277945
   },
   "isometric_parallel_scale": {
     "flow": 1.65,
@@ -326,52 +366,52 @@
   },
   "media": {
     "flow": {
-      "saved_states": 280,
-      "duration_seconds": 57.1,
+      "saved_states": 320,
+      "duration_seconds": 65.1,
       "width": 2400,
       "height": 960,
       "files": {
         "gif": {
-          "name": "oliver-flow-views.gif",
-          "sha256": "7076737063cd66acc052e9222022c2a4f407378455cf3ca7c71d73cd4ccf79cb",
-          "path": "media/oliver-flow-views.gif"
+          "name": "oliver-mali-flow-views.gif",
+          "sha256": "d1e439a806e03b935e26b78adbf1603b161f4385293b11598f1d034469ae3275",
+          "path": "media/oliver-mali-flow-views.gif"
         },
         "mp4": {
-          "name": "oliver-flow-views.mp4",
-          "sha256": "08e1cd6ad829dadb4067db4cd62f64f141dfd1fd2503929488e3e9c95b7ca315",
-          "path": "media/oliver-flow-views.mp4"
+          "name": "oliver-mali-flow-views.mp4",
+          "sha256": "a2a67a756d4a9999ca3cca0d809c2db3e65602dd7f791c6e3c7d924bed8bbf71",
+          "path": "media/oliver-mali-flow-views.mp4"
         },
         "png": {
-          "name": "oliver-flow-views.png",
-          "sha256": "214689ef5fe5a86d281b7e5e365f958e8b25e40fa0cced488ee9ee65c7bb48ae",
-          "path": "media/oliver-flow-views.png"
+          "name": "oliver-mali-flow-views.png",
+          "sha256": "9e2f77d4ab8ea2f4b389722af2f6d1f3feb8f3311d23cb6c8e88c25ec0822c56",
+          "path": "media/oliver-mali-flow-views.png"
         }
       }
     },
     "force": {
-      "saved_states": 280,
-      "duration_seconds": 57.1,
+      "saved_states": 320,
+      "duration_seconds": 65.1,
       "width": 2400,
       "height": 960,
       "files": {
         "gif": {
-          "name": "oliver-force-views.gif",
-          "sha256": "b1d1c3c6e72889f9986add38ddec0430da7a88219374d7ea902aa2c272e6377a",
-          "path": "media/oliver-force-views.gif"
+          "name": "oliver-mali-force-views.gif",
+          "sha256": "c2a5e679a9d7cff2b27486046865d3109a2b2159dd9a9c47a2fabced258521db",
+          "path": "media/oliver-mali-force-views.gif"
         },
         "mp4": {
-          "name": "oliver-force-views.mp4",
-          "sha256": "4857541da4d4ec169cf6dd3c7b8cf933c565d662235037bad6620f71d936b507",
-          "path": "media/oliver-force-views.mp4"
+          "name": "oliver-mali-force-views.mp4",
+          "sha256": "ca3dee60c7430d67f7da0cc328b9148bf11a667da950b3bb0991563029682c9d",
+          "path": "media/oliver-mali-force-views.mp4"
         },
         "png": {
-          "name": "oliver-force-views.png",
-          "sha256": "0cdea2121b515a98c044dae1db751ee5d318622da3089eefd74cee16789d3ec5",
-          "path": "media/oliver-force-views.png"
+          "name": "oliver-mali-force-views.png",
+          "sha256": "d12120fcc0aa850b88b7e943c85d6109e7f093ef8dce68976df7e46a63a707e0",
+          "path": "media/oliver-mali-force-views.png"
         }
       }
     }
   },
-  "isometric_manifest_sha256": "da6576787b7fc82c113fc4353eddf90c8e893f8889441207e3976d5c8591f2a6",
+  "isometric_manifest_sha256": "68e3456d02a8ca938a5003914f12dcee919cb3596dc064071fc7f67b4c3dafee",
   "camera_policy": "Fixed physical scales selected before image generation; every native surface checked for clipping; no per-frame zoom"
 }

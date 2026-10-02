@@ -11,6 +11,7 @@ import gzip
 import hashlib
 import json
 import os
+import re
 import shutil
 import subprocess
 import tempfile
@@ -36,6 +37,14 @@ from scripts.render_native_triptych import FORCE_THRESHOLDS, Triptych, center_pl
 
 def write(path, data):
     path.write_text(json.dumps(data, indent=2) + "\n")
+
+
+def media_slug(machine):
+    """Return a stable path-safe label for the rendering machine lineage."""
+    slug = re.sub(r"[^a-z0-9]+", "-", machine.lower()).strip("-")
+    if not slug:
+        raise ValueError("Machine label does not contain a path-safe character")
+    return slug
 
 
 def read_planes(cache, frame):
@@ -526,7 +535,10 @@ def render(args):
             if scene is not None:
                 scene.close()
         report["media"][q] = encode_frames(
-            folder, args.output / f"{manifest['machine'].lower()}-{q}-views", times, gif_size=(1600, 640)
+            folder,
+            args.output / f"{media_slug(manifest['machine'])}-{q}-views",
+            times,
+            gif_size=(1600, 640),
         )
     write(args.output / "manifest.json", report)
 
